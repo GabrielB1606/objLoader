@@ -35,13 +35,18 @@ struct Vertex{
 
 // TRIANGLE
 Vertex vertices[] = {
-    glm::vec3(0.0f, 0.5f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f),
+    glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f),
     glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f),
-    glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f)
+    glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f),
+
+    glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(1.f, 1.f, 0.f), glm::vec2(0.f, 0.f)
 };
-unsigned nrOfVertices = 3;
-GLuint indices[] = { 0, 1, 2 };
-unsigned nrOfIndices = 3;
+unsigned nrOfVertices = sizeof(vertices)/sizeof(Vertex);
+GLuint indices[] = {
+    0, 1, 2,
+    0, 2, 3
+};
+unsigned nrOfIndices = sizeof(indices)/sizeof(GLuint);
 
 //FUNCTIONS
 void INIT_GLFW()
@@ -213,7 +218,7 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINES for outlines
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINE for outlines
 
     // SHADER INIT
     GLuint core_program;
@@ -252,10 +257,24 @@ int main()
     // BIND VAO 0
     glBindVertexArray(0);
 
+    // matrix stuff
+    glm::mat4 ModelMatrix(1.f);
+    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
+
+    glUseProgram(core_program);
+    
+    glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
+    glUseProgram(0);
+
 	 //MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
-		currentFrame = glfwGetTime();
+		currentFrame = (GLfloat)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -270,12 +289,21 @@ int main()
 
         // Draw
         glUseProgram(core_program);
+
+        // update uniforms
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(deltaTime * 15.f), glm::vec3(0.f, 0.f, 1.f));
+        glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+        // glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//Swap buffers
 		glfwSwapBuffers(window);
         glFlush();
+
+        glBindVertexArray(0);
+        glUseProgram(0);
 	}
 
 	//TERMINATE GLFW
