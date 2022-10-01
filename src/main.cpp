@@ -26,6 +26,23 @@ GLfloat currentFrame = 0.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+// STRUCT VERTEX
+struct Vertex{
+    glm::vec3 position;
+    glm::vec3 color;
+    glm::vec2 textcoord;
+};
+
+// TRIANGLE
+Vertex vertices[] = {
+    glm::vec3(0.0f, 0.5f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f),
+    glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f),
+    glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f)
+};
+unsigned nrOfVertices = 3;
+GLuint indices[] = { 0, 1, 2 };
+unsigned nrOfIndices = 3;
+
 //FUNCTIONS
 void INIT_GLFW()
 {
@@ -45,8 +62,8 @@ void INIT_GLEW()
 
 GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &screenH)
 {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
@@ -63,7 +80,7 @@ GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &sc
 
 	glfwMakeContextCurrent(window);
 
-	glViewport(0, 0, screenW, screenH);
+	// glViewport(0, 0, screenW, screenH);
 
 	//glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_BLEND);
@@ -164,6 +181,13 @@ bool loadShaders(GLuint &program){
 
 }
 
+void updateInput(GLFWwindow* window){
+
+    if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+}
+
 int main()
 {
 	int screenW = 0, screenH = 0;
@@ -177,40 +201,82 @@ int main()
 	//INIT CONTEXT FOR OPENGL
 	INIT_GLEW();
 
+    // OPENGL OPTIONS
+    glEnable(GL_DEPTH_TEST);
+
+    	//BACKFACE CULLING AND CC
+	glEnable(GL_CULL_FACE); // cull face
+	glCullFace(GL_BACK); // cull back face
+	glFrontFace(GL_CCW); // GL_CCW for counter clock-wise
+
+        // BLENDING COLORS
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINES for outlines
+
+    // SHADER INIT
     GLuint core_program;
     loadShaders(core_program);
 
-	//BACKFACE CULLING AND CC
-	// glEnable(GL_CULL_FACE); // cull face
-	// glCullFace(GL_BACK); // cull back face
-	// glFrontFace(GL_CCW); // GL_CCW for counter clock-wise
+    // VAO
+    GLuint VAO;
+    glCreateVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // VBO
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // could be dynamic draw
+
+    // EBO
+    GLuint EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // VERTEXATTRIBUTEPOINTERS AND ENABLE (INPUT ASSEMBLY)
+        // POSITION
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+    glEnableVertexAttribArray(0);
+
+        // COLOR
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+    glEnableVertexAttribArray(1);
+
+        // TEXTCOORD
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, textcoord));
+    glEnableVertexAttribArray(2);
+
+    // BIND VAO 0
+    glBindVertexArray(0);
 
 	 //MAIN LOOP
-	// while (!glfwWindowShouldClose(window))
-	// {
-	// 	currentFrame = glfwGetTime();
-	// 	deltaTime = currentFrame - lastFrame;
-	// 	lastFrame = currentFrame;
+	while (!glfwWindowShouldClose(window))
+	{
+		currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
-	// 	glfwPollEvents();
+		glfwPollEvents();
 
-	// 	//Update
+		//Update
+        updateInput(window);
 
-	// 	//Clear window
-	// 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-	// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//Clear window
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	// 	//Draw
-    //     glColor3i(255,0,0);
-    //     glBegin(GL_TRIANGLE_FAN);
-    //         glVertex2i(100, 0);
-    //         glVertex2i(100, 100);
-    //         glVertex2i(50, 50);
-    //     glEnd();
+        // Draw
+        glUseProgram(core_program);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
 
-	// 	//Swap buffers
-	// 	glfwSwapBuffers(window);
-	// }
+		//Swap buffers
+		glfwSwapBuffers(window);
+        glFlush();
+	}
 
 	//TERMINATE GLFW
     glfwDestroyWindow(window);
