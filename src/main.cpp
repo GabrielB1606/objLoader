@@ -195,13 +195,13 @@ void updateInput(GLFWwindow* window){
 
 int main()
 {
-	int screenW = 0, screenH = 0;
+	int bufferScreenW = 0, bufferScreenH = 0;
 
 	//INIT GLFW
 	INIT_GLFW();
 
 	//INIT GLFW WINDOW
-	GLFWwindow *window = INIT_WINDOW(WIDTH, HEIGHT, screenW, screenH);
+	GLFWwindow *window = INIT_WINDOW(WIDTH, HEIGHT, bufferScreenW, bufferScreenH);
 
 	//INIT CONTEXT FOR OPENGL
 	INIT_GLEW();
@@ -258,6 +258,7 @@ int main()
     glBindVertexArray(0);
 
     // matrix stuff
+        // Model
     glm::mat4 ModelMatrix(1.f);
     ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f));
     ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
@@ -265,9 +266,25 @@ int main()
     ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
     ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
 
+        // View
+    glm::vec3 worldUp(0.f, 1.f, 0.f);
+    glm::vec3 camPosition(0.f, 0.f, 1.f);
+    glm::vec3 camFront(0.f, 0.f, -1.f);
+    glm::mat4 ViewMatrix(1.f);
+    ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+
+        // Projection
+    float fov = 90.f;
+    float nearPlane = 0.1f;
+    float farPlane = 1000.f;
+    glm::mat4 ProjectionMatrix(1.f);
+    ProjectionMatrix = glm::perspective( glm::radians(fov), static_cast<float>(bufferScreenW)/bufferScreenH, nearPlane, farPlane );
+
     glUseProgram(core_program);
     
     glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(core_program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
     glUseProgram(0);
 
@@ -293,6 +310,12 @@ int main()
         // update uniforms
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians(deltaTime * 15.f), glm::vec3(0.f, 0.f, 1.f));
         glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
+        ProjectionMatrix = glm::mat4(1.f);
+        glfwGetFramebufferSize(window, &bufferScreenW, &bufferScreenH);
+        ProjectionMatrix = glm::perspective( glm::radians(fov), static_cast<float>(bufferScreenW)/bufferScreenH, nearPlane, farPlane );
+        glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
