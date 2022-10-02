@@ -25,21 +25,22 @@ const GLint WIDTH = 1280, HEIGHT = 720;
 GLfloat currentFrame = 0.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+GLfloat movementSpeed = 0.3f;
 
 // STRUCT VERTEX
 struct Vertex{
     glm::vec3 position;
     glm::vec3 color;
     glm::vec2 textcoord;
+    glm::vec2 normal;
 };
 
 // TRIANGLE
 Vertex vertices[] = {
-    glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f),
-    glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f),
-    glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f),
-
-    glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(1.f, 1.f, 0.f), glm::vec2(0.f, 0.f)
+    glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f), glm::vec3(0.f, 0.f, -1.f),
+    glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, -1.f),
+    glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f), glm::vec3(0.f, 0.f, -1.f),
+    glm::vec3(0.5f, 0.5f, 0.f),     glm::vec3(1.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, -1.f)
 };
 unsigned nrOfVertices = sizeof(vertices)/sizeof(Vertex);
 GLuint indices[] = {
@@ -186,10 +187,43 @@ bool loadShaders(GLuint &program){
 
 }
 
-void updateInput(GLFWwindow* window){
+void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale, glm::vec3& lightPos){
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    
+    if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
+        position.z -= movementSpeed * deltaTime;
+    
+    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+        position.z += movementSpeed * deltaTime;
+    
+    if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
+        position.x -= movementSpeed * deltaTime;
+    
+    if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
+        position.x += movementSpeed * deltaTime;
+
+    if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
+        rotation.y += 100 * movementSpeed * deltaTime;
+
+    if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
+        rotation.y -= 100 * movementSpeed * deltaTime;
+    
+    if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
+        scale -= movementSpeed * deltaTime;
+    
+    if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
+        scale += movementSpeed * deltaTime;
+
+    if( glfwGetKey(window, GLFW_KEY_UP) )
+        lightPos.z += movementSpeed * 2 *deltaTime;
+    if( glfwGetKey(window, GLFW_KEY_DOWN) )
+        lightPos.z -= movementSpeed * 2 *deltaTime;
+    if( glfwGetKey(window, GLFW_KEY_LEFT) )
+        lightPos.x -= movementSpeed * 2 *deltaTime;
+    if( glfwGetKey(window, GLFW_KEY_RIGHT) )
+        lightPos.x += movementSpeed * 2 *deltaTime;
 
 }
 
@@ -254,17 +288,26 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, textcoord));
     glEnableVertexAttribArray(2);
 
+        // NORMAL
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(3);
+
     // BIND VAO 0
     glBindVertexArray(0);
+
+    // object parameters
+    glm::vec3 position(0.f);
+    glm::vec3 rotation(0.f);
+    glm::vec3 scale(1.f);
 
     // matrix stuff
         // Model
     glm::mat4 ModelMatrix(1.f);
-    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
-    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
+    ModelMatrix = glm::translate(ModelMatrix, position);
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.x ), glm::vec3(1.f, 0.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f));
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3( scale ));
 
         // View
     glm::vec3 worldUp(0.f, 1.f, 0.f);
@@ -280,11 +323,18 @@ int main()
     glm::mat4 ProjectionMatrix(1.f);
     ProjectionMatrix = glm::perspective( glm::radians(fov), static_cast<float>(bufferScreenW)/bufferScreenH, nearPlane, farPlane );
 
+    // lights
+    glm::vec3 lightPos0(0.f, 0.f, 2.f);
+
+    // init uniforms
     glUseProgram(core_program);
     
     glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
     glUniformMatrix4fv(glGetUniformLocation(core_program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+
+    glUniform3fv( glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0) );
+    glUniform3fv( glGetUniformLocation(core_program, "camPosition"), 1, glm::value_ptr(camPosition) );
 
     glUseProgram(0);
 
@@ -298,7 +348,7 @@ int main()
 		glfwPollEvents();
 
 		//Update
-        updateInput(window);
+        updateInput(window, position, rotation, scale, lightPos0);
 
 		//Clear window
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -308,8 +358,22 @@ int main()
         glUseProgram(core_program);
 
         // update uniforms
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians(deltaTime * 15.f), glm::vec3(0.f, 0.f, 1.f));
+        // position.z -= 0.001f;
+        // rotation.y += 90.f * deltaTime;
+        // lightPos0.y += 0.5f *deltaTime;
+        // lightPos0.x += 0.5f *deltaTime;
+        glUniform3fv( glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0) );
+
+        ModelMatrix = glm::mat4(1.f);
+
+        ModelMatrix = glm::translate(ModelMatrix, position);
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.x ), glm::vec3(1.f, 0.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f));
+        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3( scale ));
+
         glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+
 
         ProjectionMatrix = glm::mat4(1.f);
         glfwGetFramebufferSize(window, &bufferScreenW, &bufferScreenH);
