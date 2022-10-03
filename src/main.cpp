@@ -1,24 +1,4 @@
-//STANDARD
-#include<iostream>
-#include<stdlib.h>
-#include<time.h>
-#include<fstream>
-#include <string>
-
-//GLEW
-#include<GL\glew.h>
-
-//GLFW
-#include<GLFW\glfw3.h>
-
-//OPENGL MATH GLM
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp>
-
-using namespace std;
+#include "includes.h"
 
 //GLOBALS
 const GLint WIDTH = 1280, HEIGHT = 720;
@@ -27,13 +7,6 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 GLfloat movementSpeed = 0.3f;
 
-// STRUCT VERTEX
-struct Vertex{
-    glm::vec3 position;
-    glm::vec3 color;
-    glm::vec2 textcoord;
-    glm::vec2 normal;
-};
 
 // TRIANGLE
 Vertex vertices[] = {
@@ -93,98 +66,6 @@ GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &sc
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return window;
-}
-
-bool loadShaders(GLuint &program){
-    char infoLog[512];
-    GLint success;
-
-    std::string temp = "";
-    std::string src = "";
-
-    std::ifstream in_file;
-
-    // vertex
-    in_file.open("../../shaders/vertex_core.glsl");
-
-    if(in_file.is_open()){
-
-        while( std::getline(in_file, temp) ){
-            src += temp + "\n";
-        }
-
-    }else{
-        std::cout << "shader didn't open lol\n";
-        return false;
-    }
-
-    in_file.close();
-
-    GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
-    const GLchar* vertSrc = src.c_str();
-    glShaderSource( vertexShader, 1, &vertSrc, NULL );
-    glCompileShader(vertexShader);
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if( !success ){
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "vertex shader compile error:\n" << infoLog << "\n";
-        return false;
-    }
-
-    // fragment
-
-    temp = "";
-    src = "";
-
-    in_file.open("../../shaders/fragment_core.glsl");
-
-    if(in_file.is_open()){
-
-        while( std::getline(in_file, temp) ){
-            src += temp + "\n";
-        }
-
-    }else{
-        std::cout << "shader didn't open lol\n";
-        return false;
-    }
-
-    in_file.close();
-
-    GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
-    const GLchar* fragSrc = src.c_str();
-    glShaderSource( fragmentShader, 1, &fragSrc, NULL );
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if( !success ){
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "fragment shader compile error:\n" << infoLog << "\n";
-        return false;
-    }
-
-    // program
-    program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-
-    glLinkProgram(program);
-
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if( !success ){
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cout << "program link error:\n" << infoLog << "\n";
-        return false;
-    }
-
-    // end
-    glUseProgram(0);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return true;
-
 }
 
 void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale, glm::vec3& lightPos){
@@ -255,8 +136,7 @@ int main()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINE for outlines
 
     // SHADER INIT
-    GLuint core_program;
-    loadShaders(core_program);
+    Shader core_program("../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl");
 
     // VAO
     GLuint VAO;
@@ -327,16 +207,13 @@ int main()
     glm::vec3 lightPos0(0.f, 0.f, 2.f);
 
     // init uniforms
-    glUseProgram(core_program);
     
-    glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(core_program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+    core_program.setMat4fv(ModelMatrix, "ModelMatrix");
+    core_program.setMat4fv(ViewMatrix, "ViewMatrix");
+    core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
-    glUniform3fv( glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0) );
-    glUniform3fv( glGetUniformLocation(core_program, "camPosition"), 1, glm::value_ptr(camPosition) );
-
-    glUseProgram(0);
+    core_program.setVec3f(lightPos0, "lightPos0");
+    core_program.setVec3f(camPosition, "camPosition");
 
 	 //MAIN LOOP
 	while (!glfwWindowShouldClose(window))
@@ -355,14 +232,14 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // Draw
-        glUseProgram(core_program);
 
         // update uniforms
         // position.z -= 0.001f;
         // rotation.y += 90.f * deltaTime;
         // lightPos0.y += 0.5f *deltaTime;
         // lightPos0.x += 0.5f *deltaTime;
-        glUniform3fv( glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0) );
+        core_program.setVec3f(lightPos0, "lightPos0");
+        
 
         ModelMatrix = glm::mat4(1.f);
 
@@ -372,14 +249,15 @@ int main()
         ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3( scale ));
 
-        glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
-
+        core_program.setMat4fv(ModelMatrix, "ModelMatrix");
 
         ProjectionMatrix = glm::mat4(1.f);
         glfwGetFramebufferSize(window, &bufferScreenW, &bufferScreenH);
         ProjectionMatrix = glm::perspective( glm::radians(fov), static_cast<float>(bufferScreenW)/bufferScreenH, nearPlane, farPlane );
-        glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 
+        core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
+
+        core_program.use();        
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
@@ -390,13 +268,12 @@ int main()
         glFlush();
 
         glBindVertexArray(0);
-        glUseProgram(0);
+        core_program.stopUsing();
 	}
 
 	//TERMINATE GLFW
     glfwDestroyWindow(window);
 	glfwTerminate();
-    glDeleteProgram(core_program);
 
 	return 0;
 }
