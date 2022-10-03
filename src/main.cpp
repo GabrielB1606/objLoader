@@ -5,7 +5,7 @@ const GLint WIDTH = 1280, HEIGHT = 720;
 GLfloat currentFrame = 0.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-GLfloat movementSpeed = 0.3f;
+const GLfloat movementSpeed = 0.3f;
 
 
 // TRIANGLE
@@ -68,34 +68,34 @@ GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &sc
 	return window;
 }
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale, glm::vec3& lightPos){
+void updateInput(GLFWwindow* window, Mesh* objectSelected, glm::vec3& lightPos){
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     
     if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
-        position.z -= movementSpeed * deltaTime;
+        objectSelected->move( glm::vec3( 0.f, 0.f,  -movementSpeed * deltaTime ) );
     
     if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
-        position.z += movementSpeed * deltaTime;
+        objectSelected->move( glm::vec3( 0.f, 0.f,  movementSpeed * deltaTime ) );
     
     if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
-        position.x -= movementSpeed * deltaTime;
+        objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
     
     if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
-        position.x += movementSpeed * deltaTime;
+        objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
 
     if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-        rotation.y += 100 * movementSpeed * deltaTime;
+        objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
 
     if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
-        rotation.y -= 100 * movementSpeed * deltaTime;
+        objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
     
     if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-        scale -= movementSpeed * deltaTime;
+        objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
     
     if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-        scale += movementSpeed * deltaTime;
+        objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
 
     if( glfwGetKey(window, GLFW_KEY_UP) )
         lightPos.z += movementSpeed * 2 *deltaTime;
@@ -140,58 +140,7 @@ int main()
 
     Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
 
-    // VAO
-    GLuint VAO;
-    glCreateVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // VBO
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // could be dynamic draw
-
-    // EBO
-    GLuint EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // VERTEXATTRIBUTEPOINTERS AND ENABLE (INPUT ASSEMBLY)
-        // POSITION
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-    glEnableVertexAttribArray(0);
-
-        // COLOR
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-    glEnableVertexAttribArray(1);
-
-        // TEXTCOORD
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, textcoord));
-    glEnableVertexAttribArray(2);
-
-        // NORMAL
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-    glEnableVertexAttribArray(3);
-
-    // BIND VAO 0
-    glBindVertexArray(0);
-
     Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f));
-
-    // object parameters
-    glm::vec3 position(0.f);
-    glm::vec3 rotation(0.f);
-    glm::vec3 scale(1.f);
-
-    // matrix stuff
-        // Model
-    glm::mat4 ModelMatrix(1.f);
-    ModelMatrix = glm::translate(ModelMatrix, position);
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.x ), glm::vec3(1.f, 0.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f));
-    ModelMatrix = glm::scale(ModelMatrix, glm::vec3( scale ));
 
         // View
     glm::vec3 worldUp(0.f, 1.f, 0.f);
@@ -211,8 +160,6 @@ int main()
     glm::vec3 lightPos0(0.f, 0.f, 2.f);
 
     // init uniforms
-    
-    core_program.setMat4fv(ModelMatrix, "ModelMatrix");
     core_program.setMat4fv(ViewMatrix, "ViewMatrix");
     core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
@@ -229,7 +176,7 @@ int main()
 		glfwPollEvents();
 
 		//Update
-        updateInput(window, position, rotation, scale, lightPos0);
+        updateInput(window, &test, lightPos0);
 
 		//Clear window
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -238,22 +185,8 @@ int main()
         // Draw
 
         // update uniforms
-        // position.z -= 0.001f;
-        // rotation.y += 90.f * deltaTime;
-        // lightPos0.y += 0.5f *deltaTime;
-        // lightPos0.x += 0.5f *deltaTime;
         core_program.setVec3f(lightPos0, "lightPos0");
-        
-
-        ModelMatrix = glm::mat4(1.f);
-
-        ModelMatrix = glm::translate(ModelMatrix, position);
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.x ), glm::vec3(1.f, 0.f, 0.f));
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f));
-        ModelMatrix = glm::rotate(ModelMatrix, glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f));
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3( scale ));
-
-        core_program.setMat4fv(ModelMatrix, "ModelMatrix");
+    
 
         ProjectionMatrix = glm::mat4(1.f);
         glfwGetFramebufferSize(window, &bufferScreenW, &bufferScreenH);
@@ -261,12 +194,7 @@ int main()
 
         core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
-        material0.sendToShader(core_program);
-
-        core_program.use();        
-
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+        material0.sendToShader(core_program);   
 
         test.render(&core_program);
 
