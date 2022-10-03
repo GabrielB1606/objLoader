@@ -20,5 +20,6 @@
 
 #include "Shader.h"
 #include "Vertex.h"
+#include "Material.h"
 
 using namespace std;

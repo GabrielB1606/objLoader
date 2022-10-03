@@ -175,6 +175,8 @@ int main()
     // BIND VAO 0
     glBindVertexArray(0);
 
+    Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f));
+
     // object parameters
     glm::vec3 position(0.f);
     glm::vec3 rotation(0.f);
@@ -256,6 +258,8 @@ int main()
         ProjectionMatrix = glm::perspective( glm::radians(fov), static_cast<float>(bufferScreenW)/bufferScreenH, nearPlane, farPlane );
 
         core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
+
+        material0.sendToShader(core_program);
 
         core_program.use();        
 
