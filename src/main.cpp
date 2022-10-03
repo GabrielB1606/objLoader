@@ -10,10 +10,10 @@ GLfloat movementSpeed = 0.3f;
 
 // TRIANGLE
 Vertex vertices[] = {
-    glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f), glm::vec3(0.f, 0.f, -1.f),
-    glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, -1.f),
-    glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f), glm::vec3(0.f, 0.f, -1.f),
-    glm::vec3(0.5f, 0.5f, 0.f),     glm::vec3(1.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, -1.f)
+    glm::vec3(-0.5f, 0.5f, 0.f),    glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f), glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(-0.5f, -0.5f, 0.f),   glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f), glm::vec3(0.f, 0.f, 1.f),
+    glm::vec3(0.5f, 0.5f, 0.f),     glm::vec3(1.f, 1.f, 0.f), glm::vec2(0.f, 0.f), glm::vec3(0.f, 0.f, 1.f)
 };
 unsigned nrOfVertices = sizeof(vertices)/sizeof(Vertex);
 GLuint indices[] = {
@@ -137,6 +137,8 @@ int main()
 
     // SHADER INIT
     Shader core_program("../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl");
+
+    Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
 
     // VAO
     GLuint VAO;
@@ -265,6 +267,9 @@ int main()
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+
+        test.render(&core_program);
+
         // glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//Swap buffers

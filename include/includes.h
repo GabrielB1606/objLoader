@@ -4,6 +4,7 @@
 #include<time.h>
 #include<fstream>
 #include <string>
+#include <vector>
 
 //GLEW
 #include<GL\glew.h>
@@ -21,5 +22,6 @@
 #include "Shader.h"
 #include "Vertex.h"
 #include "Material.h"
+#include "Mesh.h"
 
 using namespace std;

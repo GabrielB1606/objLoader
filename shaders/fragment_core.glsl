@@ -29,34 +29,36 @@ vec3 calculateAmbient(Material mtl){
 vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, vec3 lightPos){
     
     vec3 posToLightNorm = normalize( lightPos - position );
-    float diffuse = max( dot(normal, posToLightNorm), 0.f ) ;
+    float diffuse = clamp( dot(normal, posToLightNorm), 0, 1 ) ;
 
-    return mtl.diffuse * diffuse;
+    return diffuse * mtl.diffuse;
 }
 
 vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, vec3 lightPos, vec3 camPosition){
     
-    vec3 lightToPosNorm = normalize(  position - lightPos );
+    vec3 lightToPosNorm = normalize( position -  lightPos );
     vec3 reflectNorm = normalize( reflect( lightToPosNorm, normal ) );
-    vec3 posToViewNorm = normalize( position - camPosition );
-    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), 20 );
+    vec3 posToViewNorm = normalize( camPosition - position );
+    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), 35 );
 
     return mtl.specular * specularConstant;
 }
 
 void main(){
 
-    // ambient light
-    vec3 ambientFinal = calculateAmbient(material);
+    // vec3 normal = normalize(vs_normal);
 
-    // diffuse light
-    vec3 diffuseFinal = calculateDiffuse(material, vs_position, vs_normal, lightPos0);
+    // // ambient light
+    // vec3 ambientFinal = calculateAmbient(material);
 
-    // specular light
-    vec3 specularFinal = calculateSpecular(material, vs_position, vs_normal, lightPos0, camPosition);
+    // // diffuse light
+    // vec3 diffuseFinal = calculateDiffuse(material, vs_position, normal, lightPos0);
 
-    // attenuation
+    // // specular light
+    // vec3 specularFinal = calculateSpecular(material, vs_position, normal, lightPos0, camPosition);
 
-    vec3 lightFinal = ambientFinal + diffuseFinal + specularFinal;
-    fs_color = vec4(vs_color, 1.f) * vec4( lightFinal, 1.0 ) /*+ vec4(specularFinal, 1.f)*/ ;
+    // // attenuation
+
+    // vec3 lightFinal = ambientFinal + diffuseFinal + specularFinal;
+    fs_color = vec4(vs_color, 1.f) /** vec4( lightFinal, 1.0 )*/;
 }
