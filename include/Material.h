@@ -8,7 +8,7 @@ private:
     /* data */
 public:
     Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
-    ~Material();
+    virtual ~Material();
     void sendToShader(Shader& programID);
 };
 

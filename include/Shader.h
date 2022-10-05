@@ -4,12 +4,15 @@ class Shader{
     private:
         GLuint id;
         
+        const int versionMaj;
+        const int versionMin;
+
         std::string loadShaderSource(char* filename);
         GLuint loadShader(GLenum type, char* filename);
         bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader);
 
     public:
-        Shader(char* vertexFile, char* fragmentFile, char* geometryFile);
+        Shader(const int versionMaj, const int versionMin, char* vertexFile, char* fragmentFile, char* geometryFile);
         ~Shader();
         void use();
         void stopUsing();
@@ -21,7 +24,7 @@ class Shader{
         void set1f(GLfloat value, const GLchar* name);
 };
 
-Shader::Shader(char* vertexFile, char* fragmentFile, char* geometryFile = nullptr){
+Shader::Shader(const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
 
     GLuint vertexShader = 0;
     GLuint fragmentShader = 0;
@@ -122,6 +125,9 @@ std::string Shader::loadShaderSource(char* filename){
     }
 
     in_file.close();
+
+    std::string version = std::to_string(versionMaj) + std::to_string(versionMin) + "0";
+    src.replace( src.find("#version"), 12, "#version "+version );
 
     return src;
 }

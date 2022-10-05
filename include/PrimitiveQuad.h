@@ -5,7 +5,7 @@ private:
     /* data */
 public:
     PrimitiveQuad();
-    ~PrimitiveQuad();
+    virtual ~PrimitiveQuad();
 };
 
 PrimitiveQuad::PrimitiveQuad(/* args */):Primitive(){

@@ -20,7 +20,7 @@ private:
 public:
     Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     Mesh(Primitive &primitive, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
-    ~Mesh();
+    virtual ~Mesh();
     void update();
     void render(Shader* shader);
     void updateUniforms(Shader* shader);

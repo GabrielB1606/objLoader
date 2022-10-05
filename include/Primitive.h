@@ -6,7 +6,7 @@ private:
     std::vector<GLuint> indices;
 public:
     Primitive();
-    ~Primitive();
+    virtual ~Primitive();
     void set(const Vertex* vertices, const unsigned nrOfVertices, const GLuint* indices, const unsigned nrOfIndices);
     inline Vertex* getVertices();
     inline GLuint* getIndices();

@@ -2,10 +2,11 @@
 
 //GLOBALS
 const GLint WIDTH = 1280, HEIGHT = 720;
+const int VersionMaj = 4, VersionMin = 4;
+const GLfloat movementSpeed = 0.3f;
 GLfloat currentFrame = 0.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-const GLfloat movementSpeed = 0.3f;
 
 PrimitiveQuad primitiveTest;
 
@@ -26,15 +27,15 @@ void INIT_GLEW()
 	}
 }
 
-GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &screenH)
+GLFWwindow* initWindow(const char* title, const int WIDTH, const int HEIGHT, int &bufferW, int &bufferH, int GLmajor, int GLminor, bool resizable)
 {
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLmajor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLminor);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, resizable);
 
-	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "01 TRIANGLE", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, title, nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -42,7 +43,7 @@ GLFWwindow* INIT_WINDOW(const int WIDTH, const int HEIGHT, int &screenW, int &sc
 		throw("Error in creating window!");
 	}
 
-	glfwGetFramebufferSize(window, &screenW, &screenH);
+	glfwGetFramebufferSize(window, &bufferW, &bufferH);
 
 	glfwMakeContextCurrent(window);
 
@@ -103,7 +104,7 @@ int main()
 	INIT_GLFW();
 
 	//INIT GLFW WINDOW
-	GLFWwindow *window = INIT_WINDOW(WIDTH, HEIGHT, bufferScreenW, bufferScreenH);
+	GLFWwindow *window = initWindow("objLoader", WIDTH, HEIGHT, bufferScreenW, bufferScreenH, VersionMaj, VersionMin, false);
 
 	//INIT CONTEXT FOR OPENGL
 	INIT_GLEW();
@@ -123,7 +124,7 @@ int main()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINE for outlines
 
     // SHADER INIT
-    Shader core_program("../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl");
+    Shader core_program(VersionMaj, VersionMin, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl");
 
     Mesh test(primitiveTest);
 
