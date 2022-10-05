@@ -25,5 +25,6 @@
 #include "Primitive.h"
 #include "Mesh.h"
 #include "PrimitiveQuad.h"
+#include "Game.h"
 
 using namespace std;

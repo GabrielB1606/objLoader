@@ -47,12 +47,6 @@ GLFWwindow* initWindow(const char* title, const int WIDTH, const int HEIGHT, int
 
 	glfwMakeContextCurrent(window);
 
-	// glViewport(0, 0, screenW, screenH);
-
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	return window;
 }
 
