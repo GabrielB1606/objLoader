@@ -2,7 +2,21 @@
 
 class Game{
 private:
-    // window
+
+    const int SHADER_CORE_PROGRAM = 0;
+
+    // test
+    PrimitiveQuad testPrimitive;
+
+    // Framerate
+    GLfloat currentFrame = 0.0f;
+    GLfloat deltaTime = 0.0f;
+    GLfloat lastFrame = 0.0f;
+
+    // Movement
+    const GLfloat movementSpeed = 0.3f;
+
+    // Window
     GLFWwindow* window;
     const int WIDTH, HEIGHT;
     int fbWidth, fbHeight;
@@ -10,15 +24,49 @@ private:
     // OpenGL Context
     const int GL_MAJOR, GL_MINOR;
 
+    // Matrices
+    glm::mat4 ViewMatrix;
+    glm::mat4 ProjectionMatrix;
+
+    // Vectors
+    glm::vec3 camPosition;
+    glm::vec3 worldUp;
+    glm::vec3 camFront;
+
+    // Camera options
+    float fov;
+    float nearPlane;
+    float farPlane;
+
+    // Shaders
+    std::vector<Shader*> shaders;
+
+    // Meshes
+    std::vector<Mesh*> meshes;
+
+    // Materials
+    std::vector<Material*> materials;
+
+    // Lights
+    std::vector<glm::vec3*> lights;
+
+    // callback functions
     static void framebuffer_resize(GLFWwindow* window, int fbW, int fbH);
 
+    // init functions
     void initWindow(const char* title, bool resizable);
     void initGLFW();
     void initGLEW();
     void initOpenGLOptions();
-
+    void initMatrices();
+    void initShaders();
+    void initMeshes();
+    void initMaterials();
+    void initLights();
+    void initUniforms();
 
 public:
+
     Game(const char* title, const int WIDTH, const int HEIGHT, int GLmajor, int GLminor, bool resizable);
     virtual ~Game();
 
@@ -26,8 +74,85 @@ public:
     void closeWindow();
 
     void update();
+    void updateInput(Mesh* objectSelected);
     void render();
 };
+
+void Game::updateInput(Mesh* objectSelected = nullptr){
+
+    if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    
+    if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
+        objectSelected->move( glm::vec3( 0.f, 0.f,  -movementSpeed * deltaTime ) );
+    
+    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+        objectSelected->move( glm::vec3( 0.f, 0.f,  movementSpeed * deltaTime ) );
+    
+    if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
+        objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
+    
+    if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
+        objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
+
+    if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
+        objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+
+    if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
+        objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+    
+    if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
+        objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
+    
+    if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
+        objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
+
+    // if( glfwGetKey(window, GLFW_KEY_UP) )
+    //     lightPos.z += movementSpeed * 2 *deltaTime;
+    // if( glfwGetKey(window, GLFW_KEY_DOWN) )
+    //     lightPos.z -= movementSpeed * 2 *deltaTime;
+    // if( glfwGetKey(window, GLFW_KEY_LEFT) )
+    //     lightPos.x -= movementSpeed * 2 *deltaTime;
+    // if( glfwGetKey(window, GLFW_KEY_RIGHT) )
+    //     lightPos.x += movementSpeed * 2 *deltaTime;
+
+}
+
+void Game::initUniforms(){
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+
+    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
+    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
+}
+
+void Game::initLights(){
+    this->lights.push_back( new glm::vec3(0.f, 0.f, 2.f) );
+}
+
+void Game::initMeshes(){
+    this->meshes.push_back( new Mesh( testPrimitive ) );
+}
+
+void Game::initMaterials(){
+    materials.push_back( new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) );
+}
+
+void Game::initShaders(){
+    shaders.push_back( new Shader(GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl") );
+}
+
+void Game::initMatrices(){
+
+        // View
+    this->ViewMatrix = glm::mat4(1.f);
+    this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+
+        // Projection
+    this->ProjectionMatrix = glm::mat4(1.f);
+    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
+
+}
 
 void Game::closeWindow(){
     glfwSetWindowShouldClose(this->window, GLFW_TRUE);
@@ -37,7 +162,44 @@ int Game::getWindowShouldClose(){
     return glfwWindowShouldClose(this->window);
 }
 
+void Game::render(){
+
+    //Update
+    updateInput( meshes[0] );
+
+    //Clear window
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    // update uniforms
+    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+
+    // update framebuffer size and projection matrix
+    glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
+    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+
+    // draw
+    this->meshes[0]->render( this->shaders[SHADER_CORE_PROGRAM] );
+
+    // End Draw - Swap buffers
+    glfwSwapBuffers(window);
+    glFlush();
+
+    // Reset
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
 void Game::update(){
+
+    this->currentFrame = (GLfloat)glfwGetTime();
+    this->deltaTime = this->currentFrame - this->lastFrame;
+    this->lastFrame = this->currentFrame;
+
+    // Update input
+    glfwPollEvents();
+
 
 }
 
@@ -75,6 +237,14 @@ void Game::initGLFW(){
 
 Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor){
 
+    this->fov = 90.f;
+    this->nearPlane = 0.1f;
+    this->farPlane = 1000.f;
+
+    this->worldUp = glm::vec3(0.f, 1.f, 0.f);
+    this->camPosition = glm::vec3(0.f, 0.f, 1.f);
+    this->camFront = glm::vec3(0.f, 0.f, -1.f);
+    
     this->window = nullptr;
     this->fbHeight = this->HEIGHT;
     this->fbWidth = this->WIDTH;
@@ -83,10 +253,28 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initWindow(title, resizable);
     this->initGLEW();
     this->initOpenGLOptions();
+    this->initMatrices();
+    this->initShaders();
+    this->initMaterials();
+    this->initMeshes();
+    this->initLights();
+    this->initUniforms();
 
 }
 
 Game::~Game(){
+    for(int i = 0; i<this->lights.size(); i++)
+        delete this->lights[i];
+
+    for(int i = 0; i<this->shaders.size(); i++)
+        delete this->shaders[i];
+
+    for(int i = 0; i<this->materials.size(); i++)
+        delete this->materials[i];
+
+    for(int i = 0; i<this->meshes.size(); i++)
+        delete this->meshes[i];
+
     glfwDestroyWindow(this->window);
     glfwTerminate();
 }
@@ -114,10 +302,4 @@ void Game::initWindow(const char* title, bool resizable){
     glfwSetFramebufferSizeCallback(this->window, Game::framebuffer_resize);
 
 	glfwMakeContextCurrent(this->window);
-
-	// glViewport(0, 0, screenW, screenH);
-
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
