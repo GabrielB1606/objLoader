@@ -19,6 +19,7 @@ private:
 
 public:
     Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+    Mesh(Primitive &primitive, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     ~Mesh();
     void update();
     void render(Shader* shader);
@@ -100,6 +101,19 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
     this->nrOfVertices = nrOfVertices;
 
     initVAO(vertexArray, indexArray);
+    
+    this->position = position;
+    this->rotation = rotation;
+    this->scale = scale;
+
+}
+
+Mesh::Mesh(Primitive &primitive, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+
+    this->nrOfIndices = primitive.getNrOfIndices();
+    this->nrOfVertices = primitive.getNrOfVertices();
+
+    initVAO(primitive.getVertices() , primitive.getIndices());
     
     this->position = position;
     this->rotation = rotation;

@@ -22,6 +22,8 @@
 #include "Shader.h"
 #include "Vertex.h"
 #include "Material.h"
+#include "Primitive.h"
 #include "Mesh.h"
+#include "PrimitiveQuad.h"
 
 using namespace std;
