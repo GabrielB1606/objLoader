@@ -24,6 +24,7 @@
 #include "Material.h"
 #include "Primitive.h"
 #include "Mesh.h"
+#include "Model.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
 #include "Camera.h"

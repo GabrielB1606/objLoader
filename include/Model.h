@@ -1,0 +1,52 @@
+#pragma once
+
+class Model{
+private:
+    Material* material;
+    std::vector<Mesh*> meshes;
+    glm::vec3 position;
+
+    void updateUniforms(Shader* shader);
+
+public:
+    Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position);
+    ~Model();
+
+    void update();
+    void render(Shader* shader);
+
+};
+
+void Model::render(Shader* shader){
+
+    this->updateUniforms(shader);
+
+    for(Mesh* m : meshes)
+        m->render(shader);
+
+}
+
+void Model::updateUniforms(Shader* shader){
+
+    this->material->sendToShader(*shader);
+
+}
+
+void Model::update(){
+
+}
+
+Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f)){
+
+    this->position = position;
+    this->material = material;
+
+    for( Mesh* m : meshes )
+        this->meshes.push_back( new Mesh( *m ) );
+
+}
+
+Model::~Model(){
+    for( Mesh* &m : this->meshes )
+        delete m;
+}

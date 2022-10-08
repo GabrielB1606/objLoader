@@ -91,7 +91,9 @@ void Mesh::render(Shader* shader){
     else
         glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);
 
+    // cleanup
     shader->stopUsing();
+    glBindVertexArray(0);
 
 }
 

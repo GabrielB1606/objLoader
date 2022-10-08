@@ -56,6 +56,9 @@ private:
     // Materials
     std::vector<Material*> materials;
 
+    // Models
+    std::vector<Model*> models;
+
     // Lights
     std::vector<glm::vec3*> lights;
 
@@ -69,8 +72,11 @@ private:
     void initOpenGLOptions();
     void initMatrices();
     void initShaders();
+
     void initMeshes();
     void initMaterials();
+    void initModels();
+
     void initLights();
     void initUniforms();
 
@@ -94,10 +100,11 @@ public:
     void render();
 };
 
-void Game::updateUniforms(){
-    // update uniforms
-    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+void Game::initModels(){
+    this->models.push_back( new Model( this->meshes, this->materials[0] )  );
+}
 
+void Game::updateUniforms(){
     // update framebuffer size
     glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
 
@@ -109,6 +116,9 @@ void Game::updateUniforms(){
     // update ProjectionMatrix
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+    
+    // update material
+    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
 }
 
 void Game::updateInput(Mesh* objectSelected = nullptr){
@@ -272,7 +282,10 @@ void Game::render(){
     updateUniforms();
 
     // draw
-    for( Mesh* m : meshes )
+    // for( Mesh* m : meshes )
+    //     m->render( this->shaders[SHADER_CORE_PROGRAM] );
+
+    for( Model* m : models )
         m->render( this->shaders[SHADER_CORE_PROGRAM] );
 
     // End Draw - Swap buffers
@@ -370,6 +383,7 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initShaders();
     this->initMaterials();
     this->initMeshes();
+    this->initModels();
     this->initLights();
     this->initUniforms();
 
@@ -387,6 +401,9 @@ Game::~Game(){
 
     for(size_t i = 0; i<this->meshes.size(); i++)
         delete this->meshes[i];
+
+    for(size_t i = 0; i<this->models.size(); i++)
+        delete this->models[i];
 
     glfwDestroyWindow(this->window);
     glfwTerminate();
