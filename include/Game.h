@@ -84,8 +84,14 @@ void Game::updateUniforms(){
     // update uniforms
     this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
 
-    // update framebuffer size and projection matrix
+    // update framebuffer size
     glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
+
+    // update ViewMatrix
+    this->ViewMatrix=glm::lookAt(this->camPosition, this->camPosition+this->camFront, this->worldUp);
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+
+    // update ProjectionMatrix
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 }
@@ -94,30 +100,56 @@ void Game::updateInput(Mesh* objectSelected = nullptr){
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    
-    if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
-        objectSelected->move( glm::vec3( 0.f, 0.f,  -movementSpeed * deltaTime ) );
-    
-    if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
-        objectSelected->move( glm::vec3( 0.f, 0.f,  movementSpeed * deltaTime ) );
-    
-    if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
-        objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
-    
-    if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
-        objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
 
-    if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-        objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+    if(objectSelected == nullptr){
 
-    if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
-        objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+        if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
+            this->camPosition.z -= movementSpeed*deltaTime;
+        }
+        if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
+            this->camPosition.z += movementSpeed*deltaTime;
+        }
+        if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
+            this->camPosition.x -= movementSpeed*deltaTime;
+        }
+        if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
+            this->camPosition.x += movementSpeed*deltaTime;
+        }
+        if( glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS ){
+            this->camPosition.y -= movementSpeed*deltaTime;
+        }
+        if( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ){
+            this->camPosition.y += movementSpeed*deltaTime;
+        }
+
+    }else{
+        
+        if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
+            objectSelected->move( glm::vec3( 0.f, 0.f,  -movementSpeed * deltaTime ) );
+        
+        if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+            objectSelected->move( glm::vec3( 0.f, 0.f,  movementSpeed * deltaTime ) );
+        
+        if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
+            objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
+        
+        if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
+            objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
+
+        if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
+            objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+
+        if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
+            objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+        
+        if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
+            objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
+        
+        if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
+            objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
+
+    }
     
-    if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-        objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
-    
-    if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-        objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
 
     // if( glfwGetKey(window, GLFW_KEY_UP) )
     //     lightPos.z += movementSpeed * 2 *deltaTime;
@@ -178,7 +210,7 @@ int Game::getWindowShouldClose(){
 void Game::render(){
 
     //Update
-    updateInput( meshes[0] );
+    updateInput( );
 
     //Clear window
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
