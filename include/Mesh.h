@@ -139,10 +139,12 @@ void Mesh::initVAO(Vertex* vertexArray, GLuint* indexArray){
     glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices*sizeof(Vertex), vertexArray, GL_STATIC_DRAW); // could be dynamic draw
 
     // EBO
-    glGenBuffers(1, &this->EBO);
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, this->EBO );
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices *sizeof(GLuint), indexArray, GL_STATIC_DRAW);
-
+    if( this->nrOfIndices > 0 ){
+        glGenBuffers(1, &this->EBO);
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, this->EBO );
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices *sizeof(GLuint), indexArray, GL_STATIC_DRAW);
+    }
+    
     // VERTEXATTRIBUTEPOINTERS AND ENABLE (INPUT ASSEMBLY)
         // POSITION
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));

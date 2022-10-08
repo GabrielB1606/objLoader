@@ -65,6 +65,8 @@ private:
     void initLights();
     void initUniforms();
 
+    void updateUniforms();
+
 public:
 
     Game(const char* title, const int WIDTH, const int HEIGHT, int GLmajor, int GLminor, bool resizable);
@@ -77,6 +79,16 @@ public:
     void updateInput(Mesh* objectSelected);
     void render();
 };
+
+void Game::updateUniforms(){
+    // update uniforms
+    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+
+    // update framebuffer size and projection matrix
+    glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
+    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+}
 
 void Game::updateInput(Mesh* objectSelected = nullptr){
 
@@ -131,7 +143,8 @@ void Game::initLights(){
 }
 
 void Game::initMeshes(){
-    this->meshes.push_back( new Mesh( testPrimitive ) );
+    // this->meshes.push_back( new Mesh( testPrimitive ) );
+    this->meshes.push_back( new Mesh( PrimitivePyramid() ) );
 }
 
 void Game::initMaterials(){
@@ -171,16 +184,11 @@ void Game::render(){
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // update uniforms
-    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
-
-    // update framebuffer size and projection matrix
-    glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
-    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
-    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+    updateUniforms();
 
     // draw
-    this->meshes[0]->render( this->shaders[SHADER_CORE_PROGRAM] );
+    for( Mesh* m : meshes )
+        m->render( this->shaders[SHADER_CORE_PROGRAM] );
 
     // End Draw - Swap buffers
     glfwSwapBuffers(window);
@@ -263,16 +271,16 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
 }
 
 Game::~Game(){
-    for(int i = 0; i<this->lights.size(); i++)
+    for(size_t i = 0; i<this->lights.size(); i++)
         delete this->lights[i];
 
-    for(int i = 0; i<this->shaders.size(); i++)
+    for(size_t i = 0; i<this->shaders.size(); i++)
         delete this->shaders[i];
 
-    for(int i = 0; i<this->materials.size(); i++)
+    for(size_t i = 0; i<this->materials.size(); i++)
         delete this->materials[i];
 
-    for(int i = 0; i<this->meshes.size(); i++)
+    for(size_t i = 0; i<this->meshes.size(); i++)
         delete this->meshes[i];
 
     glfwDestroyWindow(this->window);

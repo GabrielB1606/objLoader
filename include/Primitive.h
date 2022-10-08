@@ -24,7 +24,7 @@ inline Vertex* Primitive::getVertices(){ return this->vertices.data(); }
 
 Primitive::Primitive(/* args */){}
 
-void Primitive::set(const Vertex* vertices, const unsigned nrOfVertices, const GLuint* indices, const unsigned nrOfIndices){
+void Primitive::set(const Vertex* vertices, const unsigned nrOfVertices, const GLuint* indices = nullptr, const unsigned nrOfIndices = 0){
     for (size_t i = 0; i < nrOfVertices; i++)
         this->vertices.push_back(vertices[i]);
     

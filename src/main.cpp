@@ -2,7 +2,7 @@
 
 //GLOBALS
 const GLint WIDTH = 1280, HEIGHT = 720;
-const int VersionMaj = 4, VersionMin = 4;
+const int VersionMaj = 3, VersionMin = 3;
 
 int main(){
 
