@@ -26,6 +26,7 @@
 #include "Mesh.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
+#include "Camera.h"
 #include "Game.h"
 
 using namespace std;

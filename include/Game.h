@@ -14,7 +14,7 @@ private:
     GLfloat lastFrame;
 
     // Movement Speed
-    const GLfloat movementSpeed = 0.3f;
+    GLfloat movementSpeed = 0.3f;
 
     // Mouse Movement
     double lastMouseX, lastMouseY;
@@ -43,6 +43,9 @@ private:
     float fov;
     float nearPlane;
     float farPlane;
+
+    // Camera
+    Camera camera;
 
     // Shaders
     std::vector<Shader*> shaders;
@@ -98,9 +101,10 @@ void Game::updateUniforms(){
     // update framebuffer size
     glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
 
-    // update ViewMatrix
-    this->ViewMatrix=glm::lookAt(this->camPosition, this->camPosition+this->camFront, this->worldUp);
+    // update ViewMatrix and Camera Position
+    this->ViewMatrix = this->camera.getViewMatrix(); 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
 
     // update ProjectionMatrix
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
@@ -113,6 +117,7 @@ void Game::updateInput(Mesh* objectSelected = nullptr){
 
     updateInputKeyboard(objectSelected);
     updateInputMouse(objectSelected);
+    // camera.updateInput(deltaTime, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
 
 void Game::updateInputMouse(Mesh* objectSelected = nullptr){
@@ -137,6 +142,8 @@ void Game::updateInputMouse(Mesh* objectSelected = nullptr){
 
         if( objectSelected!=nullptr ){
             objectSelected->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
+        }else{
+            this->camera.updateCameraAngle(deltaTime, mouseOffsetX, mouseOffsetY);
         }
 
     }else
@@ -153,22 +160,22 @@ void Game::updateInputKeyboard(Mesh* objectSelected = nullptr){
     if(objectSelected == nullptr){
 
         if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
-            this->camPosition.z -= movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, FORWARD);
         }
         if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ){
-            this->camPosition.z += movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, BACKWARD);
         }
         if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ){
-            this->camPosition.x -= movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, LEFT);
         }
         if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ){
-            this->camPosition.x += movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, RIGHT);
         }
         if( glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS ){
-            this->camPosition.y -= movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, DOWNWARD);
         }
         if( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ){
-            this->camPosition.y += movementSpeed*deltaTime;
+            this->camera.updatePosition(deltaTime, UPWARD);
         }
 
     }else{
@@ -216,7 +223,7 @@ void Game::initUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
+    // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 }
 
 void Game::initLights(){
@@ -258,10 +265,6 @@ int Game::getWindowShouldClose(){
 
 void Game::render(){
 
-    //Update
-    updateDeltaTime();
-    updateInput( this->meshes[0] );
-
     //Clear window
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -283,7 +286,9 @@ void Game::render(){
 
 void Game::update(){
 
-    // updateDeltaTime();
+    updateDeltaTime();
+    // updateInput( this->meshes[0] );
+    updateInput(  );
 
 }
 
@@ -325,7 +330,7 @@ void Game::initGLFW(){
     }
 }
 
-Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor){
+Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
 
     // Camera View
     this->fov = 90.f;
@@ -337,6 +342,7 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->camPosition = glm::vec3(0.f, 0.f, 1.f);
     this->camFront = glm::vec3(0.f, 0.f, -1.f);
     
+
     // Window variables
     this->window = nullptr;
     this->fbHeight = this->HEIGHT;
