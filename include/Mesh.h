@@ -2,6 +2,10 @@
 
 class Mesh{
 private:
+    
+    Vertex* vertexArray;
+    GLuint* indexArray;
+
     unsigned nrOfVertices;
     unsigned nrOfIndices;
 
@@ -15,9 +19,10 @@ private:
 
     glm::mat4 ModelMatrix;
 
-    void initVAO(Vertex* vertexArray, GLuint* indexArray);
+    void initVAO();
 
 public:
+    Mesh(const Mesh &obj);
     Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     Mesh(Primitive &primitive, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     virtual ~Mesh();
@@ -32,6 +37,27 @@ public:
     void setRotation(const glm::vec3 rotation);
     void setScale(const glm::vec3 scale);
 };
+
+Mesh::Mesh(const Mesh &obj){
+
+    this->nrOfIndices = obj.nrOfIndices;
+    this->nrOfVertices = obj.nrOfVertices;
+
+    this->vertexArray = new Vertex[ this->nrOfVertices ];
+    for( size_t i = 0; i<this->nrOfVertices; i++ )
+        this->vertexArray[i] = obj.vertexArray[i];
+
+    this->indexArray = new GLuint[ this->nrOfIndices ];
+    for( size_t i = 0; i<obj.nrOfIndices; i++ )
+        this->indexArray[i] = obj.indexArray[i];
+
+    initVAO();
+    
+    this->position = obj.position;
+    this->rotation = obj.rotation;
+    this->scale = obj.scale;
+
+}
 
 void Mesh::scaleUp(const glm::vec3 scale){
     this->scale += scale;
@@ -56,7 +82,6 @@ void Mesh::setScale( const glm::vec3 scale ){
 void Mesh::setPosition( const glm::vec3 position ){
     this->position = position;
 }
-
 
 void Mesh::updateModelMatrix(){
     this->ModelMatrix = glm::mat4(1.f);
@@ -102,7 +127,15 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
     this->nrOfIndices = nrOfIndices;
     this->nrOfVertices = nrOfVertices;
 
-    initVAO(vertexArray, indexArray);
+    this->vertexArray = new Vertex[ this->nrOfVertices ];
+    for( size_t i = 0; i<nrOfVertices; i++ )
+        this->vertexArray[i] = vertexArray[i];
+
+    this->indexArray = new GLuint[ this->nrOfIndices ];
+    for( size_t i = 0; i<nrOfIndices; i++ )
+        this->indexArray[i] = indexArray[i];
+
+    initVAO();
     
     this->position = position;
     this->rotation = rotation;
@@ -115,7 +148,15 @@ Mesh::Mesh(Primitive &primitive, glm::vec3 position = glm::vec3(0.f), glm::vec3 
     this->nrOfIndices = primitive.getNrOfIndices();
     this->nrOfVertices = primitive.getNrOfVertices();
 
-    initVAO(primitive.getVertices() , primitive.getIndices());
+    this->vertexArray = new Vertex[ this->nrOfVertices ];
+    for( size_t i = 0; i<nrOfVertices; i++ )
+        this->vertexArray[i] = primitive.getVertices()[i];
+
+    this->indexArray = new GLuint[ this->nrOfIndices ];
+    for( size_t i = 0; i<nrOfIndices; i++ )
+        this->indexArray[i] = primitive.getIndices()[i];
+
+    initVAO();
     
     this->position = position;
     this->rotation = rotation;
@@ -127,9 +168,13 @@ Mesh::~Mesh(){
     glDeleteVertexArrays(1, &this->VAO);
     glDeleteBuffers(1, &this->VBO);
     glDeleteBuffers(1, &this->EBO);
+
+    delete this->vertexArray;
+    delete this->indexArray;
+
 }
 
-void Mesh::initVAO(Vertex* vertexArray, GLuint* indexArray){
+void Mesh::initVAO(){
     
     // VAO
     glCreateVertexArrays(1, &this->VAO);

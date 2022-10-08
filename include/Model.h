@@ -15,7 +15,14 @@ public:
     void update();
     void render(Shader* shader);
 
+    void rotate(const glm::vec3 rotation );
+
 };
+
+void Model::rotate(const glm::vec3 rotation){
+    for( Mesh* &m : meshes )
+        m->rotate(rotation);
+}
 
 void Model::render(Shader* shader){
 

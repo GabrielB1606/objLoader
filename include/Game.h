@@ -5,9 +5,6 @@ private:
 
     const int SHADER_CORE_PROGRAM = 0;
 
-    // test
-    PrimitiveQuad testPrimitive;
-
     // Framerate
     GLfloat currentFrame;
     GLfloat deltaTime;
@@ -73,7 +70,6 @@ private:
     void initMatrices();
     void initShaders();
 
-    void initMeshes();
     void initMaterials();
     void initModels();
 
@@ -101,7 +97,17 @@ public:
 };
 
 void Game::initModels(){
+
+    this->meshes.push_back( new Mesh( PrimitiveQuad() ) );
+    this->meshes.push_back( new Mesh( PrimitivePyramid() ) );
+
     this->models.push_back( new Model( this->meshes, this->materials[0] )  );
+
+    for(Mesh* &m : meshes)
+        delete m;
+
+    meshes.clear();
+
 }
 
 void Game::updateUniforms(){
@@ -238,11 +244,6 @@ void Game::initUniforms(){
 
 void Game::initLights(){
     this->lights.push_back( new glm::vec3(0.f, 0.f, 2.f) );
-}
-
-void Game::initMeshes(){
-    // this->meshes.push_back( new Mesh( testPrimitive ) );
-    this->meshes.push_back( new Mesh( PrimitivePyramid() ) );
 }
 
 void Game::initMaterials(){
@@ -382,7 +383,6 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initMatrices();
     this->initShaders();
     this->initMaterials();
-    this->initMeshes();
     this->initModels();
     this->initLights();
     this->initUniforms();
@@ -399,8 +399,8 @@ Game::~Game(){
     for(size_t i = 0; i<this->materials.size(); i++)
         delete this->materials[i];
 
-    for(size_t i = 0; i<this->meshes.size(); i++)
-        delete this->meshes[i];
+    // for(size_t i = 0; i<this->meshes.size(); i++)
+    //     delete this->meshes[i];
 
     for(size_t i = 0; i<this->models.size(); i++)
         delete this->models[i];
