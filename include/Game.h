@@ -9,12 +9,18 @@ private:
     PrimitiveQuad testPrimitive;
 
     // Framerate
-    GLfloat currentFrame = 0.0f;
-    GLfloat deltaTime = 0.0f;
-    GLfloat lastFrame = 0.0f;
+    GLfloat currentFrame;
+    GLfloat deltaTime;
+    GLfloat lastFrame;
 
-    // Movement
+    // Movement Speed
     const GLfloat movementSpeed = 0.3f;
+
+    // Mouse Movement
+    double lastMouseX, lastMouseY;
+    double mouseX, mouseY;
+    double mouseOffsetX, mouseOffsetY;
+    bool firstMouse;
 
     // Window
     GLFWwindow* window;
@@ -65,7 +71,13 @@ private:
     void initLights();
     void initUniforms();
 
+    // update functions
     void updateUniforms();
+    void updateDeltaTime();
+    void updateInputKeyboard(Mesh* objectSelected);
+    void updateInputMouse(Mesh* objectSelected);
+    void updateInput(Mesh* objectSelected);
+    
 
 public:
 
@@ -76,7 +88,6 @@ public:
     void closeWindow();
 
     void update();
-    void updateInput(Mesh* objectSelected);
     void render();
 };
 
@@ -97,6 +108,44 @@ void Game::updateUniforms(){
 }
 
 void Game::updateInput(Mesh* objectSelected = nullptr){
+     // Update input
+    glfwPollEvents();
+
+    updateInputKeyboard(objectSelected);
+    updateInputMouse(objectSelected);
+}
+
+void Game::updateInputMouse(Mesh* objectSelected = nullptr){
+
+    int mouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
+
+    if( mouseState == GLFW_PRESS ){
+
+        glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
+
+        if( firstMouse ){
+            this->lastMouseX = this->mouseX;
+            this->lastMouseY = this->mouseY;
+            firstMouse = false;
+        }
+
+        this->mouseOffsetX = this->mouseX - this->lastMouseX;
+        this->mouseOffsetY = this->mouseY - this->lastMouseY;
+
+        this->lastMouseX = this->mouseX;
+        this->lastMouseY = this->mouseY;
+
+        if( objectSelected!=nullptr ){
+            objectSelected->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
+        }
+
+    }else
+        this->firstMouse = true;
+
+}
+
+void Game::updateInputKeyboard(Mesh* objectSelected = nullptr){
+
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -210,7 +259,8 @@ int Game::getWindowShouldClose(){
 void Game::render(){
 
     //Update
-    updateInput( );
+    updateDeltaTime();
+    updateInput( this->meshes[0] );
 
     //Clear window
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -233,14 +283,14 @@ void Game::render(){
 
 void Game::update(){
 
+    // updateDeltaTime();
+
+}
+
+void Game::updateDeltaTime(){
     this->currentFrame = (GLfloat)glfwGetTime();
     this->deltaTime = this->currentFrame - this->lastFrame;
     this->lastFrame = this->currentFrame;
-
-    // Update input
-    glfwPollEvents();
-
-
 }
 
 void Game::initOpenGLOptions(){
@@ -277,17 +327,34 @@ void Game::initGLFW(){
 
 Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor){
 
+    // Camera View
     this->fov = 90.f;
     this->nearPlane = 0.1f;
     this->farPlane = 1000.f;
 
+    // Camera Position
     this->worldUp = glm::vec3(0.f, 1.f, 0.f);
     this->camPosition = glm::vec3(0.f, 0.f, 1.f);
     this->camFront = glm::vec3(0.f, 0.f, -1.f);
     
+    // Window variables
     this->window = nullptr;
     this->fbHeight = this->HEIGHT;
     this->fbWidth = this->WIDTH;
+
+    // Mouse input
+    this->lastMouseX = 0;
+    this->lastMouseY = 0;
+    this->mouseX = 0;
+    this->mouseY = 0;
+    this->mouseOffsetX = 0;
+    this->mouseOffsetY = 0;
+    this->firstMouse = true;
+
+    // Framerate
+    this->deltaTime = 0;
+    this->lastFrame = 0;
+    this->currentFrame = 0;
 
     this->initGLFW();
     this->initWindow(title, resizable);
