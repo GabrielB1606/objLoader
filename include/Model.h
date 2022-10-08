@@ -48,8 +48,14 @@ Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position =
     this->position = position;
     this->material = material;
 
-    for( Mesh* m : meshes )
+    for( Mesh* m : meshes ){
         this->meshes.push_back( new Mesh( *m ) );
+    }
+
+    for(Mesh* &m:meshes){
+        m->move(this->position);
+        m->setOrigin(this->position);
+    }
 
 }
 

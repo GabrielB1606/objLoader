@@ -47,9 +47,6 @@ private:
     // Shaders
     std::vector<Shader*> shaders;
 
-    // Meshes
-    std::vector<Mesh*> meshes;
-
     // Materials
     std::vector<Material*> materials;
 
@@ -98,10 +95,12 @@ public:
 
 void Game::initModels(){
 
-    this->meshes.push_back( new Mesh( PrimitiveQuad() ) );
-    this->meshes.push_back( new Mesh( PrimitivePyramid() ) );
+    std::vector<Mesh*> meshes;
 
-    this->models.push_back( new Model( this->meshes, this->materials[0] )  );
+    meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(-0.5f) ) );
+    // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(0.25f, 0.f, -0.75f) ) );
+
+    this->models.push_back( new Model( meshes, this->materials[0] )  );
 
     for(Mesh* &m : meshes)
         delete m;
@@ -286,7 +285,7 @@ void Game::render(){
     // for( Mesh* m : meshes )
     //     m->render( this->shaders[SHADER_CORE_PROGRAM] );
 
-    for( Model* m : models )
+    for( Model* &m : models )
         m->render( this->shaders[SHADER_CORE_PROGRAM] );
 
     // End Draw - Swap buffers
@@ -303,6 +302,8 @@ void Game::update(){
     updateDeltaTime();
     // updateInput( this->meshes[0] );
     updateInput(  );
+
+    models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
 
 }
 
