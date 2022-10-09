@@ -29,6 +29,7 @@
 #include "Model.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
+#include "Light.h"
 #include "Camera.h"
 #include "Game.h"
 

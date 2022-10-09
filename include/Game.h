@@ -95,23 +95,7 @@ public:
 
 void Game::initModels(){
 
-    // std::vector<Mesh*> meshes;
-
-    // std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
-
-    // meshes.push_back( new Mesh( temp.data(), temp.size() ) );
-
-    // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(-0.5f) ) );
-    // PrimitivePyramid p;
-    // meshes.push_back( new Mesh( p.getVertices(), p.getNrOfVertices() ) );
-    // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(0.25f, 0.f, -0.75f) ) );
-
     this->models.push_back( new Model( "../../obj/cube.obj", this->materials[0] )  );
-
-    // for(Mesh* &m : meshes)
-    //     delete m;
-
-    // meshes.clear();
 
 }
 
@@ -130,6 +114,9 @@ void Game::updateUniforms(){
     
     // update material
     this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+
+    // update light
+    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 void Game::updateInput(Mesh* objectSelected = nullptr){
@@ -143,9 +130,9 @@ void Game::updateInput(Mesh* objectSelected = nullptr){
 
 void Game::updateInputMouse(Mesh* objectSelected = nullptr){
 
-    int mouseState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
+    int mouseMidState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE);
 
-    if( mouseState == GLFW_PRESS ){
+    if( mouseMidState == GLFW_PRESS ){
 
         glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
 
@@ -169,6 +156,10 @@ void Game::updateInputMouse(Mesh* objectSelected = nullptr){
 
     }else
         this->firstMouse = true;
+    
+    if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
+        *this->lights[0] = this->camera.getPosition();
+    }
 
 }
 
