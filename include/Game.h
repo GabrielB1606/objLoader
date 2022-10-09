@@ -69,6 +69,7 @@ private:
 
     void initMaterials();
     void initModels();
+    void initOBJ();
 
     void initLights();
     void initUniforms();
@@ -92,6 +93,11 @@ public:
     void update();
     void render();
 };
+
+void Game::initOBJ(){
+    std::vector<Vertex> temp;
+    temp = LoadOBJ("../../obj/cube.obj");
+}
 
 void Game::initModels(){
 
@@ -381,10 +387,14 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initWindow(title, resizable);
     this->initGLEW();
     this->initOpenGLOptions();
+    
     this->initMatrices();
     this->initShaders();
+    
     this->initMaterials();
     this->initModels();
+    this->initOBJ();
+
     this->initLights();
     this->initUniforms();
 

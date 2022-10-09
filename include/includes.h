@@ -5,6 +5,7 @@
 #include<fstream>
 #include <string>
 #include <vector>
+#include<sstream>
 
 //GLEW
 #include<GL\glew.h>
@@ -28,6 +29,7 @@
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
 #include "Camera.h"
+#include "LoadOBJ.h"
 #include "Game.h"
 
 using namespace std;
