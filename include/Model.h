@@ -10,6 +10,7 @@ private:
 
 public:
     Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position);
+    Model(const char* objFile, Material* material, glm::vec3 position);
     ~Model();
 
     void update();
@@ -40,6 +41,23 @@ void Model::updateUniforms(Shader* shader){
 }
 
 void Model::update(){
+
+}
+
+Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f)){
+
+    this->position = position;
+    this->material = material;
+
+    std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
+
+    this->meshes.push_back( new Mesh( temp.data(), temp.size() ) );
+    
+
+    for(Mesh* &m:meshes){
+        m->move(this->position);
+        m->setOrigin(this->position);
+    }
 
 }
 

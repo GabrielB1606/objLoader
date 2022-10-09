@@ -69,7 +69,6 @@ private:
 
     void initMaterials();
     void initModels();
-    void initOBJ();
 
     void initLights();
     void initUniforms();
@@ -94,30 +93,25 @@ public:
     void render();
 };
 
-void Game::initOBJ(){
-    std::vector<Vertex> temp;
-    temp = LoadOBJ("../../obj/cube.obj");
-}
-
 void Game::initModels(){
 
-    std::vector<Mesh*> meshes;
+    // std::vector<Mesh*> meshes;
 
-    std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
+    // std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
 
-    meshes.push_back( new Mesh( temp.data(), temp.size() ) );
+    // meshes.push_back( new Mesh( temp.data(), temp.size() ) );
 
     // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(-0.5f) ) );
     // PrimitivePyramid p;
     // meshes.push_back( new Mesh( p.getVertices(), p.getNrOfVertices() ) );
     // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(0.25f, 0.f, -0.75f) ) );
 
-    this->models.push_back( new Model( meshes, this->materials[0] )  );
+    this->models.push_back( new Model( "../../obj/cube.obj", this->materials[0] )  );
 
-    for(Mesh* &m : meshes)
-        delete m;
+    // for(Mesh* &m : meshes)
+    //     delete m;
 
-    meshes.clear();
+    // meshes.clear();
 
 }
 
@@ -399,7 +393,6 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     
     this->initMaterials();
     this->initModels();
-    this->initOBJ();
 
     this->initLights();
     this->initUniforms();

@@ -25,11 +25,11 @@
 #include "Material.h"
 #include "Primitive.h"
 #include "Mesh.h"
+#include "LoadOBJ.h"
 #include "Model.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
 #include "Camera.h"
-#include "LoadOBJ.h"
 #include "Game.h"
 
 using namespace std;
