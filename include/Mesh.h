@@ -55,10 +55,13 @@ Mesh::Mesh(const Mesh &obj){
     for( size_t i = 0; i<this->nrOfVertices; i++ )
         this->vertexArray[i] = obj.vertexArray[i];
 
-    this->indexArray = new GLuint[ this->nrOfIndices ];
-    for( size_t i = 0; i<obj.nrOfIndices; i++ )
-        this->indexArray[i] = obj.indexArray[i];
-
+    if( obj.nrOfIndices > 0 ){
+        this->indexArray = new GLuint[ this->nrOfIndices ];
+        for( size_t i = 0; i<obj.nrOfIndices; i++ )
+            this->indexArray[i] = obj.indexArray[i];
+    }else
+        this->indexArray = nullptr;
+ 
     initVAO();
     
     this->position = obj.position;
@@ -136,7 +139,7 @@ void Mesh::setOrigin( const glm::vec3 origin ){
     this->origin = origin;
 }
 
-Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
 
     this->nrOfIndices = nrOfIndices;
     this->nrOfVertices = nrOfVertices;
@@ -145,9 +148,12 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
     for( size_t i = 0; i<nrOfVertices; i++ )
         this->vertexArray[i] = vertexArray[i];
 
-    this->indexArray = new GLuint[ this->nrOfIndices ];
-    for( size_t i = 0; i<nrOfIndices; i++ )
-        this->indexArray[i] = indexArray[i];
+    if( nrOfIndices > 0 ){
+        this->indexArray = new GLuint[ this->nrOfIndices ];
+        for( size_t i = 0; i<nrOfIndices; i++ )
+            this->indexArray[i] = indexArray[i];
+    }else
+        this->indexArray = nullptr;
 
     initVAO();
     

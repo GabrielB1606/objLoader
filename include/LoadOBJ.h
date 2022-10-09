@@ -59,8 +59,38 @@ static std::vector<Vertex> LoadOBJ(const char* filename){
 
         }else if(prefix == "f"){    //  face
 
+            for(char i = 0; i<3; i++){
+
+                ss >> tmp_int;
+                positionIndex.push_back(tmp_int);
+
+                if( ss.peek() == '/' ){
+
+                    ss.ignore(1, '/');
+                    ss >> tmp_int;
+                    textcoordIndex.push_back(tmp_int);
+
+                    if( ss.peek() == '/' ){
+                        ss.ignore(1, '/');
+                        ss >> tmp_int;
+                        normalIndex.push_back(tmp_int);
+                    }
+                }
+
+            }
+
         }
 
+    }
+
+    // done reading
+    vertexArray.resize( positionIndex.size(), Vertex() );
+
+    for (size_t i = 0; i < vertexArray.size(); i++){
+        vertexArray[i].position = position[ positionIndex[i]-1 ];
+        vertexArray[i].textcoord = textcoord[ textcoordIndex[i]-1 ];
+        vertexArray[i].normal = normal[ normalIndex[i]-1 ];
+        vertexArray[i].color = glm::vec3(0.7f);
     }
 
     return vertexArray;

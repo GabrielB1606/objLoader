@@ -103,7 +103,13 @@ void Game::initModels(){
 
     std::vector<Mesh*> meshes;
 
-    meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(-0.5f) ) );
+    std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
+
+    meshes.push_back( new Mesh( temp.data(), temp.size() ) );
+
+    // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(-0.5f) ) );
+    // PrimitivePyramid p;
+    // meshes.push_back( new Mesh( p.getVertices(), p.getNrOfVertices() ) );
     // meshes.push_back( new Mesh( PrimitivePyramid(), glm::vec3(0.25f, 0.f, -0.75f) ) );
 
     this->models.push_back( new Model( meshes, this->materials[0] )  );
