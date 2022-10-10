@@ -54,7 +54,7 @@ private:
     std::vector<Model*> models;
 
     // Lights
-    std::vector<glm::vec3*> lights;
+    std::vector<PointLight*> pointLights;
 
     // callback functions
     static void framebuffer_resize(GLFWwindow* window, int fbW, int fbH);
@@ -71,6 +71,7 @@ private:
     void initModels();
 
     void initLights();
+    void initPointLights();
     void initUniforms();
 
     // update functions
@@ -95,7 +96,14 @@ public:
 
 void Game::initModels(){
 
-    this->models.push_back( new Model( "../../obj/cube.obj", this->materials[0] )  );
+    this->models.push_back( new Model( "../../obj/cube.obj", this->materials[0], glm::vec3(0.f, 0.f, 0.f) )  );
+
+    std::vector<Mesh*> meshes;
+    meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
+
+    this->models.push_back( new Model(meshes, this->materials[0], glm::vec3(0.f) ) );
+
+    delete meshes[0];
 
 }
 
@@ -116,7 +124,9 @@ void Game::updateUniforms(){
     this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
 
     // update light
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
+    for( PointLight* &pl : this->pointLights )
+        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 void Game::updateInput(Mesh* objectSelected = nullptr){
@@ -158,7 +168,7 @@ void Game::updateInputMouse(Mesh* objectSelected = nullptr){
         this->firstMouse = true;
     
     if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
-        *this->lights[0] = this->camera.getPosition();
+        this->pointLights[0]->setPosition( this->camera.getPosition() );
     }
 
 }
@@ -234,12 +244,20 @@ void Game::initUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
+    for( PointLight* &pl : this->pointLights )
+        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 }
 
+void Game::initPointLights(){
+
+    this->pointLights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
+
+}
+
 void Game::initLights(){
-    this->lights.push_back( new glm::vec3(0.f, 0.f, 2.f) );
+
+    initPointLights();
 }
 
 void Game::initMaterials(){
@@ -391,8 +409,8 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
 }
 
 Game::~Game(){
-    for(size_t i = 0; i<this->lights.size(); i++)
-        delete this->lights[i];
+    for(size_t i = 0; i<this->pointLights.size(); i++)
+        delete this->pointLights[i];
 
     for(size_t i = 0; i<this->shaders.size(); i++)
         delete this->shaders[i];

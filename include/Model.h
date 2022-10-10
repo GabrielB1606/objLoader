@@ -9,8 +9,8 @@ private:
     void updateUniforms(Shader* shader);
 
 public:
-    Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position);
-    Model(const char* objFile, Material* material, glm::vec3 position);
+    Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position, glm::vec3 rotation);
+    Model(const char* objFile, Material* material, glm::vec3 position, glm::vec3 rotation);
     ~Model();
 
     void update();
@@ -44,7 +44,7 @@ void Model::update(){
 
 }
 
-Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f)){
+Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
     this->position = position;
     this->material = material;
@@ -57,11 +57,12 @@ Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::
     for(Mesh* &m:meshes){
         m->move(this->position);
         m->setOrigin(this->position);
+        m->rotate(rotation);
     }
 
 }
 
-Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f)){
+Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
     this->position = position;
     this->material = material;
