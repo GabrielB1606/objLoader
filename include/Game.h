@@ -55,6 +55,7 @@ private:
 
     // Lights
     std::vector<PointLight*> pointLights;
+    bool lightsOn = false;
 
     // callback functions
     static void framebuffer_resize(GLFWwindow* window, int fbW, int fbH);
@@ -90,9 +91,15 @@ public:
     int getWindowShouldClose();
     void closeWindow();
 
+    GLFWwindow* getWindowReference();
+
     void update();
     void render();
 };
+
+GLFWwindow* Game::getWindowReference(){
+    return this->window;
+}
 
 void Game::initModels(){
 
@@ -124,8 +131,9 @@ void Game::updateUniforms(){
     this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
 
     // update light
-    for( PointLight* &pl : this->pointLights )
-        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    if(lightsOn)
+        for( PointLight* &pl : this->pointLights )
+            pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
@@ -167,8 +175,9 @@ void Game::updateInputMouse(Mesh* objectSelected = nullptr){
     }else
         this->firstMouse = true;
     
-    if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
-        this->pointLights[0]->setPosition( this->camera.getPosition() );
+    if(lightsOn)
+        if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
+            this->pointLights[0]->setPosition( this->camera.getPosition() );
     }
 
 }
@@ -244,8 +253,9 @@ void Game::initUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
-    for( PointLight* &pl : this->pointLights )
-        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    if(lightsOn)
+        for( PointLight* &pl : this->pointLights )
+            pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 }
 
@@ -403,7 +413,9 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initMaterials();
     this->initModels();
 
-    this->initLights();
+    if(lightsOn)
+        this->initLights();
+        
     this->initUniforms();
 
 }

@@ -10,6 +10,11 @@
 //GLEW
 #include<GL\glew.h>
 
+// ImGUI
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 //GLFW
 #include<GLFW\glfw3.h>
 
@@ -19,6 +24,8 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>
+
+#include "UserInterface.h"
 
 #include "Shader.h"
 #include "Vertex.h"
@@ -33,5 +40,3 @@
 #include "PointLight.h"
 #include "Camera.h"
 #include "Game.h"
-
-using namespace std;
