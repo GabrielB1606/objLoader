@@ -17,7 +17,7 @@ target_link_libraries(${PROJECT_NAME} glew32s glfw3 opengl32 )
 add_executable(ImGUI_demo src/demoImGUI.cpp ${IMGUI_SRC})
 target_include_directories( ImGUI_demo PUBLIC include/ include/imgui/)
 target_link_directories( ImGUI_demo PRIVATE lib/ )
-target_link_libraries(ImGUI_demo glfw3 opengl32)
+target_link_libraries(ImGUI_demo glew32s glfw3 opengl32)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

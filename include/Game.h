@@ -24,8 +24,12 @@ private:
     const int WIDTH, HEIGHT;
     int fbWidth, fbHeight;
 
+    // User Interface
+    UserInterface* gui;
+
     // OpenGL Context
     const int GL_MAJOR, GL_MINOR;
+    const char* glsl_version;
 
     // Matrices
     glm::mat4 ViewMatrix;
@@ -65,6 +69,8 @@ private:
     void initGLFW();
     void initGLEW();
     void initOpenGLOptions();
+    void initUserInterface();
+
     void initMatrices();
     void initShaders();
 
@@ -85,7 +91,7 @@ private:
 
 public:
 
-    Game(const char* title, const int WIDTH, const int HEIGHT, int GLmajor, int GLminor, bool resizable);
+    Game(const char* title, const int WIDTH, const int HEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable);
     virtual ~Game();
 
     int getWindowShouldClose();
@@ -99,6 +105,10 @@ public:
 
 GLFWwindow* Game::getWindowReference(){
     return this->window;
+}
+
+void Game::initUserInterface(){
+    gui = new UserInterface(this->window, "#version 150");
 }
 
 void Game::initModels(){
@@ -275,7 +285,7 @@ void Game::initMaterials(){
 }
 
 void Game::initShaders(){
-    shaders.push_back( new Shader(GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl") );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl") );
 }
 
 void Game::initMatrices(){
@@ -312,6 +322,9 @@ void Game::render(){
 
     for( Model* &m : models )
         m->render( this->shaders[SHADER_CORE_PROGRAM] );
+
+    gui->update();
+    gui->render();
 
     // End Draw - Swap buffers
     glfwSwapBuffers(window);
@@ -370,7 +383,9 @@ void Game::initGLFW(){
     }
 }
 
-Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
+Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
+
+    this->glsl_version = glsl_version;
 
     // Camera View
     this->fov = 90.f;
@@ -406,6 +421,7 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, int
     this->initWindow(title, resizable);
     this->initGLEW();
     this->initOpenGLOptions();
+    this->initUserInterface();
     
     this->initMatrices();
     this->initShaders();
@@ -435,6 +451,8 @@ Game::~Game(){
 
     for(size_t i = 0; i<this->models.size(); i++)
         delete this->models[i];
+
+    delete gui;
 
     glfwDestroyWindow(this->window);
     glfwTerminate();
