@@ -3,7 +3,10 @@
 class Game{
 private:
 
-    const int SHADER_CORE_PROGRAM = 0;
+    enum SHADER_PROGRAMS{
+        SHADER_CORE_PROGRAM = 0,
+        SHADER_NORMALS_PROGRAM
+    };
 
     // Framerate
     GLfloat currentFrame;
@@ -35,7 +38,8 @@ private:
         wireframeOn = false,
         verticesOn = false,
         edgesOn = true,
-        boundingBoxOn = false;
+        boundingBoxOn = false,
+        normalsOn = true;
 
     // User Interface
     UserInterface* gui;
@@ -352,6 +356,7 @@ void Game::initMaterials(){
 
 void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl", "../../shaders/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_normals.glsl", "../../shaders/geometry_normals.glsl" ) );
 }
 
 void Game::initMatrices(){
@@ -382,8 +387,12 @@ void Game::render(){
 
     updateUniforms();
 
-    for( Model* &m : models )
+    for( Model* &m : models ){
         m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn );
+        if(normalsOn)
+            m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
+    }
+    
 
     gui->update(&menuClicked, &clearColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &edgesOn, &clearScenePressed, models[0] );
     gui->render();

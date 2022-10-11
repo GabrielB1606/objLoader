@@ -22,9 +22,9 @@ void main(){
     //     EmitVertex();
     //     gl_Position = data_in[0].projection * (gl_in[0].gl_Position + 0.01f * vec4(data_in[0].normal, 0.0f));
     //     EmitVertex();
+        // EndPrimitive();
     // }
     
-    // EndPrimitive();
 
     for(int i = 0; i<3; i++){
         gl_Position = data_in[i].projection * gl_in[i].gl_Position;
