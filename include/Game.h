@@ -351,7 +351,7 @@ void Game::initMaterials(){
 }
 
 void Game::initShaders(){
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl") );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl", "../../shaders/geometry_core.glsl" ) );
 }
 
 void Game::initMatrices(){
