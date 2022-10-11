@@ -124,10 +124,11 @@ void Mesh::render(Shader* shader){
     // render
     shader->use();
 
-    if(this->nrOfIndices == 0)
+    if(this->nrOfIndices == 0){
         glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
-    else
+    }else{
         glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+    }
 
     // cleanup
     shader->stopUsing();

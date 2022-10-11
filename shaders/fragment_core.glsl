@@ -76,7 +76,7 @@ void main(){
     // fs_color = lightFinal;
     // vec3 result = vs_color * lightFinal; 
     // fs_color = vec4(result, 1.0);
-    fs_color = vec4(vs_color, 1.f);
+    fs_color = vec4( material.diffuse , 1.f);
 
 	// fs_color = 	(vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));
 }

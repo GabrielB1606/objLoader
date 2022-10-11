@@ -433,6 +433,8 @@ void Game::initOpenGLOptions(){
 
         // Z BUFFER
     glEnable(GL_DEPTH_TEST);
+    glEnable( GL_POLYGON_OFFSET_FILL );
+    glPolygonOffset(2.0, 1.0);
 
     	//BACKFACE CULLING AND CC
 	glEnable(GL_CULL_FACE); // cull face

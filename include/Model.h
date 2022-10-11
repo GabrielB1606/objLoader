@@ -14,7 +14,7 @@ public:
     ~Model();
 
     void update();
-    void render(Shader* shader);
+    void render(Shader* shader, bool showEdges );
 
     void rotate(const glm::vec3 rotation );
 
@@ -25,13 +25,23 @@ void Model::rotate(const glm::vec3 rotation){
         m->rotate(rotation);
 }
 
-void Model::render(Shader* shader){
+void Model::render(Shader* shader, bool showEdges = true){
 
-    this->updateUniforms(shader);
-
-    for(Mesh* m : meshes)
+    // this->updateUniforms(shader);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    material->sendToShader(*shader, true);
+    for(Mesh* m : meshes){
         m->render(shader);
+    }
 
+    if( showEdges ){
+        
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        material->sendToShader(*shader, false);
+        for(Mesh* m : meshes)
+            m->render(shader);
+        
+    }
 }
 
 void Model::updateUniforms(Shader* shader){

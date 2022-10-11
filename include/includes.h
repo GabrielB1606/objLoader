@@ -25,7 +25,6 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>
 
-#include "UserInterface.h"
 
 #include "Shader.h"
 #include "Vertex.h"
@@ -39,4 +38,7 @@
 #include "Light.h"
 #include "PointLight.h"
 #include "Camera.h"
+
+#include "UserInterface.h"
+
 #include "Game.h"
