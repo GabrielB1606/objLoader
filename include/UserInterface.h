@@ -17,11 +17,11 @@ public:
     UserInterface(GLFWwindow* window, const char* version_glsl);
     ~UserInterface();
 
-    void update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* clearScenePressed );
+    void update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* clearScenePressed, Model* modelSelected );
     void render();
 };
 
-void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* clearScenePressed ){
+void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* clearScenePressed, Model* modelSelected ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -50,6 +50,7 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* back
             ImGui::Checkbox("Wireframe", wireframeOn) ||
 
             ImGui::Checkbox("Show Vertices", verticesOn) ||
+            ImGui::Checkbox("Show Edges", edgesOn) ||
             ImGui::Checkbox("Show Bounding Box", boundingBoxOn);
         
         if (ImGui::Button("Clear Scene")){
@@ -59,6 +60,18 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* back
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)clear_color); // Edit 3 floats representing a color
+        if( modelSelected != nullptr ){
+            if(!*wireframeOn)
+                ImGui::ColorEdit3("fill color", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
+            
+            if(*verticesOn){
+                ImGui::ColorEdit3("vertex color", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
+                ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            }
+
+            if(*edgesOn)
+                ImGui::ColorEdit3("edge color", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
+        }
 
         if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;

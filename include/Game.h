@@ -34,6 +34,7 @@ private:
         zBufferOn = true,
         wireframeOn = false,
         verticesOn = false,
+        edgesOn = true,
         boundingBoxOn = false;
 
     // User Interface
@@ -106,7 +107,7 @@ public:
     Game(const char* title, const int WIDTH, const int HEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable);
     virtual ~Game();
 
-// bool backFaceCullingOn, antialiasingOn, zBufferOn, wireframeOn, verticesOn, boundingBoxOn;
+// bool backFaceCullingOn, antialiasingOn, zBufferOn, wireframeOn, verticesOn, boundingBoxOn, edgesOn;
     void setBackFaceCulling(bool state);
     void setAntialiasing(bool state);
     void setZBuffer(bool state);
@@ -182,7 +183,7 @@ void Game::initModels(){
     std::vector<Mesh*> meshes;
     meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
 
-    this->models.push_back( new Model(meshes, this->materials[0], glm::vec3(0.f) ) );
+    this->models.push_back( new Model(meshes, this->materials[1], glm::vec3(0.f) ) );
 
     delete meshes[0];
 
@@ -346,6 +347,7 @@ void Game::initLights(){
 
 void Game::initMaterials(){
     materials.push_back( new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) );
+    materials.push_back( new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) );
 }
 
 void Game::initShaders(){
@@ -381,9 +383,9 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models )
-        m->render( this->shaders[SHADER_CORE_PROGRAM] );
+        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn );
 
-    gui->update(&menuClicked, &clearColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &clearScenePressed );
+    gui->update(&menuClicked, &clearColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &edgesOn, &clearScenePressed, models[0] );
     gui->render();
 
     if(menuClicked){
@@ -434,7 +436,7 @@ void Game::initOpenGLOptions(){
         // Z BUFFER
     glEnable(GL_DEPTH_TEST);
     glEnable( GL_POLYGON_OFFSET_FILL );
-    glPolygonOffset(2.0, 1.0);
+    glEnable( GL_POLYGON_OFFSET_LINE );
 
     	//BACKFACE CULLING AND CC
 	glEnable(GL_CULL_FACE); // cull face

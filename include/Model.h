@@ -6,6 +6,8 @@ private:
     std::vector<Mesh*> meshes;
     glm::vec3 position;
 
+    float vertexSize = 10.f;
+
     void updateUniforms(Shader* shader);
 
 public:
@@ -14,32 +16,54 @@ public:
     ~Model();
 
     void update();
-    void render(Shader* shader, bool showEdges );
+    void render(Shader* shader, bool showEdges, bool showVertices );
 
     void rotate(const glm::vec3 rotation );
 
+    Material* getMaterialReference();
+    float* getVertexSizeReference();
+
 };
+
+float* Model::getVertexSizeReference(){
+    return &this->vertexSize;
+}
+
+Material* Model::getMaterialReference(){
+    return material;
+}
 
 void Model::rotate(const glm::vec3 rotation){
     for( Mesh* &m : meshes )
         m->rotate(rotation);
 }
 
-void Model::render(Shader* shader, bool showEdges = true){
+void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false){
 
     // this->updateUniforms(shader);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    material->sendToShader(*shader, true);
+    glPolygonOffset(4.0, 1.0);
+    material->sendToShader(*shader, GL_FILL);
     for(Mesh* m : meshes){
         m->render(shader);
     }
 
     if( showEdges ){
-        
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        material->sendToShader(*shader, false);
+        glPolygonOffset(2.0, 1.0);
+        material->sendToShader(*shader, GL_LINE);
         for(Mesh* m : meshes)
             m->render(shader);
+        
+    }
+
+    if( showVertices ){
+        glPointSize(this->vertexSize);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        material->sendToShader(*shader, GL_POINT);
+        for(Mesh* m : meshes)
+            m->render(shader);
+        glPointSize(1.f);
         
     }
 }
