@@ -10,20 +10,18 @@ private:
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    ImGuiIO io;
     ImGuiStyle style;
 
 public:
     UserInterface(GLFWwindow* window, const char* version_glsl);
     ~UserInterface();
 
-    void update();
+    void update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* clearScenePressed );
     void render();
 };
 
-void UserInterface::update(){
+void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* clearScenePressed ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -44,8 +42,23 @@ void UserInterface::update(){
         ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
         ImGui::Checkbox("Another Window", &show_another_window);
 
+        *menuClicked = 
+            ImGui::Checkbox("Back Face Culling", backFaceCullingOn) ||
+            ImGui::Checkbox("Antialiasing", antialiasingOn) ||
+            ImGui::Checkbox("Z Buffer", zBufferOn) ||
+            
+            ImGui::Checkbox("Wireframe", wireframeOn) ||
+
+            ImGui::Checkbox("Show Vertices", verticesOn) ||
+            ImGui::Checkbox("Show Bounding Box", boundingBoxOn);
+        
+        if (ImGui::Button("Clear Scene")){
+            *clearScenePressed = true;
+            *menuClicked = true;
+        }
+
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit3("clear color", (float*)clear_color); // Edit 3 floats representing a color
 
         if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
@@ -69,40 +82,35 @@ void UserInterface::update(){
 }
 
 void UserInterface::render(){
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     // Rendering
     ImGui::Render();
-    // int display_w, display_h;
-    // glfwGetFramebufferSize(window, &display_w, &display_h);
-    // glViewport(0, 0, display_w, display_h);
-    // glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-    // glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
     // Update and Render additional Platform Windows
     // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
     //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
-    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    // {
-    //     GLFWwindow* backup_current_context = glfwGetCurrentContext();
-    //     ImGui::UpdatePlatformWindows();
-    //     ImGui::RenderPlatformWindowsDefault();
-    //     glfwMakeContextCurrent(backup_current_context);
-    // }
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
 
 }
 
 UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version){
-
     this->window = window;
     this->glsl_version = glsl_version;
 
     // Setup Dear ImGui context
-    // IMGUI_CHECKVERSION();
+    IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // io = ImGui::GetIO(); 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
     //io.ConfigViewportsNoAutoMerge = true;
     //io.ConfigViewportsNoTaskBarIcon = true;
@@ -112,12 +120,12 @@ UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version){
     //ImGui::StyleColorsLight();
 
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-    // this->style = ImGui::GetStyle();
-    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    // {
-    //     style.WindowRounding = 0.0f;
-    //     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    // }
+    this->style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(this->window, true);

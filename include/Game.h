@@ -24,6 +24,18 @@ private:
     const int WIDTH, HEIGHT;
     int fbWidth, fbHeight;
 
+    // scene variables & stuff
+    Model* modelSelected;
+    glm::vec4 clearColor;
+    bool menuClicked = false,
+        clearScenePressed = false, 
+        backFaceCullingOn = true,
+        antialiasingOn = true,
+        zBufferOn = true,
+        wireframeOn = false,
+        verticesOn = false,
+        boundingBoxOn = false;
+
     // User Interface
     UserInterface* gui;
 
@@ -94,21 +106,73 @@ public:
     Game(const char* title, const int WIDTH, const int HEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable);
     virtual ~Game();
 
+// bool backFaceCullingOn, antialiasingOn, zBufferOn, wireframeOn, verticesOn, boundingBoxOn;
+    void setBackFaceCulling(bool state);
+    void setAntialiasing(bool state);
+    void setZBuffer(bool state);
+    void setWireframe(bool state);
+    void setVerticesVisible(bool state);
+    void setBoundingBox(bool state);
+
+    void clearScene();
+
     int getWindowShouldClose();
     void closeWindow();
-
-    GLFWwindow* getWindowReference();
 
     void update();
     void render();
 };
 
-GLFWwindow* Game::getWindowReference(){
-    return this->window;
+void Game::clearScene(){
+
+    modelSelected = nullptr;
+
+    for(Model* &m : models)
+        delete m;
+    
+    models.clear();
+
+}
+
+void Game::setZBuffer(bool state){
+
+    if(state)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+
+}
+
+void Game::setBackFaceCulling(bool state){
+
+    if(state)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
+
+}
+
+void Game::setAntialiasing(bool state){
+
+    if(state)
+        glEnable(GL_MULTISAMPLE);
+    else
+        glDisable(GL_MULTISAMPLE);
+
+}
+
+void Game::setWireframe(bool state){
+
+    if(state){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+    }else{
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+    }
+
 }
 
 void Game::initUserInterface(){
-    gui = new UserInterface(this->window, "#version 150");
+    gui = new UserInterface(this->window, "#version 330" );
 }
 
 void Game::initModels(){
@@ -311,20 +375,32 @@ int Game::getWindowShouldClose(){
 void Game::render(){
 
     //Clear window
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(  clearColor.x, clearColor.y, clearColor.z, clearColor.w );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     updateUniforms();
 
-    // draw
-    // for( Mesh* m : meshes )
-    //     m->render( this->shaders[SHADER_CORE_PROGRAM] );
-
     for( Model* &m : models )
         m->render( this->shaders[SHADER_CORE_PROGRAM] );
 
-    gui->update();
+    gui->update(&menuClicked, &clearColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &clearScenePressed );
     gui->render();
+
+    if(menuClicked){
+    
+        setWireframe(wireframeOn);
+        setAntialiasing(antialiasingOn);
+        setZBuffer(zBufferOn);
+        setBackFaceCulling(backFaceCullingOn);
+        
+        if( clearScenePressed ){
+            clearScene();
+            clearScenePressed = false;
+        }
+    
+        menuClicked = false;
+
+    }
 
     // End Draw - Swap buffers
     glfwSwapBuffers(window);
@@ -341,7 +417,8 @@ void Game::update(){
     // updateInput( this->meshes[0] );
     updateInput(  );
 
-    models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
+    if( models.size() >= 1 )
+        models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
 
 }
 
@@ -352,6 +429,9 @@ void Game::updateDeltaTime(){
 }
 
 void Game::initOpenGLOptions(){
+    // verticesOn, boundingBoxOn
+
+        // Z BUFFER
     glEnable(GL_DEPTH_TEST);
 
     	//BACKFACE CULLING AND CC
@@ -363,7 +443,11 @@ void Game::initOpenGLOptions(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // WIREFRAME
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_LINE for outlines
+
+        // ANTIALIASING
+    glEnable(GL_MULTISAMPLE); 
 }
 
 void Game::initGLEW(){
@@ -385,6 +469,7 @@ void Game::initGLFW(){
 
 Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
 
+    this->modelSelected = nullptr;
     this->glsl_version = glsl_version;
 
     // Camera View
@@ -396,12 +481,12 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
     this->worldUp = glm::vec3(0.f, 1.f, 0.f);
     this->camPosition = glm::vec3(0.f, 0.f, 1.f);
     this->camFront = glm::vec3(0.f, 0.f, -1.f);
-    
 
     // Window variables
     this->window = nullptr;
     this->fbHeight = this->HEIGHT;
     this->fbWidth = this->WIDTH;
+    this->clearColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
 
     // Mouse input
     this->lastMouseX = 0;
@@ -446,9 +531,6 @@ Game::~Game(){
     for(size_t i = 0; i<this->materials.size(); i++)
         delete this->materials[i];
 
-    // for(size_t i = 0; i<this->meshes.size(); i++)
-    //     delete this->meshes[i];
-
     for(size_t i = 0; i<this->models.size(); i++)
         delete this->models[i];
 
@@ -468,6 +550,7 @@ void Game::initWindow(const char* title, bool resizable){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
 	this->window = glfwCreateWindow(this->WIDTH, this->HEIGHT, title, nullptr, nullptr);
 
