@@ -110,7 +110,6 @@ Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position =
     for(Mesh* &m:meshes){
         m->move(this->position);
         m->setOrigin(this->position);
-        
     }
 
 }

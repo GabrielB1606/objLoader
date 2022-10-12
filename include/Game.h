@@ -30,6 +30,7 @@ private:
     // scene variables & stuff
     Model* modelSelected;
     glm::vec4 clearColor;
+    glm::vec4 normalsColor;
     bool menuClicked = false,
         clearScenePressed = false, 
         backFaceCullingOn = true,
@@ -39,7 +40,7 @@ private:
         verticesOn = false,
         edgesOn = true,
         boundingBoxOn = false,
-        normalsOn = true;
+        normalsOn = false;
 
     // User Interface
     UserInterface* gui;
@@ -76,7 +77,7 @@ private:
 
     // Lights
     std::vector<PointLight*> pointLights;
-    bool lightsOn = true;
+    bool lightsOn = false;
 
     // callback functions
     static void framebuffer_resize(GLFWwindow* window, int fbW, int fbH);
@@ -393,12 +394,14 @@ void Game::render(){
 
     for( Model* &m : models ){
         m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn, wireframeOn );
-        if(normalsOn)
+        if(normalsOn){
+            this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
+        }
     }
     
 
-    gui->update(&menuClicked, &clearColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &edgesOn, &clearScenePressed, models[0] );
+    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0] );
     gui->render();
 
     if(menuClicked){
@@ -432,8 +435,8 @@ void Game::update(){
     // updateInput( this->meshes[0] );
     updateInput(  );
 
-    // if( models.size() >= 1 )
-    //     models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
+    if( models.size() >= 1 )
+        models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
 
 }
 
@@ -488,6 +491,8 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
 
     this->modelSelected = nullptr;
     this->glsl_version = glsl_version;
+
+    normalsColor = glm::vec4(0.8f, 0.3f, 0.02f , 1.f);
 
     // Camera View
     this->fov = 90.f;

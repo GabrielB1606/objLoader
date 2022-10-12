@@ -17,11 +17,11 @@ public:
     UserInterface(GLFWwindow* window, const char* version_glsl);
     ~UserInterface();
 
-    void update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* clearScenePressed, Model* modelSelected );
+    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected );
     void render();
 };
 
-void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* clearScenePressed, Model* modelSelected ){
+void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -51,7 +51,8 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* back
 
             ImGui::Checkbox("Show Vertices", verticesOn) ||
             ImGui::Checkbox("Show Edges", edgesOn) ||
-            ImGui::Checkbox("Show Bounding Box", boundingBoxOn);
+            ImGui::Checkbox("Show Bounding Box", boundingBoxOn) ||
+            ImGui::Checkbox("Show Normals", normalsOn);
         
         if (ImGui::Button("Clear Scene")){
             *clearScenePressed = true;
@@ -59,6 +60,10 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, bool* back
         }
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+        if( *normalsOn )
+            ImGui::ColorEdit3("normals color", (float*)normals_color); // Edit 3 floats representing a color
+
         ImGui::ColorEdit3("clear color", (float*)clear_color); // Edit 3 floats representing a color
         if( modelSelected != nullptr ){
             if(!*wireframeOn)

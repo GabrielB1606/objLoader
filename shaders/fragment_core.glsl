@@ -59,24 +59,24 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, vec3 lightPos, 
 void main(){
 
     // attenuation
-    float distance = length(pointLight.position - vs_position);
-    float attenuation = 1.f/(pointLight.constant +( pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
+    // float distance = length(pointLight.position - vs_position);
+    // float attenuation = 1.f/(pointLight.constant +( pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
     
     // ambient light
-    vec3 ambientFinal = calculateAmbient(material, pointLight.color, pointLight.intensity) * attenuation;
+    // vec3 ambientFinal = calculateAmbient(material, pointLight.color, pointLight.intensity);
 
-    // diffuse light
-    vec3 diffuseFinal = calculateDiffuse(material, vs_position, vs_normal, pointLight.position) * attenuation;
+    // // diffuse light
+    // vec3 diffuseFinal = calculateDiffuse(material, vs_position, vs_normal, pointLight.position);
 
-    // specular light
-    vec3 specularFinal = calculateSpecular(material, vs_position, vs_normal, pointLight.position, camPosition) * attenuation;
+    // // specular light
+    // vec3 specularFinal = calculateSpecular(material, vs_position, vs_normal, pointLight.position, camPosition);
 
 
-    vec4 lightFinal = vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) /*+ specularFinal*/;
-    // fs_color = lightFinal;
-    vec3 result = vs_color * lightFinal; 
+    // vec3 lightFinal = ambientFinal + diffuseFinal /*+ specularFinal*/;
+    // // fs_color = lightFinal;
+    // vec3 result = vs_color * lightFinal; 
     // fs_color = vec4(result, 1.0);
-    // fs_color = vec4( material.diffuse , 1.f);
+    fs_color = vec4( material.diffuse , 1.f);
 
 	// fs_color = 	(vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));
 }
