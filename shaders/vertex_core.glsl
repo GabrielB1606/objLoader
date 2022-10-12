@@ -11,23 +11,18 @@ layout (location = 3) in vec3 vertex_normal;
 // out vec3 vs_normal;
 
 out DATA{
+    vec3 position;
     vec3 normal;
     vec3 color;
     vec2 textcoord;
-    mat4 projection;
 } data_out;
 
-uniform mat4 ModelMatrix;
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-
 void main(){
-
-    gl_Position = ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);
+    data_out.position = vertex_position;
     data_out.normal = vertex_normal;
     data_out.color = vertex_color;
     data_out.textcoord = vertex_textcoord;
-    data_out.projection = ProjectionMatrix;
+    gl_Position = vec4(vertex_position, 1.f);
 
     // vs_position = vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     // vs_color = vertex_color;

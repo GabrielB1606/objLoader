@@ -9,33 +9,42 @@ out vec2 vs_textcoord;
 out vec3 vs_normal;
 
 in DATA{
+    vec3 position;
     vec3 normal;
     vec3 color;
     vec2 textcoord;
-    mat4 projection;
 } data_in[];
+
+uniform mat4 ModelMatrix;
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
 
 void main(){
 
     for(int i = 0; i<3; i++){
-        gl_Position = data_in[0].projection * gl_in[0].gl_Position;
+        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * gl_in[i].gl_Position;
         EmitVertex();
-        gl_Position = data_in[0].projection * (gl_in[0].gl_Position + 0.01f * vec4(data_in[0].normal, 0.0f));
+        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * (gl_in[i].gl_Position + 0.2*vec4(data_in[i].normal, 0.0f));
         EmitVertex();
         EndPrimitive();
     }
-    
 
-    // for(int i = 0; i<3; i++){
-    //     gl_Position = data_in[i].projection * gl_in[i].gl_Position;
-
-    //     vs_normal = data_in[i].normal;
-    //     vs_color = data_in[i].color;
-    //     vs_textcoord = data_in[i].textcoord;
-        
-    //     EmitVertex();
-    // }
+    // gl_Position = data_in[0].projection * gl_in[0].gl_Position;
+    // EmitVertex();
+    // gl_Position = data_in[0].projection * (gl_in[0].gl_Position + vec4(data_in[0].normal, 0.0f));
+    // EmitVertex();
+    // EndPrimitive();
     
+    // gl_Position = data_in[1].projection * gl_in[1].gl_Position;
+    // EmitVertex();
+    // gl_Position = data_in[1].projection * (gl_in[1].gl_Position + vec4(data_in[1].normal, 0.0f));
+    // EmitVertex();
+    // EndPrimitive();
+    
+    // gl_Position = data_in[2].projection * gl_in[2].gl_Position;
+    // EmitVertex();
+    // gl_Position = data_in[2].projection * (gl_in[2].gl_Position + vec4(data_in[2].normal, 0.0f));
+    // EmitVertex();
     // EndPrimitive();
 
 }

@@ -16,7 +16,7 @@ public:
     ~Model();
 
     void update();
-    void render(Shader* shader, bool showEdges, bool showVertices );
+    void render(Shader* shader, bool showEdges, bool showVertices, bool wireframe );
 
     void rotate(const glm::vec3 rotation );
 
@@ -38,16 +38,18 @@ void Model::rotate(const glm::vec3 rotation){
         m->rotate(rotation);
 }
 
-void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false){
+void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool wireframe = false){
 
     // this->updateUniforms(shader);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glPolygonOffset(4.0, 1.0);
-    material->sendToShader(*shader, GL_FILL);
-    for(Mesh* m : meshes){
-        m->render(shader);
+    if(!wireframe){
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glPolygonOffset(4.0, 1.0);
+        material->sendToShader(*shader, GL_FILL);
+        for(Mesh* m : meshes){
+            m->render(shader);
+        }
     }
-
+    
     if( showEdges ){
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPolygonOffset(2.0, 1.0);
@@ -108,6 +110,7 @@ Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position =
     for(Mesh* &m:meshes){
         m->move(this->position);
         m->setOrigin(this->position);
+        
     }
 
 }

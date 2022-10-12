@@ -76,7 +76,7 @@ private:
 
     // Lights
     std::vector<PointLight*> pointLights;
-    bool lightsOn = false;
+    bool lightsOn = true;
 
     // callback functions
     static void framebuffer_resize(GLFWwindow* window, int fbW, int fbH);
@@ -201,14 +201,18 @@ void Game::updateUniforms(){
     this->ViewMatrix = this->camera.getViewMatrix(); 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
+    if(normalsOn){
+        this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+        this->shaders[SHADER_NORMALS_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
+    }
 
     // update ProjectionMatrix
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
-    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-    
-    // update material
-    this->materials[0]->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
 
+    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+    if(normalsOn)
+        this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+    
     // update light
     if(lightsOn)
         for( PointLight* &pl : this->pointLights )
@@ -388,7 +392,7 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models ){
-        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn );
+        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn, wireframeOn );
         if(normalsOn)
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
     }
@@ -428,8 +432,8 @@ void Game::update(){
     // updateInput( this->meshes[0] );
     updateInput(  );
 
-    if( models.size() >= 1 )
-        models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
+    // if( models.size() >= 1 )
+    //     models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
 
 }
 
