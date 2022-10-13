@@ -1,6 +1,6 @@
 #pragma once
 
-std::vector<Model *> LoadModels(const char* objFile, std::unordered_map<std::string, Material*> materialMap){
+std::vector<Model *> LoadModels(const char* objFile, std::unordered_map<std::string, Material*> *materialMap){
 
     std::vector<Model *> models;
     std::vector<Mesh *> meshes;
@@ -69,10 +69,10 @@ std::vector<Model *> LoadModels(const char* objFile, std::unordered_map<std::str
             if(prefix == "o"){
 
                 if(meshes.size()>0){
-                    if( materialMap.find(materialName) != materialMap.end() )
-                        models.push_back( new Model( name, meshes, materialMap[materialName] ) );
+                    if( materialMap->find(materialName) != materialMap->end() )
+                        models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
                     else
-                        models.push_back( new Model( name, meshes, materialMap["default"] ) );
+                        models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
                 }
 
                 meshes.clear();
@@ -152,10 +152,10 @@ std::vector<Model *> LoadModels(const char* objFile, std::unordered_map<std::str
     meshes.push_back( new Mesh(positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, renderType ) );
 
     if(meshes.size()>0){
-        if( materialMap.find(materialName) != materialMap.end() )
-            models.push_back( new Model( name, meshes, materialMap[materialName] ) );
+        if( materialMap->find(materialName) != materialMap->end() )
+            models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
         else
-            models.push_back( new Model( name, meshes, materialMap["default"] ) );
+            models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
     }
 
     // done reading

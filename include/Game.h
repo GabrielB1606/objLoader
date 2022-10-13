@@ -70,7 +70,8 @@ private:
     std::vector<Shader*> shaders;
 
     // Materials
-    std::vector<Material*> materials;
+    // std::vector<Material*> materials;
+    std::unordered_map<std::string, Material*> materialMap;
 
     // Models
     std::vector<Model*> models;
@@ -173,12 +174,16 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    this->models.push_back( new Model( "../../obj/cube.obj", this->materials[0], glm::vec3(0.f, 0.f, 0.f) )  );
+    // this->models.push_back( new Model( "../../obj/cube.obj", this->materialMap["default"], glm::vec3(0.f, 0.f, 0.f) )  );
+
+    std::vector<Model*> modelsLoaded = LoadModels("../../obj/cube.obj", &this->materialMap);
+
+    this->models.push_back( modelsLoaded[0] );
 
     std::vector<Mesh*> meshes;
     meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
 
-    this->models.push_back( new Model( "floor", meshes, this->materials[1], glm::vec3(0.f) ) );
+    this->models.push_back( new Model( "floor", meshes, this->materialMap["floor"], glm::vec3(0.f) ) );
 
     delete meshes[0];
 
@@ -345,8 +350,10 @@ void Game::initLights(){
 }
 
 void Game::initMaterials(){
-    materials.push_back( new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) );
-    materials.push_back( new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) );
+
+    this->materialMap.insert({ "default", new Material("default", glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) });
+    this->materialMap.insert({ "floor", new Material("floor", glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) });
+
 }
 
 void Game::initShaders(){
@@ -539,13 +546,16 @@ Game::~Game(){
     for(size_t i = 0; i<this->shaders.size(); i++)
         delete this->shaders[i];
 
-    for(size_t i = 0; i<this->materials.size(); i++)
-        delete this->materials[i];
+    // for(size_t i = 0; i<this->materials.size(); i++)
+    //     delete this->materials[i];
 
     for(size_t i = 0; i<this->models.size(); i++)
         delete this->models[i];
 
     delete gui;
+
+    for(const auto & entry : materialMap)
+        delete entry.second;
 
     glfwDestroyWindow(this->window);
     glfwTerminate();

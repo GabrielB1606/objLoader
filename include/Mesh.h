@@ -5,8 +5,8 @@ private:
     
     GLenum renderType;
 
-    Vertex* vertexArray;
-    GLuint* indexArray;
+    Vertex* vertexArray = nullptr;
+    unsigned int* indexArray = nullptr;
 
     unsigned nrOfVertices;
     unsigned nrOfIndices;
@@ -56,18 +56,16 @@ Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textc
 
     this->renderType = renderType;
     
-    std::unordered_map<glm::vec2, int> vertexMap;
+    std::unordered_map< std::pair<GLuint, GLuint> , size_t, HashPair> vertexMap;
     std::vector<Vertex> vertexArray;
+    std::vector<GLuint> indexVector;
 
-    this->indexArray = new GLuint[ positionIndex.size() ];
-    this->nrOfIndices = positionVertex.size();
-
-    glm::vec2 key;
+    std::pair<GLuint, GLuint> key;
 
 
-    for( int i = 0; i<positionIndex.size(); i++ ){
+    for( size_t i = 0; i<positionIndex.size(); i++ ){
 
-        key = glm::vec2( positionIndex[i], normalIndex[i] );
+        key = std::pair<GLuint, GLuint>( positionIndex[i], normalIndex[i] );
 
         if( vertexMap.find(key) == vertexMap.end() ){
 
@@ -83,14 +81,66 @@ Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textc
 
         }
 
-        this->indexArray[i] = vertexMap[key];
+        indexVector.push_back(vertexMap[key]);
     
     }
+    this->nrOfIndices = indexVector.size();
+    this->indexArray = new GLuint[ this->nrOfIndices ];
 
-    this->vertexArray = vertexArray.data();
+    for(size_t i = 0; i<this->nrOfIndices; i++)
+        this->indexArray[i] = indexVector[i];
+
+    
     this->nrOfVertices = vertexArray.size();
+    this->vertexArray = new Vertex[ this->nrOfVertices ];
+    for(size_t i = 0; i<this->nrOfVertices; i++){
+        this->vertexArray[i].color = vertexArray[i].color;
+        this->vertexArray[i].normal = vertexArray[i].normal;
+        this->vertexArray[i].position = vertexArray[i].position;
+        this->vertexArray[i].textcoord = vertexArray[i].textcoord;
+    }
+
+    initVAO();
+    this->position = glm::vec3(0.f);
+    this->rotation = glm::vec3(0.f);
+    this->scale = glm::vec3(1.f);
+    this->origin = glm::vec3(0.f);
 
 }
+
+// Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType){
+
+//     this->renderType = renderType;
+    
+//     std::vector<Vertex> vertexArray;
+
+//     for( size_t i = 0; i<positionIndex.size(); i++ ){
+
+        
+//         vertexArray.push_back( 
+//             Vertex( 
+//                 positionVertex[ positionIndex[i]-1 ],
+//                 glm::vec3(0.7f),
+//                 textcoordVertex[ textcoordIndex[i]-1 ],
+//                 normalVertex[ normalIndex[i]-1 ]
+//             )
+//         );
+    
+//     }
+//     this->nrOfIndices = 0;
+//     this->indexArray = nullptr;
+    
+//     this->vertexArray = vertexArray.data();
+//     this->nrOfVertices = vertexArray.size();
+
+
+//     initVAO();
+//     this->position = glm::vec3(0.f);
+//     this->rotation = glm::vec3(0.f);
+//     this->scale = glm::vec3(1.f);
+//     this->origin = glm::vec3(0.f);
+
+// }
 
 Mesh::Mesh(const Mesh &obj){
 
@@ -188,7 +238,7 @@ void Mesh::setOrigin( const glm::vec3 origin ){
 }
 
 Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType = GL_TRIANGLES, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
-
+    this->renderType = renderType;
     this->nrOfIndices = nrOfIndices;
     this->nrOfVertices = nrOfVertices;
 
@@ -231,7 +281,7 @@ Mesh::Mesh(Primitive &primitive, glm::vec3 origin = glm::vec3(0.f), glm::vec3 po
     
     this->position = position;
     this->rotation = rotation;
-    this->scale = scale;
+    this->scale = scale;    
     this->origin = origin;
 
 }

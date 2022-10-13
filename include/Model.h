@@ -85,6 +85,7 @@ void Model::update(){
 
 Model::Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
+    this->name = name;
     this->position = position;
     this->material = material;
 

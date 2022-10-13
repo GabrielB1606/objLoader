@@ -14,13 +14,15 @@ private:
     glm::vec3 specular;
 
 public:
-    Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+    Material(std::string name, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
     virtual ~Material();
     void sendToShader(Shader& programID, GLenum type);
 
     glm::vec3* getFillColorReference();
     glm::vec3* getVertexColorReference();
     glm::vec3* getEdgeColorReference();
+
+    std::string getName();
 };
 
 
@@ -36,7 +38,8 @@ glm::vec3* Material::getEdgeColorReference(){
     return &edge;
 }
 
-Material::Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular){
+Material::Material(std::string name, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular){
+    this->name = name;
     this->fill = diffuse;
     this->vertex = glm::vec3(0.f, 1.f, 0.f);
     this->edge = glm::vec3(0.f);
@@ -47,7 +50,12 @@ Material::Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular){
 
 Material::~Material(){}
 
+std::string Material::getName(){
+    return this->name;
+}
+
 void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
+
     program.setVec3f(this->ambient, "material.ambient");
     
     switch (type){

@@ -7,17 +7,23 @@
 #include <vector>
 #include<sstream>
 #include <unordered_map>
+#include <utility>
+#include <functional>
+
 
 //GLEW
 #include<GL\glew.h>
+
 
 // ImGUI
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+
 //GLFW
 #include<GLFW\glfw3.h>
+
 
 //OPENGL MATH GLM
 #include <glm/vec3.hpp> // glm::vec3
@@ -27,6 +33,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+#include "HashPair.h"
 #include "Shader.h"
 #include "Vertex.h"
 #include "Material.h"
