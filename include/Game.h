@@ -36,7 +36,7 @@ private:
         backFaceCullingOn = true,
         antialiasingOn = true,
         zBufferOn = true,
-        wireframeOn = false,
+        fillOn = true,
         verticesOn = false,
         edgesOn = true,
         boundingBoxOn = false,
@@ -112,11 +112,11 @@ public:
     Game(const char* title, const int WIDTH, const int HEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable);
     virtual ~Game();
 
-// bool backFaceCullingOn, antialiasingOn, zBufferOn, wireframeOn, verticesOn, boundingBoxOn, edgesOn;
+// bool backFaceCullingOn, antialiasingOn, zBufferOn, fillOn, verticesOn, boundingBoxOn, edgesOn;
     void setBackFaceCulling(bool state);
     void setAntialiasing(bool state);
     void setZBuffer(bool state);
-    void setWireframe(bool state);
+    void setFillOn(bool state);
     void setVerticesVisible(bool state);
     void setBoundingBox(bool state);
 
@@ -167,16 +167,6 @@ void Game::setAntialiasing(bool state){
 
 }
 
-void Game::setWireframe(bool state){
-
-    if(state){
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
-    }else{
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
-    }
-
-}
-
 void Game::initUserInterface(){
     gui = new UserInterface(this->window, "#version 330" );
 }
@@ -188,7 +178,7 @@ void Game::initModels(){
     std::vector<Mesh*> meshes;
     meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
 
-    this->models.push_back( new Model(meshes, this->materials[1], glm::vec3(0.f) ) );
+    this->models.push_back( new Model( "floor", meshes, this->materials[1], glm::vec3(0.f) ) );
 
     delete meshes[0];
 
@@ -393,7 +383,7 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models ){
-        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn, wireframeOn );
+        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn, fillOn );
         if(normalsOn){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
@@ -401,12 +391,11 @@ void Game::render(){
     }
     
 
-    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &wireframeOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0] );
+    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0] );
     gui->render();
 
     if(menuClicked){
     
-        setWireframe(wireframeOn);
         setAntialiasing(antialiasingOn);
         setZBuffer(zBufferOn);
         setBackFaceCulling(backFaceCullingOn);
@@ -508,7 +497,7 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
     this->window = nullptr;
     this->fbHeight = this->HEIGHT;
     this->fbWidth = this->WIDTH;
-    this->clearColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    this->clearColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.f);
 
     // Mouse input
     this->lastMouseX = 0;

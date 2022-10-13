@@ -3,6 +3,8 @@
 class Mesh{
 private:
     
+    GLenum renderType;
+
     Vertex* vertexArray;
     GLuint* indexArray;
 
@@ -23,15 +25,14 @@ private:
     void initVAO();
 
 public:
-    
-    // void printVertices(){
-    //     for(int i = 0; i< nrOfVertices; i++)
-    //         std::cout << vertexArray[i].normal << "\n";
-    // }
 
+    Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType);
+    
     Mesh(const Mesh &obj);
-    Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+    Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     Mesh(Primitive &primitive, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+    
+    
     
     virtual ~Mesh();
     
@@ -51,8 +52,49 @@ public:
     void setOrigin(const glm::vec3 origin);
 };
 
+Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType){
+
+    this->renderType = renderType;
+    
+    std::unordered_map<glm::vec2, int> vertexMap;
+    std::vector<Vertex> vertexArray;
+
+    this->indexArray = new GLuint[ positionIndex.size() ];
+    this->nrOfIndices = positionVertex.size();
+
+    glm::vec2 key;
+
+
+    for( int i = 0; i<positionIndex.size(); i++ ){
+
+        key = glm::vec2( positionIndex[i], normalIndex[i] );
+
+        if( vertexMap.find(key) == vertexMap.end() ){
+
+            vertexMap[key] = vertexArray.size();
+            vertexArray.push_back( 
+                Vertex( 
+                    positionVertex[ positionIndex[i]-1 ],
+                    glm::vec3(0.7f),
+                    textcoordVertex[ textcoordIndex[i]-1 ],
+                    normalVertex[ normalIndex[i]-1 ]
+                )
+            );
+
+        }
+
+        this->indexArray[i] = vertexMap[key];
+    
+    }
+
+    this->vertexArray = vertexArray.data();
+    this->nrOfVertices = vertexArray.size();
+
+}
+
 Mesh::Mesh(const Mesh &obj){
 
+    this->renderType = obj.renderType;
     this->nrOfIndices = obj.nrOfIndices;
     this->nrOfVertices = obj.nrOfVertices;
 
@@ -130,9 +172,9 @@ void Mesh::render(Shader* shader){
     shader->use();
 
     if(this->nrOfIndices == 0){
-        glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
+        glDrawArrays(this->renderType, 0, this->nrOfVertices);
     }else{
-        glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+        glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
     }
 
     // cleanup
@@ -145,7 +187,7 @@ void Mesh::setOrigin( const glm::vec3 origin ){
     this->origin = origin;
 }
 
-Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType = GL_TRIANGLES, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
 
     this->nrOfIndices = nrOfIndices;
     this->nrOfVertices = nrOfVertices;
@@ -171,6 +213,8 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 }
 
 Mesh::Mesh(Primitive &primitive, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+
+    this->renderType = GL_TRIANGLES;
 
     this->nrOfIndices = primitive.getNrOfIndices();
     this->nrOfVertices = primitive.getNrOfVertices();

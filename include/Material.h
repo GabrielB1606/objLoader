@@ -2,13 +2,17 @@
 
 class Material{
 private:
+
+    std::string name;
+
     glm::vec3 fill;
     glm::vec3 edge;
     glm::vec3 vertex;
+
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
-    /* data */
+
 public:
     Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
     virtual ~Material();

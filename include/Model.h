@@ -2,6 +2,9 @@
 
 class Model{
 private:
+
+    std::string name;
+
     Material* material;
     std::vector<Mesh*> meshes;
     glm::vec3 position;
@@ -11,7 +14,7 @@ private:
     void updateUniforms(Shader* shader);
 
 public:
-    Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position, glm::vec3 rotation);
+    Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position, glm::vec3 rotation);
     Model(const char* objFile, Material* material, glm::vec3 position, glm::vec3 rotation);
     ~Model();
 
@@ -38,10 +41,10 @@ void Model::rotate(const glm::vec3 rotation){
         m->rotate(rotation);
 }
 
-void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool wireframe = false){
+void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool fillOn = true){
 
     // this->updateUniforms(shader);
-    if(!wireframe){
+    if(fillOn){
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glPolygonOffset(4.0, 1.0);
         material->sendToShader(*shader, GL_FILL);
@@ -80,25 +83,7 @@ void Model::update(){
 
 }
 
-Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
-
-    this->position = position;
-    this->material = material;
-
-    std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
-
-    this->meshes.push_back( new Mesh( temp.data(), temp.size() ) );
-    
-
-    for(Mesh* &m:meshes){
-        m->move(this->position);
-        m->setOrigin(this->position);
-        m->rotate(rotation);
-    }
-
-}
-
-Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
+Model::Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
     this->position = position;
     this->material = material;
@@ -111,6 +96,24 @@ Model::Model(std::vector<Mesh*> meshes, Material* material, glm::vec3 position =
         m->move(this->position);
         m->setOrigin(this->position);
     }
+
+}
+
+Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
+
+    // this->position = position;
+    // this->material = material;
+
+    // std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
+
+    // this->meshes.push_back( new Mesh( temp.data(), temp.size() ) );
+    
+
+    // for(Mesh* &m:meshes){
+    //     m->move(this->position);
+    //     m->setOrigin(this->position);
+    //     m->rotate(rotation);
+    // }
 
 }
 

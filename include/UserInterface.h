@@ -13,15 +13,17 @@ private:
 
     ImGuiStyle style;
 
+    bool SameLine(){ ImGui::SameLine(); return false; }
+
 public:
     UserInterface(GLFWwindow* window, const char* version_glsl);
     ~UserInterface();
 
-    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected );
+    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected );
     void render();
 };
 
-void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* wireframeOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected ){
+void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -37,53 +39,98 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
         static int counter = 0;
 
         ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        
+        if (ImGui::BeginMainMenuBar()){
+            if (ImGui::BeginMenu("GL Options")){
+                
+                if (ImGui::MenuItem("Back Face Culling", NULL, *backFaceCullingOn)){
+                    *backFaceCullingOn = !*backFaceCullingOn;
+                    *menuClicked = true;
+                }
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+                if (ImGui::MenuItem("Antialiasing", NULL, *antialiasingOn)){
+                    *antialiasingOn = !*antialiasingOn;
+                    *menuClicked = true;
+                }
 
-        *menuClicked = 
-            ImGui::Checkbox("Back Face Culling", backFaceCullingOn) ||
-            ImGui::Checkbox("Antialiasing", antialiasingOn) ||
-            ImGui::Checkbox("Z Buffer", zBufferOn) ||
+                if (ImGui::MenuItem("Z Buffer", NULL, *zBufferOn)){
+                    *zBufferOn = !*zBufferOn;
+                    *menuClicked = true;
+                }
+                
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+        // SHOW
+        ImGui::Separator();
+        ImGui::Text("Show");               // Display some text (you can use a format strings too)
+
+        *menuClicked |= 
+            ImGui::Checkbox("Fill", fillOn) ||
+            SameLine() ||
+            ImGui::Checkbox("Vertices", verticesOn) ||
+            SameLine() ||
+            ImGui::Checkbox("Edges", edgesOn) ||
+            ImGui::Checkbox("Bounding Box", boundingBoxOn) ||
+            SameLine() ||
+            ImGui::Checkbox("Normals", normalsOn);
+        
+        if(*verticesOn)
+            ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);
+        
+        // COLORS
+        ImGui::Separator();
+        ImGui::Text("Color");               // Display some text (you can use a format strings too)
+
+        if( *normalsOn )
+            ImGui::ColorEdit3("normals color", (float*)normals_color); // Edit 3 floats representing a color
+
+        ImGui::ColorEdit3("Clear", (float*)clear_color); // Edit 3 floats representing a color
+        if( modelSelected != nullptr ){
+            if(*fillOn)
+                ImGui::ColorEdit3("Fill", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
             
-            ImGui::Checkbox("Wireframe", wireframeOn) ||
+            if(*verticesOn){
+                ImGui::ColorEdit3("Vertex", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
+                
+            }
 
-            ImGui::Checkbox("Show Vertices", verticesOn) ||
-            ImGui::Checkbox("Show Edges", edgesOn) ||
-            ImGui::Checkbox("Show Bounding Box", boundingBoxOn) ||
-            ImGui::Checkbox("Show Normals", normalsOn);
+            if(*edgesOn)
+                ImGui::ColorEdit3("Edge", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
+        }
+
+        // SCENE
+        ImGui::Separator();
+        ImGui::Text("Scene");               // Display some text (you can use a format strings too)
         
         if (ImGui::Button("Clear Scene")){
             *clearScenePressed = true;
             *menuClicked = true;
         }
 
+         // DEMO LEFTOVERS
+        ImGui::Separator();
+        ImGui::Text("Demo");               // Display some text (you can use a format strings too)
+        
+        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+        ImGui::Checkbox("Another Window", &show_another_window);
+
+
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
-        if( *normalsOn )
-            ImGui::ColorEdit3("normals color", (float*)normals_color); // Edit 3 floats representing a color
-
-        ImGui::ColorEdit3("clear color", (float*)clear_color); // Edit 3 floats representing a color
-        if( modelSelected != nullptr ){
-            if(!*wireframeOn)
-                ImGui::ColorEdit3("fill color", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
-            
-            if(*verticesOn){
-                ImGui::ColorEdit3("vertex color", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
-                ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            }
-
-            if(*edgesOn)
-                ImGui::ColorEdit3("edge color", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
-        }
+        
 
         if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        
         ImGui::End();
     }
 
