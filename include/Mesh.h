@@ -144,6 +144,7 @@ void Mesh::rotate( const glm::vec3 rotation ){
 
 void Mesh::move(const glm::vec3 movement){
     this->position += movement;
+    this->origin += movement;
 }
 
 void Mesh::setRotation( const glm::vec3 rotation ){

@@ -34,6 +34,7 @@ public:
 void Model::move(const glm::vec3 movement){
     for(Mesh* &m : this->meshes)
         m->move(movement);
+    position += movement;
 }
 
 void Model::scaleUp(const glm::vec3 scale){

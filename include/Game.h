@@ -104,9 +104,9 @@ private:
     // update functions
     void updateUniforms();
     void updateDeltaTime();
-    void updateInputKeyboard(Model* objectSelected);
-    void updateInputMouse(Model* objectSelected);
-    void updateInput(Model* objectSelected);
+    void updateInputKeyboard();
+    void updateInputMouse();
+    void updateInput();
     
 
 public:
@@ -225,16 +225,16 @@ void Game::updateUniforms(){
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
-void Game::updateInput(Model* objectSelected = nullptr){
+void Game::updateInput(){
      // Update input
     glfwPollEvents();
 
-    updateInputKeyboard(objectSelected);
-    updateInputMouse(objectSelected);
+    updateInputKeyboard();
+    updateInputMouse();
     // camera.updateInput(deltaTime, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
 
-void Game::updateInputMouse(Model* objectSelected = nullptr){
+void Game::updateInputMouse(){
 
     int mouseMidState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE);
 
@@ -254,8 +254,8 @@ void Game::updateInputMouse(Model* objectSelected = nullptr){
         this->lastMouseX = this->mouseX;
         this->lastMouseY = this->mouseY;
 
-        if( objectSelected!=nullptr ){
-            objectSelected->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
+        if( modelSelected != -1 ){
+            this->models[modelSelected]->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
         }else{
             this->camera.updateCameraAngle(deltaTime, mouseOffsetX, mouseOffsetY);
         }
@@ -270,13 +270,13 @@ void Game::updateInputMouse(Model* objectSelected = nullptr){
 
 }
 
-void Game::updateInputKeyboard(Model* objectSelected = nullptr){
+void Game::updateInputKeyboard(){
 
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-    if(objectSelected == nullptr){
+    if(modelSelected == -1){
 
         if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
             this->camera.updatePosition(deltaTime, FORWARD);
@@ -300,28 +300,28 @@ void Game::updateInputKeyboard(Model* objectSelected = nullptr){
     }else{
         
         if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
-            objectSelected->move( glm::vec3( 0.f, 0.f,  -movementSpeed * deltaTime ) );
+            this->models[modelSelected]->move( glm::vec3( 0.f, 0.f, -movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
-            objectSelected->move( glm::vec3( 0.f, 0.f,  movementSpeed * deltaTime ) );
+            this->models[modelSelected]->move( glm::vec3( 0.f, 0.f, movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
-            objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
+            this->models[modelSelected]->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
         
         if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
-            objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
+            this->models[modelSelected]->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
 
         if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-            objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+            this->models[modelSelected]->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
 
         if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
-            objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+            this->models[modelSelected]->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
         
         if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-            objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
+            this->models[modelSelected]->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-            objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
+            this->models[modelSelected]->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
 
     }
     

@@ -112,6 +112,10 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
             *menuClicked = true;
         }
 
+        if (ImGui::Button("Select Camera")){
+            *indexModelSelected = -1;
+        }
+
         ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
 
          // DEMO LEFTOVERS
