@@ -46,11 +46,29 @@ public:
     void rotate(const glm::vec3 rotation);
     void scaleUp(const glm::vec3 scale);
 
+    void normalize(const float factor);
+
     void setPosition(const glm::vec3 position);
     void setRotation(const glm::vec3 rotation);
     void setScale(const glm::vec3 scale);
     void setOrigin(const glm::vec3 origin);
 };
+
+void Mesh::normalize(const float factor){
+
+    // glDeleteVertexArrays(1, &this->VAO);
+    // glDeleteBuffers(1, &this->VBO);
+    // glDeleteBuffers(1, &this->EBO);
+
+    for(size_t i = 0; i < nrOfVertices; i++){
+        vertexArray[i].position.x /= factor;
+        vertexArray[i].position.y /= factor;
+        vertexArray[i].position.z /= factor;
+    }
+
+    initVAO();
+
+}
 
 Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType){
 
@@ -100,7 +118,7 @@ Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textc
         this->vertexArray[i].textcoord = vertexArray[i].textcoord;
     }
 
-    initVAO();
+    // initVAO();
     this->position = glm::vec3(0.f);
     this->rotation = glm::vec3(0.f);
     this->scale = glm::vec3(1.f);

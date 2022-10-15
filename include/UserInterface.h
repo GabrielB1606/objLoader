@@ -79,7 +79,7 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
             SameLine() ||
             ImGui::Checkbox("Normals", normalsOn);
         
-        if(*verticesOn)
+        if(*verticesOn && modelSelected!=nullptr)
             ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);
         
         // COLORS

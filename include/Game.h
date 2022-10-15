@@ -177,7 +177,7 @@ void Game::initModels(){
 
     // this->models.push_back( new Model( "../../obj/cube.obj", this->materialMap["default"], glm::vec3(0.f, 0.f, 0.f) )  );
 
-    std::vector<Model*> modelsLoaded = LoadModels("../../obj/cube.obj", &this->materialMap);
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
 
     this->models.push_back( modelsLoaded[0] );
 
@@ -406,8 +406,10 @@ void Game::render(){
         }
     }
     
-
-    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0], &modelSelected, modelNames, this->models.size() );
+    if(modelSelected != -1)
+        gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[modelSelected], &modelSelected, modelNames, this->models.size() );
+    else
+        gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, nullptr, &modelSelected, modelNames, this->models.size() );
     gui->render();
 
     if(menuClicked){
@@ -492,9 +494,9 @@ void Game::initGLFW(){
     }
 }
 
-Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
+Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 1.f, 3.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
 
-    this->modelSelected = 0;
+    this->modelSelected = -1;
     this->glsl_version = glsl_version;
 
     normalsColor = glm::vec4(0.8f, 0.3f, 0.02f , 1.f);

@@ -25,11 +25,20 @@ public:
     void move(const glm::vec3 movement);
     void scaleUp(const glm::vec3 scale);
 
+    void normalize(const float factor);
+
     Material* getMaterialReference();
     float* getVertexSizeReference();
     std::string getName();
 
 };
+
+void Model::normalize(const float factor){
+
+    for(Mesh* &m: this->meshes)
+        m->normalize(factor);
+
+}
 
 void Model::move(const glm::vec3 movement){
     for(Mesh* &m : this->meshes)

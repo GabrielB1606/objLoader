@@ -46,7 +46,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 worldUp, GLflo
     this->right = glm::vec3(0.f);
     this->up = worldUp;
 
-    this->pitch = 0.f;
+    this->pitch = -20.f;
     this->yaw = -90.f;
     this->roll = 0.f;
 
