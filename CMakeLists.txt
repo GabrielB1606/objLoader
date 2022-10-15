@@ -1,19 +1,28 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(objLoader VERSION 0.1.0)
 
+# generate less cmake bullshit
 set(CMAKE_SUPPRESS_REGENERATION true)
+# set main project as the starting project in Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
+# define constant at compilation time (glew static linking)
 add_compile_definitions(GLEW_STATIC)
 
 # all imgui .cpp files
 file( GLOB IMGUI_SRC src/imgui/*.cpp )
 
+# Main Project
+    # add all cpp files
 add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC})
+    # target all .h and .hpp files
 target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui )
+    # target all .lib filesfor linking
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
+    # specify libraries names for linking
 target_link_libraries(${PROJECT_NAME} glew32s glfw3 opengl32 )
 
+# ImGui Demo
 add_executable(ImGUI_demo src/demoImGUI.cpp ${IMGUI_SRC})
 target_include_directories( ImGUI_demo PUBLIC include/ include/imgui/)
 target_link_directories( ImGUI_demo PRIVATE lib/ )

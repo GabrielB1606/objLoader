@@ -177,16 +177,16 @@ void Game::initModels(){
 
     // this->models.push_back( new Model( "../../obj/cube.obj", this->materialMap["default"], glm::vec3(0.f, 0.f, 0.f) )  );
 
-    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
 
     this->models.push_back( modelsLoaded[0] );
 
-    std::vector<Mesh*> meshes;
-    meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
+    // std::vector<Mesh*> meshes;
+    // meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
 
-    this->models.push_back( new Model( "floor", meshes, this->materialMap["floor"], glm::vec3(0.f) ) );
+    // this->models.push_back( new Model( "floor", meshes, this->materialMap["floor"], glm::vec3(0.f) ) );
 
-    delete meshes[0];
+    // delete meshes[0];
     
     modelNames = new char*[ this->models.size() ];
     for(size_t i = 0; i<this->models.size(); i++){

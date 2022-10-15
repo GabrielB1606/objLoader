@@ -18,6 +18,7 @@ _deps
 *.lo
 *.o
 *.obj
+*.mtl
 
 # Precompiled Headers
 *.gch

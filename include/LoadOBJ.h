@@ -1,7 +1,54 @@
 #pragma once
 
-std::vector<Material *> LoadMTL(){
+std::vector<Material *> LoadMTL(const char* mtlFile){
     std::vector<Material*> materials;
+
+    std::string name;
+
+    // file variables
+    std::stringstream ss;
+    std::ifstream file(mtlFile);
+    std::string line = "";
+
+    // line parse variables    
+    std::string prefix = "";
+    glm::vec3 tmp_vec3;
+    glm::vec2 tmp_vec2;
+    GLint tmp_int;
+
+    if( !file.is_open() )
+        std::cout << "ERROR: could not open OBJ: " << mtlFile << "\n";
+
+    while( std::getline(file, line) ){
+
+
+        ss.clear();
+        ss.str(line);
+
+        ss >> prefix;
+
+        if( prefix == "newmtl" ){
+
+        }else if( prefix == "Ns" ){
+
+        }else if( prefix == "d" ){
+
+        }else if( prefix == "Tr" ){
+            
+        }else if( prefix == "Tf" ){
+
+        }else if( prefix == "illum" ){
+
+        }else if( prefix == "Ka" ){
+
+        }else if( prefix == "Kd" ){
+
+        }else if(prefix == "Ks"){
+            
+        }
+
+
+    }
 
     return materials;
 }
