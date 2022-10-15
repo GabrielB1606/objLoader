@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <utility>
 #include <functional>
+#include <array>
 
 
 //GLEW

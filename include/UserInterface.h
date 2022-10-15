@@ -19,11 +19,11 @@ public:
     UserInterface(GLFWwindow* window, const char* version_glsl);
     ~UserInterface();
 
-    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected );
+    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected, int* indexModelSelected, char* modelNames[], size_t nrOfModels );
     void render();
 };
 
-void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected ){
+void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected, int* indexModelSelected, char* modelNames[], size_t nrOfModels ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -87,7 +87,7 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
         ImGui::Text("Color");               // Display some text (you can use a format strings too)
 
         if( *normalsOn )
-            ImGui::ColorEdit3("normals color", (float*)normals_color); // Edit 3 floats representing a color
+            ImGui::ColorEdit3("Normals", (float*)normals_color); // Edit 3 floats representing a color
 
         ImGui::ColorEdit3("Clear", (float*)clear_color); // Edit 3 floats representing a color
         if( modelSelected != nullptr ){
@@ -111,6 +111,8 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
             *clearScenePressed = true;
             *menuClicked = true;
         }
+
+        ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
 
          // DEMO LEFTOVERS
         ImGui::Separator();

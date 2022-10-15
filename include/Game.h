@@ -28,7 +28,8 @@ private:
     int fbWidth, fbHeight;
 
     // scene variables & stuff
-    Model* modelSelected;
+    char** modelNames;
+    int modelSelected;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
     bool menuClicked = false,
@@ -103,9 +104,9 @@ private:
     // update functions
     void updateUniforms();
     void updateDeltaTime();
-    void updateInputKeyboard(Mesh* objectSelected);
-    void updateInputMouse(Mesh* objectSelected);
-    void updateInput(Mesh* objectSelected);
+    void updateInputKeyboard(Model* objectSelected);
+    void updateInputMouse(Model* objectSelected);
+    void updateInput(Model* objectSelected);
     
 
 public:
@@ -132,7 +133,7 @@ public:
 
 void Game::clearScene(){
 
-    modelSelected = nullptr;
+    modelSelected = -1;
 
     for(Model* &m : models)
         delete m;
@@ -186,6 +187,14 @@ void Game::initModels(){
     this->models.push_back( new Model( "floor", meshes, this->materialMap["floor"], glm::vec3(0.f) ) );
 
     delete meshes[0];
+    
+    modelNames = new char*[ this->models.size() ];
+    for(size_t i = 0; i<this->models.size(); i++){
+        // modelNames[i] = this->models[i]->getName().c_str();
+        modelNames[i] = new char[this->models[i]->getName().size()+1 ];
+        strcpy_s( modelNames[i],this->models[i]->getName().size()+1 ,this->models[i]->getName().c_str() );
+    }
+        // memcpy( modelNames[i], this->models[i]->getName().c_str(), this->models[i]->getName().size() );
 
 }
 
@@ -216,7 +225,7 @@ void Game::updateUniforms(){
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
-void Game::updateInput(Mesh* objectSelected = nullptr){
+void Game::updateInput(Model* objectSelected = nullptr){
      // Update input
     glfwPollEvents();
 
@@ -225,7 +234,7 @@ void Game::updateInput(Mesh* objectSelected = nullptr){
     // camera.updateInput(deltaTime, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
 
-void Game::updateInputMouse(Mesh* objectSelected = nullptr){
+void Game::updateInputMouse(Model* objectSelected = nullptr){
 
     int mouseMidState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE);
 
@@ -261,7 +270,7 @@ void Game::updateInputMouse(Mesh* objectSelected = nullptr){
 
 }
 
-void Game::updateInputKeyboard(Mesh* objectSelected = nullptr){
+void Game::updateInputKeyboard(Model* objectSelected = nullptr){
 
 
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
@@ -398,7 +407,7 @@ void Game::render(){
     }
     
 
-    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0] );
+    gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[0], &modelSelected, modelNames, this->models.size() );
     gui->render();
 
     if(menuClicked){
@@ -485,7 +494,7 @@ void Game::initGLFW(){
 
 Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, const char* glsl_version, int GLmajor, int GLminor, bool resizable):WIDTH(windowWIDTH), HEIGHT(windowHEIGHT), GL_MAJOR(GLmajor), GL_MINOR(GLminor), camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f)){
 
-    this->modelSelected = nullptr;
+    this->modelSelected = 0;
     this->glsl_version = glsl_version;
 
     normalsColor = glm::vec4(0.8f, 0.3f, 0.02f , 1.f);

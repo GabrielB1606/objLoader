@@ -108,40 +108,6 @@ Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textc
 
 }
 
-// Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType){
-
-//     this->renderType = renderType;
-    
-//     std::vector<Vertex> vertexArray;
-
-//     for( size_t i = 0; i<positionIndex.size(); i++ ){
-
-        
-//         vertexArray.push_back( 
-//             Vertex( 
-//                 positionVertex[ positionIndex[i]-1 ],
-//                 glm::vec3(0.7f),
-//                 textcoordVertex[ textcoordIndex[i]-1 ],
-//                 normalVertex[ normalIndex[i]-1 ]
-//             )
-//         );
-    
-//     }
-//     this->nrOfIndices = 0;
-//     this->indexArray = nullptr;
-    
-//     this->vertexArray = vertexArray.data();
-//     this->nrOfVertices = vertexArray.size();
-
-
-//     initVAO();
-//     this->position = glm::vec3(0.f);
-//     this->rotation = glm::vec3(0.f);
-//     this->scale = glm::vec3(1.f);
-//     this->origin = glm::vec3(0.f);
-
-// }
-
 Mesh::Mesh(const Mesh &obj){
 
     this->renderType = obj.renderType;

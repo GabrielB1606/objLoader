@@ -22,11 +22,29 @@ public:
     void render(Shader* shader, bool showEdges, bool showVertices, bool wireframe );
 
     void rotate(const glm::vec3 rotation );
+    void move(const glm::vec3 movement);
+    void scaleUp(const glm::vec3 scale);
 
     Material* getMaterialReference();
     float* getVertexSizeReference();
+    std::string getName();
 
 };
+
+void Model::move(const glm::vec3 movement){
+    for(Mesh* &m : this->meshes)
+        m->move(movement);
+}
+
+void Model::scaleUp(const glm::vec3 scale){
+    for(Mesh* &m : this->meshes)
+        m->scaleUp(scale);
+
+}
+
+std::string Model::getName(){
+    return this->name;
+}
 
 float* Model::getVertexSizeReference(){
     return &this->vertexSize;
