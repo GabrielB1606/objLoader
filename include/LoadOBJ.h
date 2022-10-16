@@ -137,7 +137,15 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
         }else if(prefix == "v"){  //  vertex position
 
             ss >> tmp_vec3.x >> tmp_vec3.y >> tmp_vec3.z;
-            maxVertex = std::max( maxVertex, std::max(tmp_vec3.x, std::max(tmp_vec3.y, tmp_vec3.z)) );
+            
+            maxVertex = std::max(
+                maxVertex, std::max(
+                    std::abs(tmp_vec3.x), std::max(
+                        std::abs(tmp_vec3.y), std::abs(tmp_vec3.z) 
+                    )
+                )
+            );
+
             positionVertex.push_back( tmp_vec3 );
 
         }else if(prefix == "vt"){   //  textcoord
@@ -194,7 +202,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         renderType = GL_TRIANGLES;
                         break;
                     case 4:
-                        renderType = GL_QUADS;
+                        renderType = GL_TRIANGLE_STRIP;
                     default:
                         break;
                 }
