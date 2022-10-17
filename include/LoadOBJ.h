@@ -1,26 +1,35 @@
 #pragma once
 
-std::vector<Material *> LoadMTL(const char* mtlFile){
-    std::vector<Material*> materials;
+void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *materialMap){
 
-    std::string name;
+    // attributes
+    std::string name = ""; 
+    glm::vec3
+        diffuse(0.8f), // defines the diffuse color of the material to be (r,g,b). The default is (0.8,0.8,0.8); 
+        ambient(0.2f), // defines the ambient color of the material to be (r,g,b). The default is (0.2,0.2,0.2); 
+        specular(1.f); // defines the specular color of the material to be (r,g,b). This color shows up in highlights. The default is (1.0,1.0,1.0); 
+    
+    GLfloat
+        transparency = 1.f, // defines the non-transparency of the material to be alpha. The default is 1.0 (not transparent at all). The quantities d and Tr are the opposites of each other, and specifying transparency or nontransparency is simply a matter of user convenience. 
+        shininess = 0.f; // defines the shininess of the material to be s. The default is 0.0; 
+    
+    GLint illumination = 1; // denotes the illumination model used by the material. illum = 1 indicates a flat material with no specular highlights, so the value of Ks is not used. illum = 2 denotes the presence of specular highlights, and so a specification for Ks is required. 
+
 
     // file variables
     std::stringstream ss;
-    std::ifstream file(mtlFile);
+    std::ifstream file( mtlFile.c_str() );
     std::string line = "";
 
     // line parse variables    
     std::string prefix = "";
-    glm::vec3 tmp_vec3;
-    glm::vec2 tmp_vec2;
-    GLint tmp_int;
 
-    if( !file.is_open() )
-        std::cout << "ERROR: could not open OBJ: " << mtlFile << "\n";
+    if( !file.is_open() ){
+        std::cout << "ERROR: could not open MTL: " << mtlFile << "\n";
+        return;
+    }
 
     while( std::getline(file, line) ){
-
 
         ss.clear();
         ss.str(line);
@@ -29,28 +38,52 @@ std::vector<Material *> LoadMTL(const char* mtlFile){
 
         if( prefix == "newmtl" ){
 
+            if(name.length() != 0){
+                if( materialMap->count(name) )
+                    delete (*materialMap)[name];
+                
+                materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular) );
+            }
+
+            // reset to default
+            illumination = 1;
+            shininess = 0;
+            transparency = 1;
+            ambient = glm::vec3(0.2f);
+            diffuse = glm::vec3(0.8f);
+            specular = glm::vec3(1.f);
+            ss >> name;
+
         }else if( prefix == "Ns" ){
-
+            ss >> shininess;
         }else if( prefix == "d" ){
-
+            ss >> transparency;
         }else if( prefix == "Tr" ){
-            
+            ss >> transparency;
+            transparency = 1 - transparency;
         }else if( prefix == "Tf" ){
 
         }else if( prefix == "illum" ){
-
-        }else if( prefix == "Ka" ){
-
-        }else if( prefix == "Kd" ){
-
-        }else if(prefix == "Ks"){
-            
+            ss >> illumination;
+        }else if( prefix == "Ka" ){ // ambient 
+            ss >> ambient.x >> ambient.y >> ambient.z;
+        }else if( prefix == "Kd" ){ // diffuse
+            ss >> diffuse.x >> diffuse.y >> diffuse.z;
+        }else if(prefix == "Ks"){   // specular
+            ss >> specular.x >> specular.y >> specular.z;
         }
-
 
     }
 
-    return materials;
+    file.close();
+
+    if(name.length() != 0){
+        if( materialMap->count(name) )
+            delete (*materialMap)[name];
+        
+        materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular) );
+    }
+
 }
 
 std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string, Material*> *materialMap){
@@ -85,6 +118,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     std::string line = "";
 
     // line parse variables    
+    std::string fileMTL = "";
     std::string prefix = "";
     glm::vec3 tmp_vec3;
     glm::vec2 tmp_vec2;
@@ -209,9 +243,14 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 }
             }
 
+        }else if( prefix == "mtllib" ){
+            ss >> fileMTL;
+            LoadMTL( "../../obj/"+fileMTL, materialMap );
         }
 
     }
+
+    file.close();
 
     meshes.push_back( new Mesh(positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, renderType ) );
 
