@@ -44,6 +44,7 @@
 #include "LoadOBJ.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
+#include "PrimitiveCube.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "Camera.h"

@@ -22,10 +22,10 @@ private:
 
     glm::mat4 ModelMatrix;
 
-    void initVAO();
 
 public:
 
+    void initVAO();
     Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType);
     
     Mesh(const Mesh &obj);

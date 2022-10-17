@@ -63,6 +63,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     std::string materialName;
     GLenum renderType = 0;
     int vertexPerFace = 0;
+    glm::vec3 maxComponents(0.f), minComponents(0.f);
 
     // vertex data
     float maxVertex = 0.f;

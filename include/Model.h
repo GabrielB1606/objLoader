@@ -9,13 +9,14 @@ private:
     std::vector<Mesh*> meshes;
     glm::vec3 position;
 
+    Mesh* boundingBox;
+
     float vertexSize = 10.f;
 
     void updateUniforms(Shader* shader);
 
 public:
     Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position, glm::vec3 rotation);
-    Model(const char* objFile, Material* material, glm::vec3 position, glm::vec3 rotation);
     ~Model();
 
     void update();
@@ -26,6 +27,7 @@ public:
     void scaleUp(const glm::vec3 scale);
 
     void normalize(const float factor);
+    void setBoundingBox( glm::vec3 maxComponents, glm::vec3 minComponents );
 
     Material* getMaterialReference();
     float* getVertexSizeReference();
@@ -33,10 +35,17 @@ public:
 
 };
 
+void Model::setBoundingBox(glm::vec3 maxComponents, glm::vec3 minComponents){
+
+    
+
+}
+
 void Model::normalize(const float factor){
 
-    for(Mesh* &m: this->meshes)
-        m->normalize(factor);
+    if(factor > 1)
+        for(Mesh* &m: this->meshes)
+            m->normalize(factor);
 
 }
 
@@ -113,6 +122,7 @@ void Model::update(){
 
 Model::Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
+    this->boundingBox = nullptr;
     this->name = name;
     this->position = position;
     this->material = material;
@@ -125,24 +135,6 @@ Model::Model(std::string name, std::vector<Mesh*> meshes, Material* material, gl
         m->move(this->position);
         m->setOrigin(this->position);
     }
-
-}
-
-Model::Model(const char* objFile, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
-
-    // this->position = position;
-    // this->material = material;
-
-    // std::vector<Vertex> temp = LoadOBJ("../../obj/cube.obj");
-
-    // this->meshes.push_back( new Mesh( temp.data(), temp.size() ) );
-    
-
-    // for(Mesh* &m:meshes){
-    //     m->move(this->position);
-    //     m->setOrigin(this->position);
-    //     m->rotate(rotation);
-    // }
 
 }
 
