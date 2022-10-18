@@ -124,14 +124,13 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
     glm::vec3 tmp_vec3;
     glm::vec2 tmp_vec2;
-    // GLint tmp_int;
+    GLint tmp_int;
 
 
     if( !file.is_open() )
         std::cout << "ERROR: could not open OBJ: " << objFile << "\n";
 
     while( std::getline(file, line) ){
-
 
         ss.clear();
         ss.str(line);
@@ -144,16 +143,16 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 
                 meshes.push_back( new Mesh(positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, renderType ) );
                 
-                positionVertex.clear();
-                textcoordVertex.clear();
-                normalVertex.clear();
+                // positionVertex.clear();
+                // textcoordVertex.clear();
+                // normalVertex.clear();
                 
-                positionIndex.clear();
-                textcoordIndex.clear();
-                normalIndex.clear();
+                // positionIndex.clear();
+                // textcoordIndex.clear();
+                // normalIndex.clear();
 
-                vertexArray.clear();
-                renderType = 0;
+                // vertexArray.clear();
+                // renderType = 0;
             }
 
             if(prefix == "o"){
@@ -207,9 +206,13 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
             for(size_t i = 0; ss.rdbuf()->in_avail(); i++ ){
                 
+                ss >> tmp_int;
+                if( ss.fail() )
+                    break;
+
                 face.push_back( new GLuint[3] );
                 face[i][2] = -1;
-                ss >> face[i][0];
+                face[i][0] = tmp_int;
                 
                 if( ss.peek() == '/' ){
 
