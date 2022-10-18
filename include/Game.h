@@ -3,9 +3,10 @@
 class Game{
 private:
 
-    enum SHADER_PROGRAMS{
+    enum SHADER_PROGRAM{
         SHADER_CORE_PROGRAM = 0,
         SHADER_NORMALS_PROGRAM
+        
     };
 
     // Framerate
@@ -32,16 +33,22 @@ private:
     int modelSelected;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
-    bool menuClicked = false,
-        clearScenePressed = false, 
-        backFaceCullingOn = true,
-        antialiasingOn = true,
-        zBufferOn = true,
-        fillOn = true,
-        verticesOn = false,
-        edgesOn = true,
-        boundingBoxOn = false,
-        normalsOn = false;
+    bool guiState[14] = {
+        false,  // menu clicked   
+        false,  // clear scene button clicked
+        true,   // culling toggle
+        true,   // antialiasing toggle
+        true,   // zbuffer toggle
+        true,   // show fill toggle
+        false,  // show vertices toggle
+        true,   // show edges toggle
+        false,  // show bounding box toggle
+        false,  // show normals per vertex toggle
+        false,  // import OBJ clicked
+        false,  // import MTL clicked
+        false,  // import Scene clicked
+        false   // export Scene clicked
+    };
 
     // User Interface
     UserInterface* gui;
@@ -170,7 +177,7 @@ void Game::setAntialiasing(bool state){
 }
 
 void Game::initUserInterface(){
-    gui = new UserInterface(this->window, "#version 330", &menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, &modelSelected );
+    gui = new UserInterface(this->window, "#version 330", guiState, &clearColor, &normalsColor, &modelSelected );
 }
 
 void Game::initModels(){
@@ -211,7 +218,7 @@ void Game::updateUniforms(){
     this->ViewMatrix = this->camera.getViewMatrix(); 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
-    if(normalsOn){
+    if( guiState[SHOW_NORMALS] ){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
         this->shaders[SHADER_NORMALS_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
     }
@@ -220,7 +227,7 @@ void Game::updateUniforms(){
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
 
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-    if(normalsOn)
+    if(guiState[SHOW_NORMALS])
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
@@ -404,8 +411,8 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models ){
-        m->render( this->shaders[SHADER_CORE_PROGRAM], edgesOn, verticesOn, fillOn );
-        if(normalsOn){
+        m->render( this->shaders[SHADER_CORE_PROGRAM], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL] );
+        if( guiState[SHOW_NORMALS] ){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
         }
@@ -417,18 +424,26 @@ void Game::render(){
         gui->update( nullptr, modelNames, this->models.size() );
     gui->render();
 
-    if(menuClicked){
+    if( guiState[MENU_CLICK] ){
     
-        setAntialiasing(antialiasingOn);
-        setZBuffer(zBufferOn);
-        setBackFaceCulling(backFaceCullingOn);
+        setAntialiasing( guiState[ANTIALIASING] );
+        setZBuffer( guiState[Z_BUFFER] );
+        setBackFaceCulling( guiState[CULLING] );
         
-        if( clearScenePressed ){
+        if( guiState[CLEAR_CLICK] ){
             clearScene();
-            clearScenePressed = false;
+            guiState[CLEAR_CLICK] = false;
+        }else if( guiState[IMPORT_OBJ] ){
+            guiState[IMPORT_OBJ]  = false;
+        }else if( guiState[IMPORT_MTL] ){
+            guiState[IMPORT_MTL] = false;
+        }else if(guiState[IMPORT_SCENE]){
+            guiState[IMPORT_SCENE] = false;
+        }else if(guiState[EXPORT_SCENE]){
+            guiState[EXPORT_SCENE] = false;
         }
     
-        menuClicked = false;
+        guiState[MENU_CLICK] = false;
 
     }
 

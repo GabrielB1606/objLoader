@@ -12,17 +12,7 @@ private:
     bool show_another_window = false;
 
     // Game State
-    bool
-        *menuClicked,
-        *backFaceCullingOn,
-        *antialiasingOn,
-        *zBufferOn,
-        *fillOn,
-        *verticesOn,
-        *boundingBoxOn,
-        *edgesOn,
-        *normalsOn,
-        *clearScenePressed;
+    bool *state;
 
     const glm::vec4 *clear_color, *normals_color;
     int* indexModelSelected;
@@ -32,7 +22,7 @@ private:
     bool SameLine(){ ImGui::SameLine(); return false; }
 
 public:
-    UserInterface(GLFWwindow* window, const char* glsl_version, bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, int* indexModelSelected);
+    UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, int* indexModelSelected);
     ~UserInterface();
 
     void update(Model* modelSelected, char* modelNames[], size_t nrOfModels );
@@ -59,19 +49,19 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
         if (ImGui::BeginMainMenuBar()){
             if (ImGui::BeginMenu("GL Options")){
                 
-                if (ImGui::MenuItem("Back Face Culling", NULL, *backFaceCullingOn)){
-                    *(this->backFaceCullingOn) = !*(this->backFaceCullingOn);
-                    *menuClicked = true;
+                if (ImGui::MenuItem("Back Face Culling", NULL, state[CULLING])){
+                    state[CULLING] = !state[CULLING];
+                    state[MENU_CLICK] = true;
                 }
 
-                if (ImGui::MenuItem("Antialiasing", NULL, *antialiasingOn)){
-                    *antialiasingOn = !*antialiasingOn;
-                    *menuClicked = true;
+                if (ImGui::MenuItem("Antialiasing", NULL, state[ANTIALIASING] )){
+                    state[ANTIALIASING] = !state[ANTIALIASING];
+                    state[MENU_CLICK] = true;
                 }
 
-                if (ImGui::MenuItem("Z Buffer", NULL, *zBufferOn)){
-                    *zBufferOn = !*zBufferOn;
-                    *menuClicked = true;
+                if (ImGui::MenuItem("Z Buffer", NULL, state[Z_BUFFER])){
+                    state[Z_BUFFER] = !state[Z_BUFFER];
+                    state[MENU_CLICK] = true;
                 }
                 
                 ImGui::EndMenu();
@@ -80,23 +70,23 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
             if (ImGui::BeginMenu("Import/Export")){
                 
                 if (ImGui::MenuItem("Import OBJ", NULL)){
-                    *backFaceCullingOn = !*backFaceCullingOn;
-                    *menuClicked = true;
+                    state[IMPORT_OBJ] = true;
+                    state[MENU_CLICK] = true;
                 }
 
                 if (ImGui::MenuItem("Import MTL", NULL)){
-                    *antialiasingOn = !*antialiasingOn;
-                    *menuClicked = true;
+                    state[IMPORT_MTL] = true;
+                    state[MENU_CLICK] = true;
                 }
 
                 if (ImGui::MenuItem("Import Scene", NULL)){
-                    *zBufferOn = !*zBufferOn;
-                    *menuClicked = true;
+                    state[IMPORT_SCENE] = true;
+                    state[MENU_CLICK] = true;
                 }
 
                 if (ImGui::MenuItem("Export Scene", NULL)){
-                    *zBufferOn = !*zBufferOn;
-                    *menuClicked = true;
+                    state[EXPORT_SCENE] = true;
+                    state[MENU_CLICK] = true;
                 }
                 
                 ImGui::EndMenu();
@@ -110,37 +100,37 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
         ImGui::Separator();
         ImGui::Text("Show");               // Display some text (you can use a format strings too)
 
-        *menuClicked |= 
-            ImGui::Checkbox("Fill", fillOn) ||
+        state[MENU_CLICK] |= 
+            ImGui::Checkbox("Fill", &state[SHOW_FILL]) ||
             SameLine() ||
-            ImGui::Checkbox("Vertices", verticesOn) ||
+            ImGui::Checkbox("Vertices", &state[SHOW_VERTICES]) ||
             SameLine() ||
-            ImGui::Checkbox("Edges", edgesOn) ||
-            ImGui::Checkbox("Bounding Box", boundingBoxOn) ||
+            ImGui::Checkbox("Edges", &state[SHOW_EDGES]) ||
+            ImGui::Checkbox("Bounding Box", &state[SHOW_BOUNDING_BOX]) ||
             SameLine() ||
-            ImGui::Checkbox("Normals", normalsOn);
+            ImGui::Checkbox("Normals", &state[SHOW_NORMALS]);
         
-        if(*verticesOn && modelSelected!=nullptr)
+        if(state[SHOW_VERTICES] && modelSelected!=nullptr)
             ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);
         
         // COLORS
         ImGui::Separator();
         ImGui::Text("Color");               // Display some text (you can use a format strings too)
 
-        if( *normalsOn )
+        if( state[SHOW_NORMALS] )
             ImGui::ColorEdit3("Normals", (float*)normals_color); // Edit 3 floats representing a color
 
         ImGui::ColorEdit3("Clear", (float*)clear_color); // Edit 3 floats representing a color
         if( modelSelected != nullptr ){
-            if(*fillOn)
+            if( state[SHOW_FILL] )
                 ImGui::ColorEdit3("Fill", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
             
-            if(*verticesOn){
+            if( state[SHOW_VERTICES] ){
                 ImGui::ColorEdit3("Vertex", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
                 
             }
 
-            if(*edgesOn)
+            if( state[SHOW_EDGES] )
                 ImGui::ColorEdit3("Edge", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
         }
 
@@ -149,8 +139,8 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
         ImGui::Text("Scene");               // Display some text (you can use a format strings too)
         
         if (ImGui::Button("Clear Scene")){
-            *clearScenePressed = true;
-            *menuClicked = true;
+            state[CLEAR_CLICK] = true;
+            state[MENU_CLICK] = true;
         }
 
         if (ImGui::Button("Select Camera")){
@@ -213,19 +203,10 @@ void UserInterface::render(){
 
 }
 
-UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version, bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, int* indexModelSelected):
-    menuClicked(menuClicked),
+UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, int* indexModelSelected):
+    state(state),
     clear_color(clear_color),
     normals_color(normals_color),
-    backFaceCullingOn(backFaceCullingOn),
-    antialiasingOn(antialiasingOn),
-    zBufferOn(zBufferOn),
-    fillOn(fillOn),
-    verticesOn(verticesOn),
-    boundingBoxOn(boundingBoxOn),
-    edgesOn(edgesOn),
-    normalsOn(normalsOn),
-    clearScenePressed(clearScenePressed),
     indexModelSelected(indexModelSelected)
 {
     this->window = window;

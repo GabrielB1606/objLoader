@@ -49,6 +49,6 @@
 #include "PointLight.h"
 #include "Camera.h"
 
+#include "enumGuiEvent.h"
 #include "UserInterface.h"
-
 #include "Game.h"
