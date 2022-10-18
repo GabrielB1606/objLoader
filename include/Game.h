@@ -29,7 +29,7 @@ private:
     int fbWidth, fbHeight;
 
     // scene variables & stuff
-    char** modelNames;
+    char** modelNames = nullptr;
     int modelSelected;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
@@ -425,25 +425,73 @@ void Game::render(){
     gui->render();
 
     if( guiState[MENU_CLICK] ){
+
+        guiState[MENU_CLICK] = false;
     
         setAntialiasing( guiState[ANTIALIASING] );
         setZBuffer( guiState[Z_BUFFER] );
         setBackFaceCulling( guiState[CULLING] );
         
         if( guiState[CLEAR_CLICK] ){
-            clearScene();
             guiState[CLEAR_CLICK] = false;
+            clearScene();
         }else if( guiState[IMPORT_OBJ] ){
+            
             guiState[IMPORT_OBJ]  = false;
+
+            char const * lFilterPatterns[1] = { "*.obj" };
+            char* filePath = tinyfd_openFileDialog(
+                "Import OBJ File",
+                "",
+                1,
+                lFilterPatterns,
+                NULL,
+                0
+            );
+            
+            if( filePath == NULL )
+                return;
+
+            if( modelNames != nullptr ){
+                for(size_t i = 0; i<this->models.size(); i++)
+                    delete modelNames[i];
+                delete modelNames;
+            }
+
+            std::vector<Model*> modelsLoaded = LoadOBJ(filePath, &materialMap);
+            for( Model* &m : modelsLoaded )
+                this->models.push_back(m);
+
+
+            modelNames = new char*[ this->models.size() ];
+            for(size_t i = 0; i<this->models.size(); i++){
+                modelNames[i] = new char[this->models[i]->getName().size()+1 ];
+                strcpy_s( modelNames[i],this->models[i]->getName().size()+1 ,this->models[i]->getName().c_str() );
+            }
+        
         }else if( guiState[IMPORT_MTL] ){
             guiState[IMPORT_MTL] = false;
+
+            char const * lFilterPatterns[1] = { "*.mtl" };
+            char* filePath = tinyfd_openFileDialog(
+                "Import MTL File",
+                "",
+                1,
+                lFilterPatterns,
+                NULL,
+                0
+            );
+            
+            if( filePath == NULL )
+                return;
+            
+            LoadMTL( filePath, &materialMap );
+
         }else if(guiState[IMPORT_SCENE]){
             guiState[IMPORT_SCENE] = false;
         }else if(guiState[EXPORT_SCENE]){
             guiState[EXPORT_SCENE] = false;
         }
-    
-        guiState[MENU_CLICK] = false;
 
     }
 

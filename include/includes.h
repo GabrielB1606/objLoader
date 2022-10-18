@@ -1,11 +1,11 @@
 //STANDARD
-#include<iostream>
-#include<stdlib.h>
-#include<time.h>
-#include<fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <fstream>
 #include <string>
 #include <vector>
-#include<sstream>
+#include <sstream>
 #include <unordered_map>
 #include <utility>
 #include <functional>
@@ -13,7 +13,7 @@
 
 
 //GLEW
-#include<GL\glew.h>
+#include <GL\glew.h>
 
 
 // ImGUI
@@ -23,7 +23,7 @@
 
 
 //GLFW
-#include<GLFW\glfw3.h>
+#include <GLFW\glfw3.h>
 
 
 //OPENGL MATH GLM
@@ -32,6 +32,10 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>
+
+
+// tinyfiledialogs
+#include "tinyfiledialogs.h"
 
 
 #include "HashPair.h"
