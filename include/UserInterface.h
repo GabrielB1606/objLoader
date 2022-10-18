@@ -11,19 +11,35 @@ private:
     bool show_demo_window = true;
     bool show_another_window = false;
 
+    // Game State
+    bool
+        *menuClicked,
+        *backFaceCullingOn,
+        *antialiasingOn,
+        *zBufferOn,
+        *fillOn,
+        *verticesOn,
+        *boundingBoxOn,
+        *edgesOn,
+        *normalsOn,
+        *clearScenePressed;
+
+    const glm::vec4 *clear_color, *normals_color;
+    int* indexModelSelected;
+
     ImGuiStyle style;
 
     bool SameLine(){ ImGui::SameLine(); return false; }
 
 public:
-    UserInterface(GLFWwindow* window, const char* version_glsl);
+    UserInterface(GLFWwindow* window, const char* glsl_version, bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, int* indexModelSelected);
     ~UserInterface();
 
-    void update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected, int* indexModelSelected, char* modelNames[], size_t nrOfModels );
+    void update(Model* modelSelected, char* modelNames[], size_t nrOfModels );
     void render();
 };
 
-void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, Model* modelSelected, int* indexModelSelected, char* modelNames[], size_t nrOfModels ){
+void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrOfModels ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -44,7 +60,7 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
             if (ImGui::BeginMenu("GL Options")){
                 
                 if (ImGui::MenuItem("Back Face Culling", NULL, *backFaceCullingOn)){
-                    *backFaceCullingOn = !*backFaceCullingOn;
+                    *(this->backFaceCullingOn) = !*(this->backFaceCullingOn);
                     *menuClicked = true;
                 }
 
@@ -54,6 +70,31 @@ void UserInterface::update(bool* menuClicked, glm::vec4* clear_color, glm::vec4*
                 }
 
                 if (ImGui::MenuItem("Z Buffer", NULL, *zBufferOn)){
+                    *zBufferOn = !*zBufferOn;
+                    *menuClicked = true;
+                }
+                
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Import/Export")){
+                
+                if (ImGui::MenuItem("Import OBJ", NULL)){
+                    *backFaceCullingOn = !*backFaceCullingOn;
+                    *menuClicked = true;
+                }
+
+                if (ImGui::MenuItem("Import MTL", NULL)){
+                    *antialiasingOn = !*antialiasingOn;
+                    *menuClicked = true;
+                }
+
+                if (ImGui::MenuItem("Import Scene", NULL)){
+                    *zBufferOn = !*zBufferOn;
+                    *menuClicked = true;
+                }
+
+                if (ImGui::MenuItem("Export Scene", NULL)){
                     *zBufferOn = !*zBufferOn;
                     *menuClicked = true;
                 }
@@ -172,7 +213,21 @@ void UserInterface::render(){
 
 }
 
-UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version){
+UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version, bool* menuClicked, glm::vec4* clear_color, glm::vec4* normals_color, bool* backFaceCullingOn, bool* antialiasingOn, bool* zBufferOn, bool* fillOn, bool* verticesOn, bool* boundingBoxOn, bool* edgesOn, bool* normalsOn, bool* clearScenePressed, int* indexModelSelected):
+    menuClicked(menuClicked),
+    clear_color(clear_color),
+    normals_color(normals_color),
+    backFaceCullingOn(backFaceCullingOn),
+    antialiasingOn(antialiasingOn),
+    zBufferOn(zBufferOn),
+    fillOn(fillOn),
+    verticesOn(verticesOn),
+    boundingBoxOn(boundingBoxOn),
+    edgesOn(edgesOn),
+    normalsOn(normalsOn),
+    clearScenePressed(clearScenePressed),
+    indexModelSelected(indexModelSelected)
+{
     this->window = window;
     this->glsl_version = glsl_version;
 

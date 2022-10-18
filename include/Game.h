@@ -170,17 +170,19 @@ void Game::setAntialiasing(bool state){
 }
 
 void Game::initUserInterface(){
-    gui = new UserInterface(this->window, "#version 330" );
+    gui = new UserInterface(this->window, "#version 330", &menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, &modelSelected );
 }
 
 void Game::initModels(){
 
     // this->models.push_back( new Model( "../../obj/cube.obj", this->materialMap["default"], glm::vec3(0.f, 0.f, 0.f) )  );
 
+    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Swing Chair.obj", &this->materialMap);
+    // this->models.push_back( modelsLoaded[0] );
     std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
     this->models.push_back( modelsLoaded[0] );
-    modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
-    this->models.push_back( modelsLoaded[0] );
+    // modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
+    // this->models.push_back( modelsLoaded[0] );
     // modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
     // this->models.push_back( modelsLoaded[0] );
 
@@ -410,9 +412,9 @@ void Game::render(){
     }
     
     if(modelSelected != -1)
-        gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, models[modelSelected], &modelSelected, modelNames, this->models.size() );
+        gui->update( models[modelSelected], modelNames, this->models.size() );
     else
-        gui->update(&menuClicked, &clearColor, &normalsColor, &backFaceCullingOn, &antialiasingOn, &zBufferOn, &fillOn, &verticesOn, &boundingBoxOn, &edgesOn, &normalsOn, &clearScenePressed, nullptr, &modelSelected, modelNames, this->models.size() );
+        gui->update( nullptr, modelNames, this->models.size() );
     gui->render();
 
     if(menuClicked){

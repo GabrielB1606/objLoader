@@ -34,7 +34,7 @@ public:
     void updateInput( const float& deltaTime, const int direction, const double& offsetX, const double& offsetY );
 };
 
-Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 worldUp, GLfloat movementSpeed = 0.3f, GLfloat sensitivity=200.f){
+Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 worldUp, GLfloat movementSpeed = 0.5f, GLfloat sensitivity=200.f){
     
     this->ViewMatrix = glm::mat4(1.f);
 

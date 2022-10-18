@@ -94,8 +94,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     // model attribute values
     std::string name;
     std::string materialName;
-    GLenum renderType = 0;
-    int vertexPerFace = 0;
+    GLenum renderType = GL_TRIANGLES;
     glm::vec3 maxComponents(0.f), minComponents(0.f);
 
     // vertex data
@@ -120,9 +119,12 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     // line parse variables    
     std::string fileMTL = "";
     std::string prefix = "";
+    
+    std::vector< GLuint* > face;
+
     glm::vec3 tmp_vec3;
     glm::vec2 tmp_vec2;
-    GLint tmp_int;
+    // GLint tmp_int;
 
 
     if( !file.is_open() )
@@ -152,7 +154,6 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
                 vertexArray.clear();
                 renderType = 0;
-                vertexPerFace = 0;
             }
 
             if(prefix == "o"){
@@ -198,49 +199,61 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             ss >> materialName;
 
         }else if(prefix == "f"){    //  face
+            
+            for( GLuint* &index : face )
+                delete index;
 
-            while( ss.rdbuf()->in_avail() ){
+            face.clear();
 
-                if( !renderType )
-                    vertexPerFace++;
+            for(size_t i = 0; ss.rdbuf()->in_avail(); i++ ){
                 
-                ss >> tmp_int;
-                positionIndex.push_back(tmp_int);
-
+                face.push_back( new GLuint[3] );
+                face[i][2] = -1;
+                ss >> face[i][0];
+                
                 if( ss.peek() == '/' ){
 
                     ss.ignore(1, '/');
-                    ss >> tmp_int;
-                    if( textcoordVertex.size() > 0 )
-                        textcoordIndex.push_back(tmp_int);
-                    else if(normalVertex.size() > 0)
-                        normalIndex.push_back(tmp_int);
+                    ss >> face[i][1];
 
                     if( ss.peek() == '/' ){
                         ss.ignore(1, '/');
-                        ss >> tmp_int;
-                        normalIndex.push_back(tmp_int);
+                        ss >> face[i][2];
                     }
+
                 }
 
             }
 
-            if( !renderType ){
-                switch (vertexPerFace){
-                    case 1:
-                        renderType = GL_POINTS;
-                        break;
-                    case 2:
-                        renderType = GL_LINES;
-                        break;
-                    case 3:
-                        renderType = GL_TRIANGLES;
-                        break;
-                    case 4:
-                        renderType = GL_TRIANGLE_STRIP;
-                    default:
-                        break;
-                }
+            switch (face.size()){
+                case 3:
+                
+                    for(size_t i=0; i<face.size(); i++){
+                        positionIndex.push_back( face[i][0] );
+                        
+                        if( textcoordVertex.size() > 0 ){
+                            textcoordIndex.push_back(face[i][1]);
+                            if( face[i][2]!=-1 )
+                                normalIndex.push_back(face[i][2]);
+                        }else if(normalVertex.size() > 0)
+                            normalIndex.push_back(face[i][1]);
+
+                    }
+                    
+                    break;
+            
+                case 4:
+                    for(int i : {0, 1, 2, 0, 2, 3}){
+                        positionIndex.push_back( face[i][0] );
+                        
+                        if( textcoordVertex.size() > 0 ){
+                            textcoordIndex.push_back(face[i][1]);
+                            if( face[i][2]!=-1 )
+                                normalIndex.push_back(face[i][2]);
+                        }else if(normalVertex.size() > 0)
+                            normalIndex.push_back(face[i][1]);
+                    }
+                    break;
             }
 
         }else if( prefix == "mtllib" ){
@@ -249,6 +262,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
         }
 
     }
+
+    for( GLuint* &index : face )
+        delete index;
+
+    face.clear();
 
     file.close();
 

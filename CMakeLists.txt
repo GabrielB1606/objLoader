@@ -14,19 +14,24 @@ file( GLOB IMGUI_SRC src/imgui/*.cpp )
 
 # Main Project
     # add all cpp files
-add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC})
+add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC} src/tinyfiledialogs/tinyfiledialogs.c)
     # target all .h and .hpp files
-target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui )
+target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui include/tinyfiledialogs)
     # target all .lib filesfor linking
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
     # specify libraries names for linking
 target_link_libraries(${PROJECT_NAME} glew32s glfw3 opengl32 )
 
 # ImGui Demo
-add_executable(ImGUI_demo src/demoImGUI.cpp ${IMGUI_SRC})
+add_executable(ImGUI_demo src/ImGuiDemo.cpp ${IMGUI_SRC})
 target_include_directories( ImGUI_demo PUBLIC include/ include/imgui/)
 target_link_directories( ImGUI_demo PRIVATE lib/ )
 target_link_libraries(ImGUI_demo glew32s glfw3 opengl32)
+
+# tinyfiledialogs Demo
+add_executable(tinyfiledialogs_demo src/tinyfiledialogsDemo.c src/tinyfiledialogs/tinyfiledialogs.c)
+target_include_directories(tinyfiledialogs_demo PUBLIC include/tinyfiledialogs)
+target_link_libraries(tinyfiledialogs_demo comdlg32 ole32)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
