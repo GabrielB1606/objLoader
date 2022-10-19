@@ -162,8 +162,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
                     else
                         models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
+                    models.back()->setBoundingBox(maxComponents, minComponents);
                 }
-
+                maxComponents = glm::vec3(0.f);
+                minComponents = glm::vec3(0.f);
                 meshes.clear();
                 ss >> name;
 
@@ -195,7 +197,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
         }else if(prefix == "usemtl"){   //  use material
             
-            ss >> materialName;
+            if( ss.peek() == ' ' )
+                ss.ignore(1, ' ');
+            
+            std::getline(ss, materialName);
+            // ss >> materialName;
 
         }else if(prefix == "f"){    //  face
             
@@ -213,6 +219,14 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 face.push_back( new GLuint[3] );
                 face[i][2] = -1;
                 face[i][0] = tmp_int;
+
+                maxComponents.x = std::max( maxComponents.x, positionVertex[tmp_int-1].x );
+                maxComponents.y = std::max( maxComponents.y, positionVertex[tmp_int-1].y );
+                maxComponents.z = std::max( maxComponents.z, positionVertex[tmp_int-1].z );
+
+                minComponents.x = std::min( minComponents.x, positionVertex[tmp_int-1].x );
+                minComponents.y = std::min( minComponents.y, positionVertex[tmp_int-1].y );
+                minComponents.z = std::min( minComponents.z, positionVertex[tmp_int-1].z );
                 
                 if( ss.peek() == '/' ){
 
@@ -233,7 +247,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 
                     for(size_t i=0; i<face.size(); i++){
                         positionIndex.push_back( face[i][0] );
-                        
+
                         if( textcoordVertex.size() > 0 ){
                             textcoordIndex.push_back(face[i][1]);
                             if( face[i][2]!=-1 )
@@ -260,7 +274,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             }
 
         }else if( prefix == "mtllib" ){
-            ss >> fileMTL;
+
+            if( ss.peek() == ' ' )
+                ss.ignore(1, ' ');
+
+            std::getline(ss, fileMTL);
             LoadMTL( "../../obj/"+fileMTL, materialMap );
         }
 
@@ -280,6 +298,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
         else
             models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
+        models.back()->setBoundingBox(maxComponents, minComponents);
     }
 
     for(Model* &m : models)

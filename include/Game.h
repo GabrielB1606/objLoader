@@ -411,7 +411,7 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models ){
-        m->render( this->shaders[SHADER_CORE_PROGRAM], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL] );
+        m->render( this->shaders[SHADER_CORE_PROGRAM], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL], guiState[SHOW_BOUNDING_BOX], guiState[CULLING] );
         if( guiState[SHOW_NORMALS] ){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
