@@ -93,10 +93,17 @@ Mesh::Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector
 
             vertexMap[key] = vertexArray.size();
             vertexArray.push_back( 
+                textcoordVertex.size() >0?
                 Vertex( 
                     positionVertex[ positionIndex[i]-1 ],
                     glm::vec3(0.7f),
                     textcoordVertex[ textcoordIndex[i]-1 ],
+                    normalVertex[ normalIndex[i]-1 ]
+                ):
+                Vertex( 
+                    positionVertex[ positionIndex[i]-1 ],
+                    glm::vec3(0.7f),
+                    glm::vec2(0.f),
                     normalVertex[ normalIndex[i]-1 ]
                 )
             );
@@ -106,6 +113,7 @@ Mesh::Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector
         indexVector.push_back(vertexMap[key]);
     
     }
+
     this->nrOfIndices = indexVector.size();
     this->indexArray = new GLuint[ this->nrOfIndices ];
 
