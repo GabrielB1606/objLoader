@@ -373,7 +373,7 @@ void Game::initLights(){
 void Game::initMaterials(){
 
     this->materialMap.insert({ "default", new Material("default", glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) });
-    this->materialMap.insert({ "floor", new Material("floor", glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) });
+    this->materialMap.insert({ "Bounding Box", new Material("Bounding Box", glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f)) });
 
 }
 

@@ -24,14 +24,14 @@ public:
     void scaleUp(const glm::vec3 scale);
 
     void normalize(const float factor);
-    void setBoundingBox( glm::vec3 maxComponents, glm::vec3 minComponents );
+    void setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, glm::vec3 minComponents );
 
     float* getVertexSizeReference();
     std::string getName();
 
 };
 
-void Model::setBoundingBox(glm::vec3 maxComponents, glm::vec3 minComponents){
+void Model::setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, glm::vec3 minComponents){
 
     Vertex vertices[] = {
         Vertex( glm::vec3(  minComponents.x,    minComponents.y,    minComponents.z)),
@@ -65,7 +65,7 @@ void Model::setBoundingBox(glm::vec3 maxComponents, glm::vec3 minComponents){
         0, 5, 4
     };
 
-    boundingBox = new Mesh( vertices, 8, GL_TRIANGLES, indices, 36);
+    boundingBox = new Mesh(boundingBoxMTL, vertices, 8, GL_TRIANGLES, indices, 36);
 
 }
 

@@ -187,7 +187,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
                 if(meshes.size()>0){
                     models.push_back( new Model( name, meshes ) );
-                    models.back()->setBoundingBox(maxComponents, minComponents);
+                    models.back()->setBoundingBox((*materialMap)["Bounding Box"], maxComponents, minComponents);
                 }
 
                 maxComponents = glm::vec3(0.f);
@@ -273,9 +273,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
                         positionIndex.push_back( face[i][0] );
 
-                        textcoordIndex.push_back(face[i][1]);
+                        if( textcoordVertex.size()>0 )
+                            textcoordIndex.push_back(face[i][1]);
                             
-                        normalIndex.push_back(face[i][2]);
+                        if( normalVertex.size()>0 )
+                            normalIndex.push_back(face[i][2]);
 
                     }
                     
@@ -285,9 +287,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                     for(int i : {0, 1, 2, 0, 2, 3}){
                         positionIndex.push_back( face[i][0] );
 
-                        textcoordIndex.push_back(face[i][1]);
-                            
-                        normalIndex.push_back(face[i][2]);
+                        if( textcoordVertex.size()>0 )
+                            textcoordIndex.push_back(face[i][1]);
+                        
+                        if( normalVertex.size()>0 )
+                            normalIndex.push_back(face[i][2]);
                     }
                     break;
             }
@@ -329,7 +333,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     }
 
     models.push_back( new Model( name, meshes ) );
-    models.back()->setBoundingBox(maxComponents, minComponents);
+    models.back()->setBoundingBox((*materialMap)["Bounding Box"], maxComponents, minComponents);
 
     for(Model* &m : models)
         m->normalize(maxVertex);

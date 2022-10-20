@@ -32,7 +32,7 @@ public:
     Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
     
     Mesh(const Mesh &obj);
-    Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+    Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     Mesh(Primitive &primitive, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     
 
@@ -266,7 +266,8 @@ void Mesh::setOrigin( const glm::vec3 origin ){
     this->origin = origin;
 }
 
-Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType = GL_TRIANGLES, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+Mesh::Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType = GL_TRIANGLES, GLuint* indexArray = nullptr, const unsigned& nrOfIndices = 0, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+    this->material = material;
     this->renderType = renderType;
     this->nrOfIndices = nrOfIndices;
     this->nrOfVertices = nrOfVertices;
