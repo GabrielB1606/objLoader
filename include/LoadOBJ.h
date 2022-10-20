@@ -104,6 +104,9 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     std::vector<glm::vec2> textcoordVertex;
     std::vector<glm::vec3> normalVertex;
 
+    std::vector<glm::vec3> approxNormalVertex;
+    std::unordered_map<std::string, size_t> approxNormalIndex;
+
     // vertex indices
     std::vector<GLuint> positionIndex;
     std::vector<GLuint> textcoordIndex;
@@ -123,9 +126,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     
     std::vector< GLuint* > face;
 
+    std::string tmp_str;
     glm::vec3 tmp_vec3;
     glm::vec2 tmp_vec2;
     GLint tmp_int;
+    size_t tmp_uint;
 
 
     if( !file.is_open() )
@@ -149,15 +154,39 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         groupName = name + " mesh";
                     
                 
-                if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
-                    meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
-                else{
+                if( materialName != "" && materialMap->find(materialName) != materialMap->end() ){
+
+                    meshes.push_back(
+                        new Mesh(
+                            groupName,
+                            positionVertex,
+                            textcoordVertex,
+                            normalVertex.size()>0? normalVertex:approxNormalVertex,
+                            positionIndex,
+                            textcoordIndex,
+                            normalIndex,
+                            (*materialMap)[materialName]
+                        )
+                    );
+                
+                }else{
                     
-                    fileMTL = "default"+std::to_string(default_material_counter);
-                    materialMap->insert_or_assign(prefix, new Material(fileMTL));
+                    tmp_str = "default"+std::to_string(default_material_counter);
+                    materialMap->insert_or_assign(tmp_str, new Material(tmp_str));
                     default_material_counter++;
 
-                    meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[fileMTL] ) );
+                    meshes.push_back(
+                        new Mesh(
+                            groupName,
+                            positionVertex,
+                            textcoordVertex,
+                            normalVertex.size()>0? normalVertex:approxNormalVertex,
+                            positionIndex,
+                            textcoordIndex,
+                            normalIndex,
+                            (*materialMap)[tmp_str]
+                        )
+                    );
                     
                 }
                 
@@ -260,8 +289,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
                         ss.ignore(1, '/');
 
-                        if( normalVertex.size()>0 )
+                        if( normalVertex.size()>0 ){
                             ss >> face[i][2];
+                        }else if( ss.peek() != ' ' )
+                            ss >> tmp_int;
                     
                     }
 
@@ -271,6 +302,25 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
             switch (face.size()){
                 case 3:
+
+                    if( normalVertex.size() == 0 ){
+                        tmp_vec3 = 
+                            glm::cross(
+                                (positionVertex[face[1][0]-1] - positionVertex[face[0][0]-1])
+                                ,
+                                (positionVertex[face[2][0]-1] - positionVertex[face[0][0]-1])
+                            );
+                        tmp_vec3 = glm::normalize(tmp_vec3);
+                        tmp_str = (std::to_string( tmp_vec3.x ) +","+std::to_string( tmp_vec3.y ) +","+std::to_string( tmp_vec3.z ));
+                        
+                        if( approxNormalIndex.find(tmp_str) == approxNormalIndex.end() ){
+                            approxNormalVertex.push_back( tmp_vec3 );
+                            tmp_uint = approxNormalVertex.size();
+                            approxNormalIndex.insert_or_assign(tmp_str, tmp_uint);
+                        }else{
+                            tmp_uint = approxNormalIndex[tmp_str];
+                        }
+                    }
                 
                     for(size_t i=0; i<face.size(); i++){
 
@@ -281,12 +331,34 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                             
                         if( normalVertex.size()>0 )
                             normalIndex.push_back(face[i][2]);
+                        else
+                            normalIndex.push_back(tmp_uint);
 
                     }
                     
                     break;
             
                 case 4:
+
+                    if( normalVertex.size() == 0 ){
+                        tmp_vec3 = 
+                        glm::cross(
+                            (positionVertex[face[1][0]-1] - positionVertex[face[0][0]-1])
+                            ,
+                            (positionVertex[face[2][0]-1] - positionVertex[face[0][0]-1])
+                        );
+                        tmp_vec3 = glm::normalize(tmp_vec3);
+                        tmp_str = std::to_string( tmp_vec3.x ) +",",std::to_string( tmp_vec3.y ) +","+std::to_string( tmp_vec3.z );
+                        
+                        if( approxNormalIndex.find(tmp_str) == approxNormalIndex.end() ){
+                            approxNormalVertex.push_back( tmp_vec3 );
+                            tmp_uint = approxNormalVertex.size();
+                            approxNormalIndex.insert_or_assign(tmp_str, tmp_uint);
+                        }else{
+                            tmp_uint = approxNormalIndex[tmp_str];
+                        }
+                    }
+
                     for(int i : {0, 1, 2, 0, 2, 3}){
                         positionIndex.push_back( face[i][0] );
 
@@ -295,6 +367,8 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         
                         if( normalVertex.size()>0 )
                             normalIndex.push_back(face[i][2]);
+                        else
+                            normalIndex.push_back(tmp_uint);
                     }
                     break;
             }
@@ -323,15 +397,37 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
         else if(name != "")
             groupName = name + " mesh";
 
-    if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
-        meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
-    else{
+    if( materialName != "" && materialMap->find(materialName) != materialMap->end() ){
+        meshes.push_back(
+            new Mesh(
+                groupName,
+                positionVertex,
+                textcoordVertex,
+                normalVertex.size()>0? normalVertex:approxNormalVertex,
+                positionIndex,
+                textcoordIndex,
+                normalIndex,
+                (*materialMap)[materialName]
+            )
+        );
+    }else{
         
-        prefix = "default"+std::to_string( default_material_counter );
-        materialMap->insert_or_assign(prefix, new Material(prefix));
+        tmp_str = "default"+std::to_string( default_material_counter );
+        materialMap->insert_or_assign(tmp_str, new Material(tmp_str));
         default_material_counter++;
 
-        meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
+        meshes.push_back(
+            new Mesh(
+                groupName,
+                positionVertex,
+                textcoordVertex,
+                normalVertex.size()>0? normalVertex:approxNormalVertex,
+                positionIndex,
+                textcoordIndex,
+                normalIndex,
+                (*materialMap)[tmp_str]
+            )
+        );
         
     }
 

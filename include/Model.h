@@ -87,10 +87,13 @@ void Model::normalize(const float factor){
 }
 
 void Model::move(const glm::vec3 movement){
-    for(Mesh* &m : this->meshes)
-        m->move(movement);
-    boundingBox->move(movement);
     position += movement;
+    for(Mesh* &m : this->meshes){
+        m->move(movement);
+        m->setOrigin(position);
+    }
+    boundingBox->move(movement);
+    boundingBox->setOrigin(position);
 }
 
 void Model::scaleUp(const glm::vec3 scale){

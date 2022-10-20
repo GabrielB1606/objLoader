@@ -125,18 +125,18 @@ void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelecte
             ImGui::ColorEdit3("Normals", (float*)normals_color); // Edit 3 floats representing a color
 
         ImGui::ColorEdit3("Clear", (float*)clear_color); // Edit 3 floats representing a color
-        // if( modelSelected != nullptr ){
-        //     if( state[SHOW_FILL] )
-        //         ImGui::ColorEdit3("Fill", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
+        if( *indexMeshSelected != -1 ){
+            if( state[SHOW_FILL] )
+                ImGui::ColorEdit3("Fill", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getFillColorReference() ); // Edit 3 floats representing a color
             
-        //     if( state[SHOW_VERTICES] ){
-        //         ImGui::ColorEdit3("Vertex", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
+            if( state[SHOW_VERTICES] ){
+                ImGui::ColorEdit3("Vertex", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
                 
-        //     }
+            }
 
-        //     if( state[SHOW_EDGES] )
-        //         ImGui::ColorEdit3("Edge", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
-        // }
+            if( state[SHOW_EDGES] )
+                ImGui::ColorEdit3("Edge", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
+        }
 
         // SCENE
         ImGui::Separator();
@@ -176,6 +176,7 @@ void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelecte
                         ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, models[i]->getMeshesReferences()[j]->getName().c_str() );
 
                         if (ImGui::IsItemClicked() ){
+                            *indexModelSelected = i;
                             *indexMeshSelected = j;
                             objectSelected = models[i]->getMeshesReferences()[j];
                         }

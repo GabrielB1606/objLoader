@@ -30,7 +30,7 @@ private:
 
     // scene variables & stuff
     Moveable* objectSelected = nullptr;
-    size_t modelSelected, meshSelected;
+    size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
     bool guiState[14] = {
@@ -182,8 +182,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
-    this->models.push_back( modelsLoaded[0] );
+    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    // this->models.push_back( modelsLoaded[0] );
 
 }
 
