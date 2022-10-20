@@ -37,6 +37,7 @@
 // tinyfiledialogs
 #include "tinyfiledialogs.h"
 
+size_t default_material_counter = 0;
 
 #include "HashPair.h"
 #include "Shader.h"

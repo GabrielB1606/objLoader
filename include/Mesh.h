@@ -3,6 +3,8 @@
 class Mesh{
 private:
     
+    const char* name;
+
     GLenum renderType;
 
     Vertex* vertexArray = nullptr;
@@ -21,23 +23,23 @@ private:
     glm::vec3 origin;
 
     glm::mat4 ModelMatrix;
+    Material* material;
 
 
 public:
 
     void initVAO();
-    Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType);
+    Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
     
     Mesh(const Mesh &obj);
     Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     Mesh(Primitive &primitive, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
     
-    
-    
+
     virtual ~Mesh();
     
     void update();
-    void render(Shader* shader);
+    void render(Shader* shader, bool showFill, bool showEdges, bool showVertices, float vertexSize);
     
     void updateUniforms(Shader* shader);
     void updateModelMatrix();
@@ -70,10 +72,12 @@ void Mesh::normalize(const float factor){
 
 }
 
-Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, GLenum renderType){
+Mesh::Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
 
+    this->name = name;
     this->renderType = renderType;
-    
+    this->material = material;
+
     std::unordered_map< std::pair<GLuint, GLuint> , size_t, HashPair> vertexMap;
     std::vector<Vertex> vertexArray;
     std::vector<GLuint> indexVector;
@@ -128,6 +132,8 @@ Mesh::Mesh(std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textc
 
 Mesh::Mesh(const Mesh &obj){
 
+    this->name = obj.name;
+    this->material = obj.material;
     this->renderType = obj.renderType;
     this->nrOfIndices = obj.nrOfIndices;
     this->nrOfVertices = obj.nrOfVertices;
@@ -192,7 +198,7 @@ void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
 }
 
-void Mesh::render(Shader* shader){
+void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = true, bool showVertices = false, float vertexSize = 0.f){
     
     // Model Matrix update
     this->updateModelMatrix();
@@ -204,13 +210,51 @@ void Mesh::render(Shader* shader){
     glBindVertexArray(this->VAO);
 
     // render
-    shader->use();
 
-    if(this->nrOfIndices == 0){
-        glDrawArrays(this->renderType, 0, this->nrOfVertices);
-    }else{
-        glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+    if(showFill){
+        
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glPolygonOffset(4.0, 1.0);
+        material->sendToShader(*shader, GL_FILL);
+
+        shader->use();
+        if(this->nrOfIndices == 0)
+            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+        else
+            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+                
     }
+
+    if( showEdges ){
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonOffset(2.0, 1.0);
+        material->sendToShader(*shader, GL_LINE);
+
+        shader->use();
+        if(this->nrOfIndices == 0)
+            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+        else
+            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+        
+    }
+
+    if( showVertices ){
+
+        glPointSize(vertexSize);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        material->sendToShader(*shader, GL_POINT);
+
+        shader->use();
+        if(this->nrOfIndices == 0)
+            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+        else
+            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+
+        glPointSize(1.f);
+        
+    }
+
 
     // cleanup
     shader->stopUsing();

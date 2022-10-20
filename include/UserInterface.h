@@ -121,18 +121,18 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
             ImGui::ColorEdit3("Normals", (float*)normals_color); // Edit 3 floats representing a color
 
         ImGui::ColorEdit3("Clear", (float*)clear_color); // Edit 3 floats representing a color
-        if( modelSelected != nullptr ){
-            if( state[SHOW_FILL] )
-                ImGui::ColorEdit3("Fill", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
+        // if( modelSelected != nullptr ){
+        //     if( state[SHOW_FILL] )
+        //         ImGui::ColorEdit3("Fill", (float*)modelSelected->getMaterialReference()->getFillColorReference()); // Edit 3 floats representing a color
             
-            if( state[SHOW_VERTICES] ){
-                ImGui::ColorEdit3("Vertex", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
+        //     if( state[SHOW_VERTICES] ){
+        //         ImGui::ColorEdit3("Vertex", (float*)modelSelected->getMaterialReference()->getVertexColorReference()); // Edit 3 floats representing a color
                 
-            }
+        //     }
 
-            if( state[SHOW_EDGES] )
-                ImGui::ColorEdit3("Edge", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
-        }
+        //     if( state[SHOW_EDGES] )
+        //         ImGui::ColorEdit3("Edge", (float*)modelSelected->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
+        // }
 
         // SCENE
         ImGui::Separator();

@@ -93,7 +93,8 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
     // model attribute values
     std::string name;
-    std::string materialName;
+    std::string groupName = "";
+    std::string materialName = "";
     GLenum renderType = GL_TRIANGLES;
     glm::vec3 maxComponents(0.f), minComponents(0.f);
 
@@ -137,33 +138,58 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
         ss >> prefix;
 
-        if(prefix == "o" || prefix == "g"){ // new object name
+        if(prefix == "o" || prefix == "g" || prefix == "usemtl"){ // new object name
 
             if( positionIndex.size() != 0 ){
+
+                if(groupName == "" )
+                    if(materialName != "")
+                        groupName = materialName;
+                    else if(name != "")
+                        groupName = name + " mesh";
+                    
                 
-                meshes.push_back( new Mesh(positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, renderType ) );
+                if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
+                    meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
+                else{
+                    
+                    prefix = "default"+std::to_string(default_material_counter);
+                    materialMap->insert_or_assign(prefix, new Material(prefix));
+                    default_material_counter++;
+
+                    meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
+                    
+                }
                 
                 // positionVertex.clear();
                 // textcoordVertex.clear();
                 // normalVertex.clear();
                 
-                // positionIndex.clear();
-                // textcoordIndex.clear();
-                // normalIndex.clear();
+                positionIndex.clear();
+                textcoordIndex.clear();
+                normalIndex.clear();
 
                 // vertexArray.clear();
                 // renderType = 0;
             }
 
+            if(prefix == "usemtl"){   //  use material
+            
+                if( ss.peek() == ' ' )
+                    ss.ignore(1, ' ');
+                
+                std::getline(ss, materialName);
+                // ss >> materialName;
+
+            }
+
             if(prefix == "o"){
 
                 if(meshes.size()>0){
-                    if( materialMap->find(materialName) != materialMap->end() )
-                        models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
-                    else
-                        models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
+                    models.push_back( new Model( name, meshes ) );
                     models.back()->setBoundingBox(maxComponents, minComponents);
                 }
+
                 maxComponents = glm::vec3(0.f);
                 minComponents = glm::vec3(0.f);
                 meshes.clear();
@@ -195,14 +221,6 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             ss >> tmp_vec3.x >> tmp_vec3.y >> tmp_vec3.z;
             normalVertex.push_back( tmp_vec3 );
 
-        }else if(prefix == "usemtl"){   //  use material
-            
-            if( ss.peek() == ' ' )
-                ss.ignore(1, ' ');
-            
-            std::getline(ss, materialName);
-            // ss >> materialName;
-
         }else if(prefix == "f"){    //  face
             
             for( GLuint* &index : face )
@@ -231,11 +249,17 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 if( ss.peek() == '/' ){
 
                     ss.ignore(1, '/');
-                    ss >> face[i][1];
-
+                    
+                    if( textcoordVertex.size()>0 )
+                        ss >> face[i][1];
+                    
                     if( ss.peek() == '/' ){
+
                         ss.ignore(1, '/');
-                        ss >> face[i][2];
+
+                        if( normalVertex.size()>0 )
+                            ss >> face[i][2];
+                    
                     }
 
                 }
@@ -246,14 +270,12 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 case 3:
                 
                     for(size_t i=0; i<face.size(); i++){
+
                         positionIndex.push_back( face[i][0] );
 
-                        if( textcoordVertex.size() > 0 ){
-                            textcoordIndex.push_back(face[i][1]);
-                            if( face[i][2]!=-1 )
-                                normalIndex.push_back(face[i][2]);
-                        }else if(normalVertex.size() > 0)
-                            normalIndex.push_back(face[i][1]);
+                        textcoordIndex.push_back(face[i][1]);
+                            
+                        normalIndex.push_back(face[i][2]);
 
                     }
                     
@@ -262,13 +284,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 case 4:
                     for(int i : {0, 1, 2, 0, 2, 3}){
                         positionIndex.push_back( face[i][0] );
-                        
-                        if( textcoordVertex.size() > 0 ){
-                            textcoordIndex.push_back(face[i][1]);
-                            if( face[i][2]!=-1 )
-                                normalIndex.push_back(face[i][2]);
-                        }else if(normalVertex.size() > 0)
-                            normalIndex.push_back(face[i][1]);
+
+                        textcoordIndex.push_back(face[i][1]);
+                            
+                        normalIndex.push_back(face[i][2]);
                     }
                     break;
             }
@@ -291,15 +310,26 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
     file.close();
 
-    meshes.push_back( new Mesh(positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, renderType ) );
+    if(groupName == "" )
+        if(materialName != "")
+            groupName = materialName;
+        else if(name != "")
+            groupName = name + " mesh";
 
-    if(meshes.size()>0){
-        if( materialMap->find(materialName) != materialMap->end() )
-            models.push_back( new Model( name, meshes, (*materialMap)[materialName] ) );
-        else
-            models.push_back( new Model( name, meshes, (*materialMap)["default"] ) );
-        models.back()->setBoundingBox(maxComponents, minComponents);
+    if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
+        meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
+    else{
+        
+        prefix = "default"+std::to_string( default_material_counter );
+        materialMap->insert_or_assign(prefix, new Material(prefix));
+        default_material_counter++;
+
+        meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
+        
     }
+
+    models.push_back( new Model( name, meshes ) );
+    models.back()->setBoundingBox(maxComponents, minComponents);
 
     for(Model* &m : models)
         m->normalize(maxVertex);

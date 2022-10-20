@@ -5,7 +5,6 @@ private:
 
     std::string name;
 
-    Material* material;
     std::vector<Mesh*> meshes;
     glm::vec3 position;
 
@@ -13,10 +12,8 @@ private:
 
     float vertexSize = 10.f;
 
-    void updateUniforms(Shader* shader);
-
 public:
-    Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position, glm::vec3 rotation);
+    Model(std::string name, std::vector<Mesh*> meshes, glm::vec3 position, glm::vec3 rotation);
     ~Model();
 
     void update();
@@ -29,7 +26,6 @@ public:
     void normalize(const float factor);
     void setBoundingBox( glm::vec3 maxComponents, glm::vec3 minComponents );
 
-    Material* getMaterialReference();
     float* getVertexSizeReference();
     std::string getName();
 
@@ -106,45 +102,18 @@ float* Model::getVertexSizeReference(){
     return &this->vertexSize;
 }
 
-Material* Model::getMaterialReference(){
-    return material;
-}
-
 void Model::rotate(const glm::vec3 rotation){
     for( Mesh* &m : meshes )
         m->rotate(rotation);
     boundingBox->rotate(rotation);
 }
 
-void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool fillOn = true, bool showBoundingBox = true, bool prevCull = true){
+void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool fillOn = true, bool showBoundingBox = false, bool prevCull = true){
 
     // this->updateUniforms(shader);
-    if(fillOn){
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glPolygonOffset(4.0, 1.0);
-        material->sendToShader(*shader, GL_FILL);
-        for(Mesh* m : meshes){
-            m->render(shader);
-        }
-    }
-    
-    if( showEdges ){
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glPolygonOffset(2.0, 1.0);
-        material->sendToShader(*shader, GL_LINE);
-        for(Mesh* m : meshes)
-            m->render(shader);
-        
-    }
 
-    if( showVertices ){
-        glPointSize(this->vertexSize);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        material->sendToShader(*shader, GL_POINT);
-        for(Mesh* m : meshes)
-            m->render(shader);
-        glPointSize(1.f);
-        
+    for(Mesh* m : meshes){
+        m->render(shader, fillOn, showEdges, showVertices, vertexSize);
     }
 
     if( showBoundingBox && boundingBox != nullptr ){
@@ -152,10 +121,7 @@ void Model::render(Shader* shader, bool showEdges = true, bool showVertices = fa
             glDisable(GL_CULL_FACE);
 
         glLineWidth(2);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // glPolygonOffset(1, 0);
-        material->sendToShader(*shader, GL_LINE);
-        boundingBox->render(shader);
+        boundingBox->render(shader, false);
         glLineWidth(1);
 
         if(prevCull)
@@ -163,22 +129,15 @@ void Model::render(Shader* shader, bool showEdges = true, bool showVertices = fa
     }
 }
 
-void Model::updateUniforms(Shader* shader){
-
-    this->material->sendToShader(*shader);
-
-}
-
 void Model::update(){
 
 }
 
-Model::Model(std::string name, std::vector<Mesh*> meshes, Material* material, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
+Model::Model(std::string name, std::vector<Mesh*> meshes, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f)){
 
     this->boundingBox = nullptr;
     this->name = name;
     this->position = position;
-    this->material = material;
 
     for( Mesh* m : meshes ){
         this->meshes.push_back( new Mesh( *m ) );
