@@ -152,13 +152,15 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
         }
 
         ImGui::Text("Models & Meshes");
-            for (int i = 0; i < 1; i++)
-            {
+            for (int i = 0; i < nrOfModels; i++){
 
                 ImGuiTreeNodeFlags node_flags = base_flags;
+                
                 if ( i == *indexModelSelected )
                     node_flags |= ImGuiTreeNodeFlags_Selected;
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
+
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, modelNames[i]);
+
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                     *indexModelSelected = i;
                 if (node_open){
@@ -166,7 +168,7 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
                         node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
                         if( j == *indexMeshSelected )
                             node_flags |= ImGuiTreeNodeFlags_Selected;
-                        ImGui::TreeNodeEx((void*)(intptr_t)(i+j+1), node_flags, "Selectable Leaf %d", (i+j+1));
+                        ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, "Selectable Leaf %d", (j));
 
                         if (ImGui::IsItemClicked() )
                             *indexMeshSelected = j;
