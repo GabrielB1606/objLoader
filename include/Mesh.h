@@ -19,6 +19,7 @@ private:
 
     glm::vec3 position;
     glm::vec3 rotation;
+    glm::mat4 rotationMatrix = glm::mat4(1.f);
     glm::vec3 scale;
     glm::vec3 origin;
 
@@ -184,7 +185,8 @@ void Mesh::scaleUp(const glm::vec3 scale){
 }
 
 void Mesh::rotate( const glm::vec3 rotation ){
-    this->rotation += rotation;
+    this->rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians( rotation.x), glm::vec3(1.f, 0.f, 0.f)) * this->rotationMatrix;
+    this->rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f)) * this->rotationMatrix;
 }
 
 void Mesh::move(const glm::vec3 movement){
@@ -207,11 +209,10 @@ void Mesh::updateModelMatrix(){
     this->ModelMatrix = glm::mat4(1.f);
 
     this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
-    this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians( this->rotation.x ), glm::vec3(1.f, 0.f, 0.f));
-    this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians( this->rotation.y ), glm::vec3(0.f, 1.f, 0.f));
-    this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians( this->rotation.z ), glm::vec3(0.f, 0.f, 1.f));
+    this->ModelMatrix =   this->ModelMatrix * this->rotationMatrix;
     this->ModelMatrix = glm::translate(this->ModelMatrix, this->position - this->origin);
     this->ModelMatrix = glm::scale(this->ModelMatrix, glm::vec3( this->scale ));
+
 }
 
 void Mesh::updateUniforms(Shader* shader){
@@ -314,6 +315,7 @@ Mesh::Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices
 
 Mesh::Mesh(Primitive &primitive, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
 
+    this->ModelMatrix = glm::mat4(1.f);
     this->renderType = GL_TRIANGLES;
 
     this->nrOfIndices = primitive.getNrOfIndices();

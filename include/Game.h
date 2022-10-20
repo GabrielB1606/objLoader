@@ -182,8 +182,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    this->models.push_back( modelsLoaded[0] );
 
 }
 
@@ -471,8 +471,8 @@ void Game::update(){
     // updateInput( this->meshes[0] );
     updateInput(  );
 
-    if( models.size() >= 1 )
-        models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
+    // if( models.size() >= 1 )
+    //     models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
 
 }
 
