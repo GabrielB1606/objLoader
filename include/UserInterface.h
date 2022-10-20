@@ -29,11 +29,11 @@ public:
     UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, int* indexModelSelected);
     ~UserInterface();
 
-    void update(Model* modelSelected, char* modelNames[], size_t nrOfModels );
+    void update( std::vector<Model*> models );
     void render();
 };
 
-void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrOfModels ){
+void UserInterface::update( std::vector<Model*> models ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -114,8 +114,8 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
             SameLine() ||
             ImGui::Checkbox("Normals", &state[SHOW_NORMALS]);
         
-        if(state[SHOW_VERTICES] && modelSelected!=nullptr)
-            ImGui::SliderFloat("vertex size", modelSelected->getVertexSizeReference(), 1.0f, 20.0f);
+        if(state[SHOW_VERTICES] && *indexModelSelected != -1)
+            ImGui::SliderFloat("vertex size", models[*indexModelSelected]->getVertexSizeReference(), 1.0f, 20.0f);
         
         // COLORS
         ImGui::Separator();
@@ -152,23 +152,25 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
         }
 
         ImGui::Text("Models & Meshes");
-            for (int i = 0; i < nrOfModels; i++){
+            for (size_t i = 0; i < models.size(); i++){
 
                 ImGuiTreeNodeFlags node_flags = base_flags;
                 
                 if ( i == *indexModelSelected )
                     node_flags |= ImGuiTreeNodeFlags_Selected;
 
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, modelNames[i]);
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, models[i]->getName().c_str() );
 
-                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
                     *indexModelSelected = i;
+                    *indexMeshSelected = -1;
+                }
                 if (node_open){
-                    for(int j = 0; j<3; j++){
+                    for(size_t j = 0; j<models[i]->getMeshesReferences().size(); j++){
                         node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
                         if( j == *indexMeshSelected )
                             node_flags |= ImGuiTreeNodeFlags_Selected;
-                        ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, "Selectable Leaf %d", (j));
+                        ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, models[i]->getMeshesReferences()[j]->getName().c_str() );
 
                         if (ImGui::IsItemClicked() )
                             *indexMeshSelected = j;
@@ -179,7 +181,7 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
             }
 
 
-        ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
+        // ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
 
          // DEMO LEFTOVERS
         // ImGui::Separator();

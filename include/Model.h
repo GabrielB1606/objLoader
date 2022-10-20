@@ -28,8 +28,13 @@ public:
 
     float* getVertexSizeReference();
     std::string getName();
+    std::vector<Mesh *> getMeshesReferences();
 
 };
+
+std::vector<Mesh *> Model::getMeshesReferences(){
+    return this->meshes;
+}
 
 void Model::setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, glm::vec3 minComponents){
 

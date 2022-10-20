@@ -418,10 +418,7 @@ void Game::render(){
         }
     }
     
-    if(modelSelected != -1)
-        gui->update( models[modelSelected], modelNames, this->models.size() );
-    else
-        gui->update( nullptr, modelNames, this->models.size() );
+    gui->update( models );
     gui->render();
 
     if( guiState[MENU_CLICK] ){

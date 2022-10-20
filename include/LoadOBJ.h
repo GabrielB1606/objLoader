@@ -92,7 +92,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     std::vector<Mesh *> meshes;
 
     // model attribute values
-    std::string name;
+    std::string name = "";
     std::string groupName = "";
     std::string materialName = "";
     GLenum renderType = GL_TRIANGLES;
@@ -142,22 +142,22 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
             if( positionIndex.size() != 0 ){
 
-                if(groupName == "" )
-                    if(materialName != "")
+                if( !groupName.length() )
+                    if( !materialName.length() )
                         groupName = materialName;
-                    else if(name != "")
+                    else if( !name.length() )
                         groupName = name + " mesh";
                     
                 
                 if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
-                    meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
+                    meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
                 else{
                     
-                    prefix = "default"+std::to_string(default_material_counter);
-                    materialMap->insert_or_assign(prefix, new Material(prefix));
+                    fileMTL = "default"+std::to_string(default_material_counter);
+                    materialMap->insert_or_assign(prefix, new Material(fileMTL));
                     default_material_counter++;
 
-                    meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
+                    meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[fileMTL] ) );
                     
                 }
                 
@@ -168,12 +168,17 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 positionIndex.clear();
                 textcoordIndex.clear();
                 normalIndex.clear();
+                groupName = "";
 
                 // vertexArray.clear();
                 // renderType = 0;
             }
 
-            if(prefix == "usemtl"){   //  use material
+            if( prefix == "g" ){
+                if( ss.peek() == ' ' )
+                    ss.ignore(1, ' ');
+                std::getline(ss, groupName);
+            }else if(prefix == "usemtl"){   //  use material
             
                 if( ss.peek() == ' ' )
                     ss.ignore(1, ' ');
@@ -181,9 +186,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 std::getline(ss, materialName);
                 // ss >> materialName;
 
-            }
-
-            if(prefix == "o"){
+            }else if(prefix == "o"){
 
                 if(meshes.size()>0){
                     models.push_back( new Model( name, meshes ) );
@@ -321,14 +324,14 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             groupName = name + " mesh";
 
     if( materialName != "" && materialMap->find(materialName) != materialMap->end() )
-        meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
+        meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[materialName] ) );
     else{
         
         prefix = "default"+std::to_string( default_material_counter );
         materialMap->insert_or_assign(prefix, new Material(prefix));
         default_material_counter++;
 
-        meshes.push_back( new Mesh(groupName.c_str(), positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
+        meshes.push_back( new Mesh(groupName, positionVertex, textcoordVertex, normalVertex, positionIndex, textcoordIndex, normalIndex, (*materialMap)[prefix] ) );
         
     }
 

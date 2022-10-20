@@ -3,7 +3,7 @@
 class Mesh{
 private:
     
-    const char* name;
+    std::string name;
 
     GLenum renderType;
 
@@ -29,7 +29,7 @@ private:
 public:
 
     void initVAO();
-    Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
+    Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
     
     Mesh(const Mesh &obj);
     Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
@@ -55,7 +55,7 @@ public:
     void setScale(const glm::vec3 scale);
     void setOrigin(const glm::vec3 origin);
 
-    const char* getName();
+    std::string getName();
     Material* getMaterialReference();
 };
 
@@ -63,7 +63,7 @@ Material* Mesh::getMaterialReference(){
     return this->material;
 }
 
-const char* Mesh::getName(){
+std::string Mesh::getName(){
     return this->name;
 }
 
@@ -85,7 +85,7 @@ void Mesh::normalize(const float factor){
 
 
 
-Mesh::Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
+Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
 
     this->name = name;
     this->renderType = renderType;
