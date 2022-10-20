@@ -54,7 +54,18 @@ public:
     void setRotation(const glm::vec3 rotation);
     void setScale(const glm::vec3 scale);
     void setOrigin(const glm::vec3 origin);
+
+    const char* getName();
+    Material* getMaterialReference();
 };
+
+Material* Mesh::getMaterialReference(){
+    return this->material;
+}
+
+const char* Mesh::getName(){
+    return this->name;
+}
 
 void Mesh::normalize(const float factor){
 
@@ -71,6 +82,8 @@ void Mesh::normalize(const float factor){
     initVAO();
 
 }
+
+
 
 Mesh::Mesh(const char* name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
 

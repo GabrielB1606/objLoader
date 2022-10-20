@@ -7,6 +7,9 @@ private:
 
     const char* glsl_version;
 
+    // Tree porperties
+    static const ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
+
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
@@ -16,6 +19,7 @@ private:
 
     const glm::vec4 *clear_color, *normals_color;
     int* indexModelSelected;
+    int* indexMeshSelected = new int[1];
 
     ImGuiStyle style;
 
@@ -147,25 +151,51 @@ void UserInterface::update( Model* modelSelected, char* modelNames[], size_t nrO
             *indexModelSelected = -1;
         }
 
+        ImGui::Text("Models & Meshes");
+            for (int i = 0; i < 1; i++)
+            {
+
+                ImGuiTreeNodeFlags node_flags = base_flags;
+                if ( i == *indexModelSelected )
+                    node_flags |= ImGuiTreeNodeFlags_Selected;
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
+                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                    *indexModelSelected = i;
+                if (node_open){
+                    for(int j = 0; j<3; j++){
+                        node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
+                        if( j == *indexMeshSelected )
+                            node_flags |= ImGuiTreeNodeFlags_Selected;
+                        ImGui::TreeNodeEx((void*)(intptr_t)(i+j+1), node_flags, "Selectable Leaf %d", (i+j+1));
+
+                        if (ImGui::IsItemClicked() )
+                            *indexMeshSelected = j;
+                    }
+                        ImGui::TreePop();
+                }
+
+            }
+
+
         ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
 
          // DEMO LEFTOVERS
-        ImGui::Separator();
-        ImGui::Text("Demo");               // Display some text (you can use a format strings too)
+        // ImGui::Separator();
+        // ImGui::Text("Demo");               // Display some text (you can use a format strings too)
         
-        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+        // // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+        // ImGui::Checkbox("Another Window", &show_another_window);
 
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        // ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
+        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        //     counter++;
+        // ImGui::SameLine();
+        // ImGui::Text("counter = %d", counter);
 
         
         ImGui::End();
