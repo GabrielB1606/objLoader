@@ -18,22 +18,22 @@ private:
     bool *state;
 
     const glm::vec4 *clear_color, *normals_color;
-    int* indexModelSelected;
-    int* indexMeshSelected = new int[1];
+    size_t* indexModelSelected;
+    size_t* indexMeshSelected;
 
     ImGuiStyle style;
 
     bool SameLine(){ ImGui::SameLine(); return false; }
 
 public:
-    UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, int* indexModelSelected);
+    UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, size_t* indexModelSelected, size_t* indexMeshSelected);
     ~UserInterface();
 
-    void update( std::vector<Model*> models );
+    void update( std::vector<Model*> models, Moveable* &objectSelected);
     void render();
 };
 
-void UserInterface::update( std::vector<Model*> models ){
+void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelected ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -149,6 +149,8 @@ void UserInterface::update( std::vector<Model*> models ){
 
         if (ImGui::Button("Select Camera")){
             *indexModelSelected = -1;
+            *indexMeshSelected = -1;
+            objectSelected = nullptr;
         }
 
         ImGui::Text("Models & Meshes");
@@ -164,6 +166,7 @@ void UserInterface::update( std::vector<Model*> models ){
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
                     *indexModelSelected = i;
                     *indexMeshSelected = -1;
+                    objectSelected = models[i];
                 }
                 if (node_open){
                     for(size_t j = 0; j<models[i]->getMeshesReferences().size(); j++){
@@ -172,8 +175,10 @@ void UserInterface::update( std::vector<Model*> models ){
                             node_flags |= ImGuiTreeNodeFlags_Selected;
                         ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, models[i]->getMeshesReferences()[j]->getName().c_str() );
 
-                        if (ImGui::IsItemClicked() )
+                        if (ImGui::IsItemClicked() ){
                             *indexMeshSelected = j;
+                            objectSelected = models[i]->getMeshesReferences()[j];
+                        }
                     }
                         ImGui::TreePop();
                 }
@@ -237,11 +242,12 @@ void UserInterface::render(){
 
 }
 
-UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, int* indexModelSelected):
+UserInterface::UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, size_t* indexModelSelected, size_t* indexMeshSelected):
     state(state),
     clear_color(clear_color),
     normals_color(normals_color),
-    indexModelSelected(indexModelSelected)
+    indexModelSelected(indexModelSelected),
+    indexMeshSelected(indexMeshSelected)
 {
     this->window = window;
     this->glsl_version = glsl_version;

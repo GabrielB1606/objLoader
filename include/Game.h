@@ -29,8 +29,8 @@ private:
     int fbWidth, fbHeight;
 
     // scene variables & stuff
-    char** modelNames = nullptr;
-    int modelSelected;
+    Moveable* objectSelected = nullptr;
+    size_t modelSelected, meshSelected;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
     bool guiState[14] = {
@@ -177,36 +177,13 @@ void Game::setAntialiasing(bool state){
 }
 
 void Game::initUserInterface(){
-    gui = new UserInterface(this->window, "#version 330", guiState, &clearColor, &normalsColor, &modelSelected );
+    gui = new UserInterface(this->window, "#version 330", guiState, &clearColor, &normalsColor, &modelSelected, &meshSelected );
 }
 
 void Game::initModels(){
 
-    // this->models.push_back( new Model( "../../obj/cube.obj", this->materialMap["default"], glm::vec3(0.f, 0.f, 0.f) )  );
-
-    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Swing Chair.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
     std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
     this->models.push_back( modelsLoaded[0] );
-    // modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
-    // modelsLoaded = LoadOBJ("../../obj/cube.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
-
-    // std::vector<Mesh*> meshes;
-    // meshes.push_back( new Mesh( PrimitiveQuad(), glm::vec3(0.f), glm::vec3(0.f, 0.f, -2.f), glm::vec3(-90.f, 0.f, 0.f), glm::vec3(50.f) ) );
-
-    // this->models.push_back( new Model( "floor", meshes, this->materialMap["floor"], glm::vec3(0.f) ) );
-
-    // delete meshes[0];
-    
-    modelNames = new char*[ this->models.size() ];
-    for(size_t i = 0; i<this->models.size(); i++){
-        // modelNames[i] = this->models[i]->getName().c_str();
-        modelNames[i] = new char[this->models[i]->getName().size()+1 ];
-        strcpy_s( modelNames[i],this->models[i]->getName().size()+1 ,this->models[i]->getName().c_str() );
-    }
-        // memcpy( modelNames[i], this->models[i]->getName().c_str(), this->models[i]->getName().size() );
 
 }
 
@@ -267,7 +244,7 @@ void Game::updateInputMouse(){
         this->lastMouseY = this->mouseY;
 
         if( modelSelected != -1 ){
-            this->models[modelSelected]->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
+            this->objectSelected->rotate( glm::vec3( this->mouseOffsetY*deltaTime*movementSpeed*1000, this->mouseOffsetX*deltaTime*movementSpeed*1000, 0.f ) );
         }else{
             this->camera.updateCameraAngle(deltaTime, mouseOffsetX, mouseOffsetY);
         }
@@ -288,7 +265,7 @@ void Game::updateInputKeyboard(){
     if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-    if(modelSelected == -1){
+    if(objectSelected == nullptr){
 
         if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ){
             this->camera.updatePosition(deltaTime, FORWARD);
@@ -312,28 +289,28 @@ void Game::updateInputKeyboard(){
     }else{
         
         if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
-            this->models[modelSelected]->move( glm::vec3( 0.f, 0.f, -movementSpeed * deltaTime ) );
+            this->objectSelected->move( glm::vec3( 0.f, 0.f, -movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
-            this->models[modelSelected]->move( glm::vec3( 0.f, 0.f, movementSpeed * deltaTime ) );
+            this->objectSelected->move( glm::vec3( 0.f, 0.f, movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
-            this->models[modelSelected]->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
+            this->objectSelected->move( glm::vec3( -movementSpeed * deltaTime, 0.f, 0.f ) );
         
         if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
-            this->models[modelSelected]->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
+            this->objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
 
         if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-            this->models[modelSelected]->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+            this->objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
 
         if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
-            this->models[modelSelected]->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+            this->objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
         
         if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-            this->models[modelSelected]->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
+            this->objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
         
         if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-            this->models[modelSelected]->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
+            this->objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
 
     }
     
@@ -418,7 +395,7 @@ void Game::render(){
         }
     }
     
-    gui->update( models );
+    gui->update( models, objectSelected );
     gui->render();
 
     if( guiState[MENU_CLICK] ){
@@ -449,22 +426,9 @@ void Game::render(){
             if( filePath == NULL )
                 return;
 
-            if( modelNames != nullptr ){
-                for(size_t i = 0; i<this->models.size(); i++)
-                    delete modelNames[i];
-                delete modelNames;
-            }
-
             std::vector<Model*> modelsLoaded = LoadOBJ(filePath, &materialMap);
             for( Model* &m : modelsLoaded )
                 this->models.push_back(m);
-
-
-            modelNames = new char*[ this->models.size() ];
-            for(size_t i = 0; i<this->models.size(); i++){
-                modelNames[i] = new char[this->models[i]->getName().size()+1 ];
-                strcpy_s( modelNames[i],this->models[i]->getName().size()+1 ,this->models[i]->getName().c_str() );
-            }
         
         }else if( guiState[IMPORT_MTL] ){
             guiState[IMPORT_MTL] = false;

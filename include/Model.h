@@ -1,6 +1,6 @@
 #pragma once
 
-class Model{
+class Model : public Moveable{
 private:
 
     std::string name;
