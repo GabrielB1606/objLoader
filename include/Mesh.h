@@ -245,7 +245,7 @@ void Mesh::renderPicking(Shader* shader){
 
 }
 
-void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = true, bool showVertices = false, float vertexSize = 0.f){
+void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, bool showVertices = false, float vertexSize = 0.f){
     
     // Model Matrix update
     this->updateModelMatrix();
