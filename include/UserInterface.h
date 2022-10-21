@@ -31,7 +31,14 @@ public:
 
     void update( std::vector<Model*> models, Moveable* &objectSelected);
     void render();
+
+    bool clickOutside();
 };
+
+bool UserInterface::clickOutside(){
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    return !io.WantCaptureMouse;
+}
 
 void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelected ){
     // Start the Dear ImGui frame

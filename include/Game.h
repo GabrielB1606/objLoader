@@ -23,6 +23,7 @@ private:
     double mouseX, mouseY;
     double mouseOffsetX, mouseOffsetY;
     bool firstMouse;
+    int mouseButtonPressState = GLFW_RELEASE;
 
     // Window
     GLFWwindow* window;
@@ -311,16 +312,15 @@ void Game::updateInputMouse(){
             this->camera.updateCameraAngle(deltaTime, mouseOffsetX, mouseOffsetY);
         }
 
-    }else if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS ){
-        
-        if( firstMouse ){
-            firstMouse = false;
-            picking();
-        }
-
     }else{
         firstMouse = true;
     }
+
+    int newState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT);
+    if (newState == GLFW_RELEASE && this->mouseButtonPressState == GLFW_PRESS && gui->clickOutside() ) {
+        picking();
+    }
+    this->mouseButtonPressState = newState;
 
     if(lightsOn)
         if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
