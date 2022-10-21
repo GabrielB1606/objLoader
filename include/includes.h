@@ -47,7 +47,7 @@ size_t default_material_counter = 0;
 #include "Primitive.h"
 #include "Mesh.h"
 #include "Model.h"
-#include "LoadOBJ.h"
+#include "LoadFiles.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
 #include "PrimitiveCube.h"

@@ -218,6 +218,15 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             }else if(prefix == "o"){
 
                 if(meshes.size()>0){
+
+                    if( name.length() == 0 )
+                        if( groupName.length() != 0 )
+                            name = groupName + " Model";
+                        else if( materialName.length() != 0 )
+                            name = materialName + " Model";
+                        else
+                            name = objFile;
+
                     models.push_back( new Model( name, meshes ) );
                     models.back()->setBoundingBox((*materialMap)["Bounding Box"], maxComponents, minComponents);
                 }
@@ -431,6 +440,14 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
         
     }
 
+    if( name.length() == 0 )
+        if( groupName.length() != 0 )
+            name = groupName + " Model";
+        else if( materialName.length() != 0 )
+            name = materialName + " Model";
+        else
+            name = objFile;
+
     models.push_back( new Model( name, meshes ) );
     models.back()->setBoundingBox((*materialMap)["Bounding Box"], maxComponents, minComponents);
 
@@ -438,5 +455,81 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
         m->normalize(maxVertex);
 
     return models;
+
+}
+
+void LoadSCN( std::string scnFile, std::vector<Model*> models, std::unordered_map<std::string, Material*> *materialMap){
+
+     // file variables
+    std::stringstream ss;
+    std::ifstream file( scnFile.c_str() );
+    std::string line = "";
+    
+    std::string file2read = "";
+    std::vector<Model*> modelsLoaded;
+
+    glm::vec3 tmp_vec3;
+
+    // line parse variables    
+    std::string prefix = "";
+
+    if( !file.is_open() ){
+        std::cout << "ERROR: could not open SCN: " << scnFile << "\n";
+        return;
+    }
+
+    while( std::getline(file, line) ){
+        
+        ss.clear();
+        ss.str(line);
+
+        ss >> prefix;
+
+        if(prefix == "obj"){
+
+            std::getline(ss, file2read);
+            modelsLoaded = LoadOBJ(file2read.c_str(), materialMap);
+            
+            if(!std::getline(file, line))
+                break;
+
+            ss.clear();
+            ss.str(line);
+
+            ss >> prefix;
+
+            if(prefix == "pos"){
+                
+                ss >> tmp_vec3.x >> tmp_vec3.y >> tmp_vec3.z;
+
+                for(Model* &m:modelsLoaded)
+                    m->move( tmp_vec3 );
+
+                if(!std::getline(file, line))
+                    break;
+
+                ss.clear();
+                ss.str(line);
+
+                ss >> prefix;
+
+            }
+
+            if( prefix == "rot" ){
+                ss >> tmp_vec3.x >> tmp_vec3.y >> tmp_vec3.z;
+
+                for(Model* &m:modelsLoaded)
+                    m->rotate( tmp_vec3 );
+            }
+
+            for(Model* &m:modelsLoaded)
+                models.push_back(m);
+
+        }else if(prefix == "mtl"){
+            std::getline(ss, file2read);
+            LoadMTL(file2read, materialMap);
+        }
+
+    }
 
 }
