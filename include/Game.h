@@ -138,6 +138,7 @@ public:
     void closeWindow();
 
     void update();
+    void updateState();
     void render();
     void picking();
 };
@@ -332,7 +333,7 @@ void Game::updateUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     if(guiState[SHOW_NORMALS])
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-        
+
     this->shaders[SHADER_PICKING_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
@@ -490,9 +491,9 @@ void Game::initMaterials(){
 }
 
 void Game::initShaders(){
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl", "../../shaders/geometry_core.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_normals.glsl", "../../shaders/geometry_normals.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_picking.glsl", "../../shaders/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/core/fragment_core.glsl", "../../shaders/core/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/normals/fragment_normals.glsl", "../../shaders/normals/geometry_normals.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/picking/fragment_picking.glsl", "../../shaders/core/geometry_core.glsl" ) );
 }
 
 void Game::initMatrices(){
@@ -529,13 +530,36 @@ void Game::render(){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
         }
-        this->shaders[SHADER_PICKING_PROGRAM]->setVec4f(glm::vec4(1.f, 0.f, 0.f, 1.0f), "PickingColor");
-        m->render( this->shaders[SHADER_PICKING_PROGRAM] );
+        // this->shaders[SHADER_PICKING_PROGRAM]->setVec4f(glm::vec4(1.f, 0.f, 0.f, 1.0f), "PickingColor");
+        // m->render( this->shaders[SHADER_PICKING_PROGRAM] );
     }
     
     gui->update( models, objectSelected );
     gui->render();
 
+    updateState();
+
+    // End Draw - Swap buffers
+    glfwSwapBuffers(window);
+    glFlush();
+
+    // Reset
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+void Game::update(){
+
+    updateDeltaTime();
+    // updateInput( this->meshes[0] );
+    updateInput(  );
+
+    // if( models.size() >= 1 )
+    //     models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
+
+}
+
+void Game::updateState(){
     if( guiState[MENU_CLICK] ){
 
         guiState[MENU_CLICK] = false;
@@ -609,25 +633,6 @@ void Game::render(){
         }
 
     }
-
-    // End Draw - Swap buffers
-    glfwSwapBuffers(window);
-    glFlush();
-
-    // Reset
-    glBindVertexArray(0);
-    glUseProgram(0);
-}
-
-void Game::update(){
-
-    updateDeltaTime();
-    // updateInput( this->meshes[0] );
-    updateInput(  );
-
-    // if( models.size() >= 1 )
-    //     models[0]->rotate( deltaTime*glm::vec3(0.f, 30.f, 0.f) );
-
 }
 
 void Game::updateDeltaTime(){
