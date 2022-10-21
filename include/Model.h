@@ -18,6 +18,7 @@ public:
 
     void update();
     void render(Shader* shader, bool showEdges, bool showVertices, bool wireframe, bool showBoundingBox, bool prevCull );
+    void renderPicking(Shader* shader);
 
     void rotate(const glm::vec3 rotation );
     void move(const glm::vec3 movement);
@@ -31,6 +32,11 @@ public:
     std::vector<Mesh *> getMeshesReferences();
 
 };
+
+void Model::renderPicking(Shader* shader){
+    for(Mesh* &m:this->meshes)
+        m->renderPicking(shader);
+}
 
 std::vector<Mesh *> Model::getMeshesReferences(){
     return this->meshes;

@@ -41,6 +41,7 @@ public:
     
     void update();
     void render(Shader* shader, bool showFill, bool showEdges, bool showVertices, float vertexSize);
+    void renderPicking(Shader* shader);
     
     void updateUniforms(Shader* shader);
     void updateModelMatrix();
@@ -220,6 +221,30 @@ void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
 }
 
+void Mesh::renderPicking(Shader* shader){
+    // Model Matrix update
+    this->updateModelMatrix();
+    
+    // update uniforms
+    this->updateUniforms(shader);
+
+    // bind VAO
+    glBindVertexArray(this->VAO);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    shader->use();
+    if(this->nrOfIndices == 0)
+        glDrawArrays(this->renderType, 0, this->nrOfVertices);
+    else
+        glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+
+    // cleanup
+    shader->stopUsing();
+    glBindVertexArray(0);
+
+}
+
 void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = true, bool showVertices = false, float vertexSize = 0.f){
     
     // Model Matrix update
@@ -244,7 +269,7 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = true, b
             glDrawArrays(this->renderType, 0, this->nrOfVertices);
         else
             glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
-                
+
     }
 
     if( showEdges ){
