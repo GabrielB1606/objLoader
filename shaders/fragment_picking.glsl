@@ -1,13 +1,19 @@
-#version 330
+#version 440
 
-// Ouput data
-out vec4 color;
+// structs
+struct Material{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
 
-// Values that stay constant for the whole mesh.
+// out
+out vec4 fs_color;
+
 uniform vec4 PickingColor;
 
 void main(){
 
-    color = PickingColor;
+    fs_color = PickingColor;
 
 }

@@ -144,29 +144,86 @@ public:
 
 void Game::picking(){
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    this->shaders[SHADER_PICKING_PROGRAM]->use();
+    // glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // this->shaders[SHADER_PICKING_PROGRAM]->use();
 
-    glEnableVertexAttribArray(0);
+    // glEnableVertexAttribArray(0);
 
-    for(size_t i = 0; i<this->models.size(); i++){
+    // for(size_t i = 0; i<this->models.size(); i++){
         
+    //     // Convert "i", the integer mesh ID, into an RGB color
+    //     size_t r = (i & 0x000000FF) >>  0;
+    //     size_t g = (i & 0x0000FF00) >>  8;
+    //     size_t b = (i & 0x00FF0000) >> 16;
+
+    //     // OpenGL expects colors to be in [0,1], so divide by 255.
+    //     this->shaders[SHADER_PICKING_PROGRAM]->setVec4f( glm::vec4(r/255.0f, g/255.0f, b/255.0f, 1.0f), "PickingColor" );
+
+    //     models[i]->renderPicking(this->shaders[SHADER_PICKING_PROGRAM]);
+
+    // }
+    // // Wait until all the pending drawing commands are really done.
+    // // Ultra-mega-over slow ! 
+    // // There are usually a long time between glDrawElements() and
+    // // all the fragments completely rasterized.
+    // glFlush();
+    // glFinish(); 
+
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    // // Read the pixel at the center of the screen.
+    // // You can also use glfwGetMousePos().
+    // // Ultra-mega-over slow too, even for 1 pixel, 
+    // // because the framebuffer is on the GPU.
+    // unsigned char data[4];
+    // glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
+    // glReadPixels( this->mouseX , this->mouseY,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    // // Convert the color back to an integer ID
+    // size_t pickedID = 
+    //     data[0] + 
+    //     data[1] * 256 +
+    //     data[2] * 256*256;
+
+    // if (pickedID == 0x00ffffff){ // Full white, must be the background !
+    //     objectSelected = nullptr;
+    //     modelSelected = -1;
+    //     meshSelected = -1;
+    // }else{
+    //     modelSelected = pickedID;
+    //     objectSelected = models[pickedID];
+    // }
+
+    // // Uncomment these lines to see the picking shader in effect
+    // glfwSwapBuffers(window);
+    // // continue; // skips the normal rendering
+
+// /////////////////////////////////
+
+    //Clear window
+    glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    updateUniforms();
+
+    for( size_t i = 0; i<models.size(); i++ ){
+
         // Convert "i", the integer mesh ID, into an RGB color
         size_t r = (i & 0x000000FF) >>  0;
         size_t g = (i & 0x0000FF00) >>  8;
         size_t b = (i & 0x00FF0000) >> 16;
 
-        // OpenGL expects colors to be in [0,1], so divide by 255.
-        this->shaders[SHADER_PICKING_PROGRAM]->setVec4f( glm::vec4(r/255.0f, g/255.0f, b/255.0f, 1.0f), "PickingColor" );
-
-        models[i]->renderPicking(this->shaders[SHADER_PICKING_PROGRAM]);
-
+        this->shaders[SHADER_PICKING_PROGRAM]->setVec4f(glm::vec4(r/255.0f, g/255.0f, b/255.0f, 1.0f), "PickingColor");
+        models[i]->render( this->shaders[SHADER_PICKING_PROGRAM] );
     }
+
     // Wait until all the pending drawing commands are really done.
     // Ultra-mega-over slow ! 
     // There are usually a long time between glDrawElements() and
     // all the fragments completely rasterized.
+    
+    // glfwSwapBuffers(window);
     glFlush();
     glFinish(); 
 
@@ -195,9 +252,13 @@ void Game::picking(){
         objectSelected = models[pickedID];
     }
 
-    // Uncomment these lines to see the picking shader in effect
+    // End Draw - Swap buffers
     glfwSwapBuffers(window);
-    // continue; // skips the normal rendering
+    glFlush();
+
+    // Reset
+    glBindVertexArray(0);
+    glUseProgram(0);
 
 }
 
@@ -262,6 +323,8 @@ void Game::updateUniforms(){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
         this->shaders[SHADER_NORMALS_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
     }
+    this->shaders[SHADER_PICKING_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+    this->shaders[SHADER_PICKING_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
 
     // update ProjectionMatrix
     ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
@@ -269,6 +332,8 @@ void Game::updateUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     if(guiState[SHOW_NORMALS])
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+        
+    this->shaders[SHADER_PICKING_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
     if(lightsOn)
@@ -427,7 +492,7 @@ void Game::initMaterials(){
 void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_core.glsl", "../../shaders/geometry_core.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_normals.glsl", "../../shaders/geometry_normals.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_picking.glsl", "../../shaders/fragment_picking.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/vertex_core.glsl", "../../shaders/fragment_picking.glsl", "../../shaders/geometry_core.glsl" ) );
 }
 
 void Game::initMatrices(){
@@ -451,7 +516,7 @@ int Game::getWindowShouldClose(){
 }
 
 void Game::render(){
-
+    // picking();
     //Clear window
     glClearColor(  clearColor.x, clearColor.y, clearColor.z, clearColor.w );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -464,6 +529,8 @@ void Game::render(){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
         }
+        this->shaders[SHADER_PICKING_PROGRAM]->setVec4f(glm::vec4(1.f, 0.f, 0.f, 1.0f), "PickingColor");
+        m->render( this->shaders[SHADER_PICKING_PROGRAM] );
     }
     
     gui->update( models, objectSelected );
@@ -541,11 +608,6 @@ void Game::render(){
             guiState[EXPORT_SCENE] = false;
         }
 
-    }
-
-    if( guiState[PICKING] ){
-        picking();
-        guiState[PICKING] = false;
     }
 
     // End Draw - Swap buffers

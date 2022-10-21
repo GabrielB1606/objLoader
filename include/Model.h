@@ -122,7 +122,7 @@ void Model::rotate(const glm::vec3 rotation){
     boundingBox->rotate(rotation);
 }
 
-void Model::render(Shader* shader, bool showEdges = true, bool showVertices = false, bool fillOn = true, bool showBoundingBox = false, bool prevCull = true){
+void Model::render(Shader* shader, bool showEdges = false, bool showVertices = false, bool fillOn = true, bool showBoundingBox = false, bool prevCull = true){
 
     // this->updateUniforms(shader);
 
