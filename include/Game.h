@@ -301,10 +301,10 @@ void Game::updateInputKeyboard(){
             this->objectSelected->move( glm::vec3( movementSpeed * deltaTime, 0.f, 0.f ) );
 
         if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-            this->objectSelected->rotate( glm::vec3(0.f, 100 * movementSpeed * deltaTime, 0.f) );
+            this->objectSelected->rotate( glm::vec3(0.f, 0.f, -100 * movementSpeed * deltaTime) );
 
         if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
-            this->objectSelected->rotate( glm::vec3(0.f, -100 * movementSpeed * deltaTime, 0.f) );
+            this->objectSelected->rotate( glm::vec3(0.f, 0.f, 100 * movementSpeed * deltaTime) );
         
         if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
             this->objectSelected->scaleUp( glm::vec3( -movementSpeed * deltaTime ) );
@@ -450,6 +450,22 @@ void Game::render(){
 
         }else if(guiState[IMPORT_SCENE]){
             guiState[IMPORT_SCENE] = false;
+
+            char const * lFilterPatterns[1] = { "*.scn" };
+            char* filePath = tinyfd_openFileDialog(
+                "Import SCN File",
+                "",
+                1,
+                lFilterPatterns,
+                NULL,
+                0
+            );
+            
+            if( filePath == NULL )
+                return;
+            
+            LoadSCN( filePath, models, materialMap );
+
         }else if(guiState[EXPORT_SCENE]){
             guiState[EXPORT_SCENE] = false;
         }

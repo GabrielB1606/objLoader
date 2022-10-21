@@ -309,30 +309,29 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
             }
 
+            if( normalVertex.size() == 0 ){
+                tmp_vec3 = 
+                    glm::cross(
+                        (positionVertex[face[1][0]-1] - positionVertex[face[0][0]-1])
+                        ,
+                        (positionVertex[face[2][0]-1] - positionVertex[face[0][0]-1])
+                    );
+                tmp_vec3 = glm::normalize(tmp_vec3);
+                tmp_str = (std::to_string( tmp_vec3.x ) +","+std::to_string( tmp_vec3.y ) +","+std::to_string( tmp_vec3.z ));
+                
+                if( approxNormalIndex.find(tmp_str) == approxNormalIndex.end() ){
+                    approxNormalVertex.push_back( tmp_vec3 );
+                    tmp_uint = approxNormalVertex.size();
+                    approxNormalIndex.insert_or_assign(tmp_str, tmp_uint);
+                }else{
+                    tmp_uint = approxNormalIndex[tmp_str];
+                }
+            }
+
             switch (face.size()){
                 case 3:
 
-                    if( normalVertex.size() == 0 ){
-                        tmp_vec3 = 
-                            glm::cross(
-                                (positionVertex[face[1][0]-1] - positionVertex[face[0][0]-1])
-                                ,
-                                (positionVertex[face[2][0]-1] - positionVertex[face[0][0]-1])
-                            );
-                        tmp_vec3 = glm::normalize(tmp_vec3);
-                        tmp_str = (std::to_string( tmp_vec3.x ) +","+std::to_string( tmp_vec3.y ) +","+std::to_string( tmp_vec3.z ));
-                        
-                        if( approxNormalIndex.find(tmp_str) == approxNormalIndex.end() ){
-                            approxNormalVertex.push_back( tmp_vec3 );
-                            tmp_uint = approxNormalVertex.size();
-                            approxNormalIndex.insert_or_assign(tmp_str, tmp_uint);
-                        }else{
-                            tmp_uint = approxNormalIndex[tmp_str];
-                        }
-                    }
-                
                     for(size_t i=0; i<face.size(); i++){
-
                         positionIndex.push_back( face[i][0] );
 
                         if( textcoordVertex.size()>0 )
@@ -342,31 +341,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                             normalIndex.push_back(face[i][2]);
                         else
                             normalIndex.push_back(tmp_uint);
-
                     }
                     
                     break;
             
                 case 4:
-
-                    if( normalVertex.size() == 0 ){
-                        tmp_vec3 = 
-                        glm::cross(
-                            (positionVertex[face[1][0]-1] - positionVertex[face[0][0]-1])
-                            ,
-                            (positionVertex[face[2][0]-1] - positionVertex[face[0][0]-1])
-                        );
-                        tmp_vec3 = glm::normalize(tmp_vec3);
-                        tmp_str = std::to_string( tmp_vec3.x ) +",",std::to_string( tmp_vec3.y ) +","+std::to_string( tmp_vec3.z );
-                        
-                        if( approxNormalIndex.find(tmp_str) == approxNormalIndex.end() ){
-                            approxNormalVertex.push_back( tmp_vec3 );
-                            tmp_uint = approxNormalVertex.size();
-                            approxNormalIndex.insert_or_assign(tmp_str, tmp_uint);
-                        }else{
-                            tmp_uint = approxNormalIndex[tmp_str];
-                        }
-                    }
 
                     for(int i : {0, 1, 2, 0, 2, 3}){
                         positionIndex.push_back( face[i][0] );
@@ -458,7 +437,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
 }
 
-void LoadSCN( std::string scnFile, std::vector<Model*> models, std::unordered_map<std::string, Material*> *materialMap){
+void LoadSCN( std::string scnFile, std::vector<Model*> &models, std::unordered_map<std::string, Material*> &materialMap){
 
      // file variables
     std::stringstream ss;
@@ -488,7 +467,7 @@ void LoadSCN( std::string scnFile, std::vector<Model*> models, std::unordered_ma
         if(prefix == "obj"){
 
             std::getline(ss, file2read);
-            modelsLoaded = LoadOBJ(file2read.c_str(), materialMap);
+            modelsLoaded = LoadOBJ(file2read.c_str(), &materialMap);
             
             if(!std::getline(file, line))
                 break;
@@ -527,7 +506,7 @@ void LoadSCN( std::string scnFile, std::vector<Model*> models, std::unordered_ma
 
         }else if(prefix == "mtl"){
             std::getline(ss, file2read);
-            LoadMTL(file2read, materialMap);
+            LoadMTL(file2read, &materialMap);
         }
 
     }

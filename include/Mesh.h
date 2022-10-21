@@ -187,6 +187,7 @@ void Mesh::scaleUp(const glm::vec3 scale){
 void Mesh::rotate( const glm::vec3 rotation ){
     this->rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians( rotation.x), glm::vec3(1.f, 0.f, 0.f)) * this->rotationMatrix;
     this->rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians( rotation.y ), glm::vec3(0.f, 1.f, 0.f)) * this->rotationMatrix;
+    this->rotationMatrix = glm::rotate(glm::mat4(1.f), glm::radians( rotation.z ), glm::vec3(0.f, 0.f, 1.f)) * this->rotationMatrix;
 }
 
 void Mesh::move(const glm::vec3 movement){

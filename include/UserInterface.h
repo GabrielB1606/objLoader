@@ -138,6 +138,28 @@ void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelecte
                 ImGui::ColorEdit3("Edge", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getEdgeColorReference()); // Edit 3 floats representing a color
         }
 
+        // OBJECT SELECTED
+        ImGui::Separator();
+        ImGui::Text("Object Selected");
+        if( *indexModelSelected != -1 ){
+            Moveable *selected;
+            
+            if( *indexMeshSelected != -1 )
+                selected = models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected];
+            else
+                selected = models[*indexModelSelected];
+
+            ImGui::Text("Scale ");
+            ImGui::SameLine();
+            if( ImGui::Button("-") )
+                selected->scaleUp( glm::vec3(-0.5f) );
+            ImGui::SameLine();
+            if( ImGui::Button("+") )
+                selected->scaleUp( glm::vec3(0.5f) );
+            
+        
+        }
+
         // SCENE
         ImGui::Separator();
         ImGui::Text("Scene");               // Display some text (you can use a format strings too)
