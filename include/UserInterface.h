@@ -29,7 +29,7 @@ public:
     UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, size_t* indexModelSelected, size_t* indexMeshSelected);
     ~UserInterface();
 
-    void update( std::vector<Model*> models, Moveable* &objectSelected);
+    void update( std::vector<Model*> &models, Moveable* &objectSelected);
     void render();
 
     bool clickOutside();
@@ -40,7 +40,7 @@ bool UserInterface::clickOutside(){
     return !io.WantCaptureMouse;
 }
 
-void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelected ){
+void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelected ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -163,6 +163,17 @@ void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelecte
             ImGui::SameLine();
             if( ImGui::Button("+") )
                 selected->scaleUp( glm::vec3(0.5f) );
+
+            if (ImGui::Button("Delete")){
+                if( *indexMeshSelected == -1 ){
+                    models.erase( models.begin() + *indexModelSelected );
+                }else{
+                    models[*indexModelSelected]->removeMesh( *indexMeshSelected );
+                }
+                *indexModelSelected = -1;
+                *indexMeshSelected = -1;
+                objectSelected = nullptr;
+            }
             
         
         }
@@ -214,28 +225,6 @@ void UserInterface::update( std::vector<Model*> models, Moveable* &objectSelecte
                 }
 
             }
-
-
-        // ImGui::ListBox("Models", indexModelSelected, modelNames, nrOfModels, 4);
-
-         // DEMO LEFTOVERS
-        // ImGui::Separator();
-        // ImGui::Text("Demo");               // Display some text (you can use a format strings too)
-        
-        // // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        // ImGui::Checkbox("Another Window", &show_another_window);
-
-
-        // ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-
-        
-
-        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
-
         
         ImGui::End();
     }

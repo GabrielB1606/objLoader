@@ -390,6 +390,13 @@ void Game::updateInputKeyboard(){
         if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
             this->objectSelected->scaleUp( glm::vec3( movementSpeed * deltaTime ) );
 
+        if( glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS ){
+            this->objectSelected->move( glm::vec3( 0.f, -movementSpeed * deltaTime, 0.f ) );
+        }
+        if( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ){
+            this->objectSelected->move( glm::vec3( 0.f, movementSpeed * deltaTime, 0.f ) );
+        }
+
     }
     
 

@@ -50,7 +50,6 @@ size_t default_material_counter = 0;
 #include "LoadFiles.h"
 #include "PrimitiveQuad.h"
 #include "PrimitivePyramid.h"
-#include "PrimitiveCube.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "Camera.h"

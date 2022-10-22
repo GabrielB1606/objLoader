@@ -31,6 +31,8 @@ public:
     std::string getName();
     std::vector<Mesh *> getMeshesReferences();
 
+    void removeMesh(size_t index);
+
 };
 
 void Model::renderPicking(Shader* shader){
@@ -40,6 +42,10 @@ void Model::renderPicking(Shader* shader){
 
 std::vector<Mesh *> Model::getMeshesReferences(){
     return this->meshes;
+}
+
+void Model::removeMesh(size_t index){
+    meshes.erase( meshes.begin() + index );
 }
 
 void Model::setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, glm::vec3 minComponents){
