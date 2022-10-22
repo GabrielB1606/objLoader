@@ -698,8 +698,6 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
         
     this->initUniforms();
 
-    // glfwSetMouseButtonCallback(this->window,this->picking() );
-
 }
 
 Game::~Game(){

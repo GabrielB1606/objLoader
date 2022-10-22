@@ -141,7 +141,7 @@ void Model::render(Shader* shader, bool showEdges = false, bool showVertices = f
             glDisable(GL_CULL_FACE);
 
         glLineWidth(2);
-        boundingBox->render(shader, false);
+        boundingBox->render(shader, false, true);
         glLineWidth(1);
 
         if(prevCull)

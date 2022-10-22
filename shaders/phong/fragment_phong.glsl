@@ -24,11 +24,6 @@ in DATA{
     vec2 textcoord;
 } data_in;
 
-// in vec3 vs_position;
-// in vec3 vs_color;
-// in vec2 vs_textcoord;
-// in vec3 vs_normal;
-
 // out
 out vec4 fs_color;
 
@@ -75,12 +70,8 @@ void main(){
     // // specular light
     vec3 specularFinal = calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
 
-
     vec3 lightFinal = ambientFinal + diffuseFinal + specularFinal;
-    // // fs_color = lightFinal;
     vec3 result = data_in.color * lightFinal; 
     fs_color = vec4(result, 1.f);
-    // fs_color = vec4( material.diffuse , 1.f);
 
-	// fs_color = 	(vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));
 }
