@@ -22,12 +22,17 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
 void main(){
-    data_out.position = vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
-    data_out.normal = vertex_normal;
+    data_out.position = vec3(ModelMatrix * vec4(vertex_position, 1.f));
+    // static solution
+    // data_out.normal = vertex_normal; 
+    
+    // accurate but expensive af solution
+    // data_out.normal = mat3(transpose(inverse(ModelMatrix))) * vertex_normal;
+    
+    // good enough
+    data_out.normal = mat3(ModelMatrix) * vertex_normal;
+    
     data_out.color = vertex_color;
     data_out.textcoord = vertex_textcoord;
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix *vec4(vertex_position, 1.f);
-
-    // // vs_normal = mat3(ModelMatrix) * vertex_normal;
-    // // vs_normal = mat3(transpose(inverse(ModelMatrix))) * vertex_normal;
 }
