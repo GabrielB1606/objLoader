@@ -6,7 +6,8 @@ private:
     enum SHADER_PROGRAM{
         SHADER_CORE_PROGRAM = 0,
         SHADER_NORMALS_PROGRAM,
-        SHADER_PICKING_PROGRAM
+        SHADER_PICKING_PROGRAM,
+        SHADER_PHONG_PROGRAM
         
     };
 
@@ -31,6 +32,7 @@ private:
     int fbWidth, fbHeight;
 
     // scene variables & stuff
+    SHADER_PROGRAM coreProgramIndex = SHADER_CORE_PROGRAM;
     Moveable* objectSelected = nullptr;
     size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
@@ -50,7 +52,7 @@ private:
         false,  // import MTL clicked
         false,  // import Scene clicked
         false,  // export Scene clicked
-        false   // do picking
+        false
     };
 
     // User Interface
@@ -117,6 +119,8 @@ private:
     void updateInputKeyboard();
     void updateInputMouse();
     void updateInput();
+    void updateState();
+    void updateMatrices();
     
 
 public:
@@ -138,7 +142,6 @@ public:
     void closeWindow();
 
     void update();
-    void updateState();
     void render();
     void picking();
 };
@@ -181,7 +184,7 @@ void Game::picking(){
     // because the framebuffer is on the GPU.
     unsigned char data[4];
     glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
-    glReadPixels( this->mouseX , (this->fbHeight-this->mouseY) ,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glReadPixels( (GLint)(this->mouseX) , (GLint)(this->fbHeight-this->mouseY) ,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     // Convert the color back to an integer ID
     size_t pickedID = 
@@ -258,30 +261,36 @@ void Game::initModels(){
 
 }
 
-void Game::updateUniforms(){
+void Game::updateMatrices(){
     // update framebuffer size
     glfwGetFramebufferSize( this->window, &this->fbWidth, &this->fbHeight );
 
     // update ViewMatrix and Camera Position
     this->ViewMatrix = this->camera.getViewMatrix(); 
-    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-    this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
+
+    // update ProjectionMatrix
+    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
+}
+
+void Game::updateUniforms(){
+    updateMatrices(); 
+    
+    this->shaders[this->coreProgramIndex]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+    this->shaders[this->coreProgramIndex]->setVec3f(this->camera.getPosition(), "camPosition");
+
     if( guiState[SHOW_NORMALS] ){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
         this->shaders[SHADER_NORMALS_PROGRAM]->setVec3f(this->camera.getPosition(), "camPosition");
     }
 
-    // update ProjectionMatrix
-    ProjectionMatrix = glm::perspective( glm::radians(this->fov), static_cast<float>(this->fbWidth)/this->fbHeight, this->nearPlane, this->farPlane );
-
-    this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+    this->shaders[this->coreProgramIndex]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     if(guiState[SHOW_NORMALS])
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
     if(lightsOn)
         for( PointLight* &pl : this->pointLights )
-            pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+            pl->sendToShader( *this->shaders[SHADER_PHONG_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
@@ -443,6 +452,7 @@ void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/core/fragment_core.glsl", "../../shaders/core/geometry_core.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/normals/fragment_normals.glsl", "../../shaders/normals/geometry_normals.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/picking/fragment_picking.glsl", "../../shaders/core/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/phong/vertex_phong.glsl", "../../shaders/phong/fragment_phong.glsl" ) );
 }
 
 void Game::initMatrices(){
@@ -474,7 +484,7 @@ void Game::render(){
     updateUniforms();
 
     for( Model* &m : models ){
-        m->render( this->shaders[SHADER_CORE_PROGRAM], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL], guiState[SHOW_BOUNDING_BOX], guiState[CULLING] );
+        m->render( this->shaders[this->coreProgramIndex], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL], guiState[SHOW_BOUNDING_BOX], guiState[CULLING] );
         if( guiState[SHOW_NORMALS] ){
             this->shaders[SHADER_NORMALS_PROGRAM]->setVec4f(normalsColor, "normalsColor");
             m->render( this->shaders[SHADER_NORMALS_PROGRAM] );
@@ -577,6 +587,12 @@ void Game::updateState(){
 
         }else if(guiState[EXPORT_SCENE]){
             guiState[EXPORT_SCENE] = false;
+        }else if( guiState[PHONG_SHADING] && coreProgramIndex != SHADER_PHONG_PROGRAM ){
+            coreProgramIndex = SHADER_PHONG_PROGRAM;
+            lightsOn = true;
+        }else if( !guiState[PHONG_SHADING] && coreProgramIndex != SHADER_CORE_PROGRAM ){
+            coreProgramIndex = SHADER_CORE_PROGRAM;
+            lightsOn = false;
         }
 
     }
@@ -678,8 +694,7 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
     this->initMaterials();
     this->initModels();
 
-    if(lightsOn)
-        this->initLights();
+    this->initLights();
         
     this->initUniforms();
 

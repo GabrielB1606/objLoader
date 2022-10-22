@@ -46,7 +46,7 @@ vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, vec3 lightPos){
     
     vec3 lightDir = normalize( lightPos - position );
     // float diffuse = max( dot(normal, lightDir), 0.0 ); 
-    float diffuse = clamp( dot(lightDir, normalize(normal)), 0, 1 ) ;
+    float diffuse = clamp( dot(lightDir, normalize(normal)), 0, 1 );
 
     vec3 ans = mtl.diffuse * diffuse;
 
@@ -70,7 +70,7 @@ void main(){
     // float attenuation = 1.f/(pointLight.constant +( pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
     
     // ambient light
-    vec3 ambientFinal = calculateAmbient(material, pointLight.color, pointLight.intensity);
+    // vec3 ambientFinal = calculateAmbient(material, pointLight.color, pointLight.intensity);
 
     // // diffuse light
     // vec3 diffuseFinal = calculateDiffuse(material, vs_position, vs_normal, pointLight.position);
@@ -79,10 +79,10 @@ void main(){
     // vec3 specularFinal = calculateSpecular(material, vs_position, vs_normal, pointLight.position, camPosition);
 
 
-    vec3 lightFinal = ambientFinal /*+ diffuseFinal /*+ specularFinal*/;
+    // vec3 lightFinal = ambientFinal; // + diffuseFinal + specularFinal
     // // fs_color = lightFinal;
-    vec3 result = vs_color * lightFinal; 
-    fs_color = vec4(result, 1.0);
+    // vec3 result = data_in.color * lightFinal; 
+    fs_color = vec4(material.diffuse, 1.f);
     // fs_color = vec4( material.diffuse , 1.f);
 
 	// fs_color = 	(vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));

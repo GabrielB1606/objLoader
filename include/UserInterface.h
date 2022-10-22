@@ -13,8 +13,6 @@ private:
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-
-    // Game State
     bool *state;
 
     const glm::vec4 *clear_color, *normals_color;
@@ -47,8 +45,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
     ImGui::NewFrame();
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
+    // ImGui::ShowDemoWindow(&show_demo_window);
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
@@ -74,6 +71,11 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     state[Z_BUFFER] = !state[Z_BUFFER];
                     state[MENU_CLICK] = true;
                 }
+
+                if (ImGui::MenuItem("Phong Shading", NULL, state[PHONG_SHADING])){
+                    state[PHONG_SHADING] = !state[PHONG_SHADING];
+                    state[MENU_CLICK] = true;
+                }
                 
                 ImGui::EndMenu();
             }
@@ -95,10 +97,10 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     state[MENU_CLICK] = true;
                 }
 
-                if (ImGui::MenuItem("Export Scene", NULL)){
-                    state[EXPORT_SCENE] = true;
-                    state[MENU_CLICK] = true;
-                }
+                // if (ImGui::MenuItem("Export Scene", NULL)){
+                //     state[EXPORT_SCENE] = true;
+                //     state[MENU_CLICK] = true;
+                // }
                 
                 ImGui::EndMenu();
             }
@@ -226,16 +228,6 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
 
             }
         
-        ImGui::End();
-    }
-
-    // 3. Show another simple window.
-    if (show_another_window)
-    {
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-            show_another_window = false;
         ImGui::End();
     }
 
