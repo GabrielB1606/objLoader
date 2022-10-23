@@ -24,7 +24,7 @@ void main(){
     for(int i = 0; i<3; i++){
         gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * gl_in[i].gl_Position;
         EmitVertex();
-        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * (gl_in[i].gl_Position + 0.2*vec4(data_in[i].normal, 0.0f));
+        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * (gl_in[i].gl_Position + 0.025*vec4(data_in[i].normal, 0.0f));
         EmitVertex();
         EndPrimitive();
     }

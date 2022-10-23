@@ -153,7 +153,7 @@ void Game::picking(){
     updateUniforms();
 
     //Clear window
-    glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
+    // glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     this->shaders[SHADER_PICKING_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
@@ -196,16 +196,16 @@ void Game::picking(){
         data[1] * 256 +
         data[2] * 256*256;
 
-    if (pickedID == 0x00ffffff){ // Full white, must be the background !
+
+    if( pickedID < models.size() ){
+        modelSelected = pickedID;
+        objectSelected = models[pickedID];
+    }else{
         objectSelected = nullptr;
         modelSelected = -1;
         meshSelected = -1;
-    }else{
-        if( pickedID < models.size() ){
-            modelSelected = pickedID;
-            objectSelected = models[pickedID];
-        }
     }
+
 
     // End Draw - Swap buffers
 
@@ -259,8 +259,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
-    this->models.push_back( modelsLoaded[0] );
+    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    // this->models.push_back( modelsLoaded[0] );
 
 }
 
@@ -452,10 +452,10 @@ void Game::initMaterials(){
 }
 
 void Game::initShaders(){
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/core/fragment_core.glsl", "../../shaders/core/geometry_core.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/normals/fragment_normals.glsl", "../../shaders/normals/geometry_normals.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/core/vertex_core.glsl", "../../shaders/picking/fragment_picking.glsl", "../../shaders/core/geometry_core.glsl" ) );
-    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "../../shaders/phong/vertex_phong.glsl", "../../shaders/phong/fragment_phong.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/core/fragment_core.glsl", "./shaders/core/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/normals/fragment_normals.glsl", "./shaders/normals/geometry_normals.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/picking/fragment_picking.glsl", "./shaders/core/geometry_core.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/phong/vertex_phong.glsl", "./shaders/phong/fragment_phong.glsl" ) );
 }
 
 void Game::initMatrices(){
