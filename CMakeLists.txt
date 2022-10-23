@@ -23,8 +23,9 @@ target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
 target_link_libraries(${PROJECT_NAME} glew32s glfw3 opengl32 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders )
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/shaders/
+                    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/ )
 
 # ImGui Demo
 add_executable(ImGUI_demo src/ImGuiDemo.cpp ${IMGUI_SRC})
