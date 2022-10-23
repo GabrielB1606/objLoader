@@ -343,7 +343,7 @@ void Game::updateInputMouse(){
     this->mouseButtonPressState = newState;
 
     if(lightsOn)
-        if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ){
+        if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS ){
             this->pointLights[0]->setPosition( this->camera.getPosition() );
     }
 
