@@ -148,6 +148,8 @@ public:
 
 void Game::picking(){
 
+    // http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-an-opengl-hack/
+
     updateUniforms();
 
     //Clear window
@@ -186,6 +188,8 @@ void Game::picking(){
     glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
     glReadPixels( (GLint)(this->mouseX) , (GLint)(this->fbHeight-this->mouseY) ,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
+    glfwSwapBuffers(window);
+
     // Convert the color back to an integer ID
     size_t pickedID = 
         data[0] + 
@@ -204,7 +208,6 @@ void Game::picking(){
     }
 
     // End Draw - Swap buffers
-    glfwSwapBuffers(window);
 
     // Reset
     glBindVertexArray(0);
@@ -305,9 +308,9 @@ void Game::updateInput(){
 
 void Game::updateInputMouse(){
 
-    int mouseMidState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE);
+    int mouseRightState = glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT);
 
-    if( mouseMidState == GLFW_PRESS ){
+    if( mouseRightState == GLFW_PRESS ){
 
         glfwGetCursorPos( this->window, &this->mouseX, &this->mouseY );
 
