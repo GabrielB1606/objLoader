@@ -46,6 +46,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     // ImGui::ShowDemoWindow(&show_demo_window);
+    ImGui::ShowDemoWindow();
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
@@ -165,6 +166,16 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
             ImGui::SameLine();
             if( ImGui::Button("+") )
                 selected->scaleUp( glm::vec3(0.5f) );
+
+            if( *indexMeshSelected != -1 ){
+                ImGui::SliderFloat("Mesh Size X", models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getSizeXRef() , -30.0f, 30.0f);
+                ImGui::SliderFloat("Mesh Size Y", models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getSizeYRef() , -30.0f, 30.0f);
+                ImGui::SliderFloat("Mesh Size Z", models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getSizeZRef() , -30.0f, 30.0f);
+            }else{
+                ImGui::SliderFloat("Model Size X", models[*indexModelSelected]->getSizeXRef() , -30.0f, 30.0f);
+                ImGui::SliderFloat("Model Size Y", models[*indexModelSelected]->getSizeYRef() , -30.0f, 30.0f);
+                ImGui::SliderFloat("Model Size Z", models[*indexModelSelected]->getSizeZRef() , -30.0f, 30.0f);
+            }
 
             if (ImGui::Button("Delete")){
                 if( *indexMeshSelected == -1 ){

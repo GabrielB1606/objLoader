@@ -21,6 +21,7 @@ private:
     glm::vec3 rotation;
     glm::mat4 rotationMatrix = glm::mat4(1.f);
     glm::vec3 scale;
+    glm::vec3* fatherScale;
     glm::vec3 origin;
 
     glm::mat4 ModelMatrix;
@@ -41,7 +42,6 @@ public:
     
     void update();
     void render(Shader* shader, bool showFill, bool showEdges, bool showVertices, float vertexSize);
-    void renderPicking(Shader* shader);
     
     void updateUniforms(Shader* shader);
     void updateModelMatrix();
@@ -56,10 +56,31 @@ public:
     void setRotation(const glm::vec3 rotation);
     void setScale(const glm::vec3 scale);
     void setOrigin(const glm::vec3 origin);
+    void setFatherScale( glm::vec3* fatherScale );
+
+    float* getSizeXRef();
+    float* getSizeYRef();
+    float* getSizeZRef();
 
     std::string getName();
     Material* getMaterialReference();
 };
+    
+void Mesh::setFatherScale( glm::vec3* fatherScale ){
+    this->fatherScale = fatherScale;
+}
+
+float* Mesh::getSizeXRef(){
+    return &scale.x;
+}
+
+float* Mesh::getSizeYRef(){
+    return &scale.y;
+}
+
+float* Mesh::getSizeZRef(){
+    return &scale.z;
+}
 
 Material* Mesh::getMaterialReference(){
     return this->material;
@@ -85,10 +106,9 @@ void Mesh::normalize(const float factor){
 
 }
 
-
-
 Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
 
+    this->fatherScale = nullptr;
     this->name = name;
     this->renderType = renderType;
     this->material = material;
@@ -155,6 +175,7 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
 
 Mesh::Mesh(const Mesh &obj){
 
+    this->fatherScale = this->fatherScale;
     this->name = obj.name;
     this->material = obj.material;
     this->renderType = obj.renderType;
@@ -211,38 +232,19 @@ void Mesh::updateModelMatrix(){
     this->ModelMatrix = glm::mat4(1.f);
 
     this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
-    this->ModelMatrix =   this->ModelMatrix * this->rotationMatrix;
+    this->ModelMatrix = this->ModelMatrix * this->rotationMatrix;
     this->ModelMatrix = glm::translate(this->ModelMatrix, this->position - this->origin);
-    this->ModelMatrix = glm::scale(this->ModelMatrix, glm::vec3( this->scale ));
+
+    glm::vec3 scale = this->scale;
+    if( this->fatherScale != nullptr )
+        scale += *(this->fatherScale);
+
+    this->ModelMatrix = glm::scale(this->ModelMatrix, scale);
 
 }
 
 void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
-}
-
-void Mesh::renderPicking(Shader* shader){
-    // Model Matrix update
-    this->updateModelMatrix();
-    
-    // update uniforms
-    this->updateUniforms(shader);
-
-    // bind VAO
-    glBindVertexArray(this->VAO);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    shader->use();
-    if(this->nrOfIndices == 0)
-        glDrawArrays(this->renderType, 0, this->nrOfVertices);
-    else
-        glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
-
-    // cleanup
-    shader->stopUsing();
-    glBindVertexArray(0);
-
 }
 
 void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, bool showVertices = false, float vertexSize = 0.f){
@@ -302,7 +304,6 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
         
     }
 
-
     // cleanup
     shader->stopUsing();
     glBindVertexArray(0);
@@ -340,6 +341,8 @@ Mesh::Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices
 }
 
 Mesh::Mesh(Primitive &primitive, glm::vec3 origin = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f)){
+
+    this->fatherScale = nullptr;
 
     this->ModelMatrix = glm::mat4(1.f);
     this->renderType = GL_TRIANGLES;

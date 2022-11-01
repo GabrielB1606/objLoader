@@ -21,7 +21,7 @@ target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui includ
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
     # specify libraries names for linking
 target_link_libraries(${PROJECT_NAME} glew32s glfw3 opengl32 )
-
+    # copy shaders in build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                     ${CMAKE_SOURCE_DIR}/shaders/

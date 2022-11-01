@@ -7,6 +7,7 @@ private:
 
     std::vector<Mesh*> meshes;
     glm::vec3 position;
+    glm::vec3 scale = glm::vec3(1.f);
 
     Mesh* boundingBox = nullptr;
 
@@ -18,11 +19,14 @@ public:
 
     void update();
     void render(Shader* shader, bool showEdges, bool showVertices, bool wireframe, bool showBoundingBox, bool prevCull );
-    void renderPicking(Shader* shader);
 
     void rotate(const glm::vec3 rotation );
     void move(const glm::vec3 movement);
     void scaleUp(const glm::vec3 scale);
+
+    float* getSizeXRef();
+    float* getSizeYRef();
+    float* getSizeZRef();
 
     void normalize(const float factor);
     void setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, glm::vec3 minComponents );
@@ -35,9 +39,16 @@ public:
 
 };
 
-void Model::renderPicking(Shader* shader){
-    for(Mesh* &m:this->meshes)
-        m->renderPicking(shader);
+float* Model::getSizeXRef(){
+    return &this->scale.x;
+}
+
+float* Model::getSizeYRef(){
+    return &this->scale.y;
+}
+
+float* Model::getSizeZRef(){
+    return &this->scale.z;
 }
 
 std::vector<Mesh *> Model::getMeshesReferences(){
@@ -83,6 +94,7 @@ void Model::setBoundingBox(Material* boundingBoxMTL, glm::vec3 maxComponents, gl
     };
 
     boundingBox = new Mesh(boundingBoxMTL, vertices, 8, GL_TRIANGLES, indices, 36);
+    boundingBox->setFatherScale(&this->scale);
 
 }
 
@@ -109,9 +121,7 @@ void Model::move(const glm::vec3 movement){
 }
 
 void Model::scaleUp(const glm::vec3 scale){
-    for(Mesh* &m : this->meshes)
-        m->scaleUp(scale);
-    boundingBox->scaleUp(scale);
+    this->scale += scale;
 }
 
 std::string Model::getName(){
@@ -166,6 +176,7 @@ Model::Model(std::string name, std::vector<Mesh*> meshes, glm::vec3 position = g
     for(Mesh* &m:meshes){
         m->move(this->position);
         m->setOrigin(this->position);
+        m->setFatherScale(&this->scale);
     }
 
 }
