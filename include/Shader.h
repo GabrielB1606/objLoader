@@ -11,10 +11,10 @@ class Shader{
 
         std::string loadShaderSource(char* filename);
         GLuint loadShader(GLenum type, char* filename);
-        bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader);
+        bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tesselationShader);
 
     public:
-        Shader(const char* glsl_version, const int versionMaj, const int versionMin, char* vertexFile, char* fragmentFile, char* geometryFile);
+        Shader(const char* glsl_version, const int versionMaj, const int versionMin, char* vertexFile, char* fragmentFile, char* geometryFile, char* tesselationFile);
         ~Shader();
         void use();
         void stopUsing();
@@ -26,22 +26,26 @@ class Shader{
         void set1f(GLfloat value, const GLchar* name);
 };
 
-Shader::Shader(const char* glsl_version, const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
+Shader::Shader(const char* glsl_version, const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr, char* tesselationFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
 
     this->glsl_version = glsl_version;
 
     GLuint vertexShader = 0;
     GLuint fragmentShader = 0;
     GLuint geometryShader = 0;
+    GLuint tesselationShader = 0;
 
     vertexShader = loadShader(GL_VERTEX_SHADER, vertexFile);
     
+    if( tesselationFile != nullptr)
+        tesselationShader = loadShader(GL_TESS_CONTROL_SHADER , tesselationFile);
+
     if( geometryFile != nullptr)
         geometryShader = loadShader(GL_GEOMETRY_SHADER, geometryFile);
 
     fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentFile);
 
-    this->linkProgram( vertexShader, fragmentShader, geometryShader );
+    this->linkProgram( vertexShader, fragmentShader, geometryShader, tesselationShader );
 
     // end
     glDeleteShader(vertexShader);
@@ -159,13 +163,16 @@ GLuint Shader::loadShader(GLenum type, char* filename){
     return shader;
 }
 
-bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader){
+bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tesselationShader){
     char infoLog[512];
     GLint success;
 
     this->id = glCreateProgram();
     
     glAttachShader(this->id, vertexShader);
+
+    if(tesselationShader)
+        glAttachShader(this->id, tesselationShader);
 
     if(geometryShader)
         glAttachShader(this->id, geometryShader);
