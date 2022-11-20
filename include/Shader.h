@@ -11,10 +11,10 @@ class Shader{
 
         std::string loadShaderSource(char* filename);
         GLuint loadShader(GLenum type, char* filename);
-        bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tesselationShader);
+        bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tessControlShader, GLuint tessEvalShader);
 
     public:
-        Shader(const char* glsl_version, const int versionMaj, const int versionMin, char* vertexFile, char* fragmentFile, char* geometryFile, char* tesselationFile);
+        Shader(const char* glsl_version, const int versionMaj, const int versionMin, char* vertexFile, char* fragmentFile, char* geometryFile, char* tessControlFile, char* tessEvalFile);
         ~Shader();
         void use();
         void stopUsing();
@@ -26,26 +26,30 @@ class Shader{
         void set1f(GLfloat value, const GLchar* name);
 };
 
-Shader::Shader(const char* glsl_version, const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr, char* tesselationFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
+Shader::Shader(const char* glsl_version, const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr, char* tessControlFile = nullptr, char* tessEvalFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
 
     this->glsl_version = glsl_version;
 
     GLuint vertexShader = 0;
     GLuint fragmentShader = 0;
     GLuint geometryShader = 0;
-    GLuint tesselationShader = 0;
+    GLuint tessControlShader = 0;
+    GLuint tessEvalShader = 0;
 
     vertexShader = loadShader(GL_VERTEX_SHADER, vertexFile);
     
-    if( tesselationFile != nullptr)
-        tesselationShader = loadShader(GL_TESS_CONTROL_SHADER , tesselationFile);
+    if( tessControlFile != nullptr)
+        tessControlShader = loadShader(GL_TESS_CONTROL_SHADER , tessControlFile);
 
     if( geometryFile != nullptr)
         geometryShader = loadShader(GL_GEOMETRY_SHADER, geometryFile);
+    
+    if( tessEvalFile != nullptr)
+        tessEvalShader = loadShader(GL_TESS_EVALUATION_SHADER , tessEvalFile);
 
     fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentFile);
 
-    this->linkProgram( vertexShader, fragmentShader, geometryShader, tesselationShader );
+    this->linkProgram( vertexShader, fragmentShader, geometryShader, tessControlShader, tessEvalShader);
 
     // end
     glDeleteShader(vertexShader);
@@ -163,7 +167,7 @@ GLuint Shader::loadShader(GLenum type, char* filename){
     return shader;
 }
 
-bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tesselationShader){
+bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader, GLuint tessControlShader, GLuint tessEvalShader){
     char infoLog[512];
     GLint success;
 
@@ -171,11 +175,14 @@ bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geom
     
     glAttachShader(this->id, vertexShader);
 
-    if(tesselationShader)
-        glAttachShader(this->id, tesselationShader);
+    if(tessControlShader)
+        glAttachShader(this->id, tessControlShader);
 
     if(geometryShader)
         glAttachShader(this->id, geometryShader);
+
+    if(tessEvalShader)
+        glAttachShader(this->id, tessEvalShader);
 
     glAttachShader(this->id, fragmentShader);
 
