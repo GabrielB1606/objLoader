@@ -22,18 +22,22 @@ uniform float explosionScale;
 
 void main(){
 
+    vec3 face_normal = cross( 
+        vec3(gl_in[1].gl_Position - gl_in[0].gl_Position),
+        vec3(gl_in[2].gl_Position - gl_in[0].gl_Position)
+    );
+    
+    face_normal = normalize(face_normal);
+
     for(int i = 0; i<3; i++){
         
         gl_Position =
             ProjectionMatrix * ViewMatrix * ModelMatrix *
-            (gl_in[i].gl_Position+ explosionScale*vec4(data_in[i].normal, 0.0f));
+            (gl_in[i].gl_Position+ explosionScale*vec4(face_normal, 0.0f));
         
-        // vs_position = vec4(ModelMatrix * vec4(data_in[i].position, 1.f)).xyz;
-        // vs_normal = data_in[i].normal;
         vs_color = data_in[i].color;
-        // vs_textcoord = data_in[i].textcoord;
-        
         EmitVertex();
+        
     }
     
     EndPrimitive();
