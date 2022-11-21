@@ -7,7 +7,8 @@ private:
         SHADER_CORE_PROGRAM = 0,
         SHADER_NORMALS_PROGRAM,
         SHADER_PICKING_PROGRAM,
-        SHADER_PHONG_PROGRAM
+        SHADER_PHONG_PROGRAM,
+        SHADER_BOOM_PROGRAM
         
     };
 
@@ -259,8 +260,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    this->models.push_back( modelsLoaded[0] );
 
 }
 
@@ -456,6 +457,7 @@ void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/normals/fragment_normals.glsl", "./shaders/normals/geometry_normals.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/picking/fragment_picking.glsl", "./shaders/core/geometry_core.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/phong/vertex_phong.glsl", "./shaders/phong/fragment_phong.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/boom/vertex.glsl", "./shaders/boom/fragment.glsl", "./shaders/boom/geometry.glsl" ) );
 }
 
 void Game::initMatrices(){
@@ -593,7 +595,10 @@ void Game::updateState(){
         }else if( guiState[PHONG_SHADING] && coreProgramIndex != SHADER_PHONG_PROGRAM ){
             coreProgramIndex = SHADER_PHONG_PROGRAM;
             lightsOn = true;
-        }else if( !guiState[PHONG_SHADING] && coreProgramIndex != SHADER_CORE_PROGRAM ){
+        }else if( guiState[BOOM_SHADER] && coreProgramIndex != SHADER_BOOM_PROGRAM ){
+            coreProgramIndex = SHADER_BOOM_PROGRAM;
+            lightsOn = false;
+        }else if( !guiState[PHONG_SHADING] && !guiState[BOOM_SHADER] && coreProgramIndex != SHADER_CORE_PROGRAM ){
             coreProgramIndex = SHADER_CORE_PROGRAM;
             lightsOn = false;
         }

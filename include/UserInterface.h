@@ -76,6 +76,11 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     state[PHONG_SHADING] = !state[PHONG_SHADING];
                     state[MENU_CLICK] = true;
                 }
+
+                if (ImGui::MenuItem("Boom Shader", NULL, state[BOOM_SHADER])){
+                    state[BOOM_SHADER] = !state[BOOM_SHADER];
+                    state[MENU_CLICK] = true;
+                }
                 
                 ImGui::EndMenu();
             }
