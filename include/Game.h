@@ -34,6 +34,7 @@ private:
 
     // scene variables & stuff
     SHADER_PROGRAM coreProgramIndex = SHADER_CORE_PROGRAM;
+    float explosionScale = 0.0f;
     Moveable* objectSelected = nullptr;
     size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
@@ -291,6 +292,9 @@ void Game::updateUniforms(){
     if(guiState[SHOW_NORMALS])
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
+    if(guiState[BOOM_SHADER])
+        this->shaders[SHADER_BOOM_PROGRAM]->set1f(explosionScale, "explosionScale");
+
     // update light
     if(lightsOn)
         for( PointLight* &pl : this->pointLights )
@@ -496,7 +500,7 @@ void Game::render(){
         }
     }
     
-    gui->update( models, objectSelected );
+    gui->update( models, objectSelected, explosionScale );
     gui->render();
 
     updateState();

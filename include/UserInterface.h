@@ -27,7 +27,7 @@ public:
     UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, size_t* indexModelSelected, size_t* indexMeshSelected);
     ~UserInterface();
 
-    void update( std::vector<Model*> &models, Moveable* &objectSelected);
+    void update( std::vector<Model*> &models, Moveable* &objectSelected, float &explosionScale);
     void render();
 
     bool clickOutside();
@@ -38,7 +38,7 @@ bool UserInterface::clickOutside(){
     return !io.WantCaptureMouse;
 }
 
-void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelected ){
+void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelected, float &explosionScale ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -131,6 +131,9 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
         if(state[SHOW_VERTICES] && *indexModelSelected != -1)
             ImGui::SliderFloat("vertex size", models[*indexModelSelected]->getVertexSizeReference(), 1.0f, 20.0f);
         
+        if(state[BOOM_SHADER])
+            ImGui::SliderFloat("Explosion Scale", &explosionScale, 0.0f, 1.0f);
+
         // COLORS
         ImGui::Separator();
         ImGui::Text("Color");               // Display some text (you can use a format strings too)

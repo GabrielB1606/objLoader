@@ -18,6 +18,7 @@ in DATA{
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
+uniform float explosionScale;
 
 void main(){
 
@@ -25,7 +26,7 @@ void main(){
         
         gl_Position =
             ProjectionMatrix * ViewMatrix * ModelMatrix *
-            (gl_in[i].gl_Position+ 0.5*vec4(data_in[i].normal, 0.0f));
+            (gl_in[i].gl_Position+ explosionScale*vec4(data_in[i].normal, 0.0f));
         
         // vs_position = vec4(ModelMatrix * vec4(data_in[i].position, 1.f)).xyz;
         // vs_normal = data_in[i].normal;
