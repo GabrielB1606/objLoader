@@ -23,12 +23,13 @@ void main(){
 
     for(int i = 0; i<3; i++){
         
-        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * gl_in[i].gl_Position;
+        gl_Position =
+            ProjectionMatrix * ViewMatrix * ModelMatrix * (gl_in[i].gl_Position);
         
-        vs_position = vec4(ModelMatrix * vec4(data_in[i].position, 1.f)).xyz;
-        vs_normal = data_in[i].normal;
+        // vs_position = vec4(ModelMatrix * vec4(data_in[i].position, 1.f)).xyz;
+        // vs_normal = data_in[i].normal;
         vs_color = data_in[i].color;
-        vs_textcoord = data_in[i].textcoord;
+        // vs_textcoord = data_in[i].textcoord;
         
         EmitVertex();
     }
