@@ -81,6 +81,11 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     state[BOOM_SHADER] = !state[BOOM_SHADER];
                     state[MENU_CLICK] = true;
                 }
+
+                if (ImGui::MenuItem("Tessellation Shader", NULL, state[TESS_SHADER])){
+                    state[TESS_SHADER] = !state[TESS_SHADER];
+                    state[MENU_CLICK] = true;
+                }
                 
                 ImGui::EndMenu();
             }
@@ -131,7 +136,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
         if(state[SHOW_VERTICES] && *indexModelSelected != -1)
             ImGui::SliderFloat("vertex size", models[*indexModelSelected]->getVertexSizeReference(), 1.0f, 20.0f);
         
-        if(state[BOOM_SHADER])
+        if(state[BOOM_SHADER] || state[TESS_SHADER])
             ImGui::SliderFloat("Explosion Scale", &explosionScale, 0.0f, 1.0f);
 
         // COLORS

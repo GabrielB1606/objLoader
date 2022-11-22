@@ -607,6 +607,9 @@ void Game::updateState(){
         }else if( guiState[BOOM_SHADER] && coreProgramIndex != SHADER_BOOM_PROGRAM ){
             coreProgramIndex = SHADER_BOOM_PROGRAM;
             lightsOn = false;
+        }else if( guiState[TESS_SHADER] && coreProgramIndex != SHADER_TESS_PROGRAM ){
+            coreProgramIndex = SHADER_TESS_PROGRAM;
+            lightsOn = false;
         }else if( !guiState[PHONG_SHADING] && !guiState[BOOM_SHADER] && coreProgramIndex != SHADER_CORE_PROGRAM ){
             coreProgramIndex = SHADER_CORE_PROGRAM;
             lightsOn = false;
