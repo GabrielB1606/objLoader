@@ -29,22 +29,4 @@ void main(){
         EndPrimitive();
     }
 
-    // gl_Position = data_in[0].projection * gl_in[0].gl_Position;
-    // EmitVertex();
-    // gl_Position = data_in[0].projection * (gl_in[0].gl_Position + vec4(data_in[0].normal, 0.0f));
-    // EmitVertex();
-    // EndPrimitive();
-    
-    // gl_Position = data_in[1].projection * gl_in[1].gl_Position;
-    // EmitVertex();
-    // gl_Position = data_in[1].projection * (gl_in[1].gl_Position + vec4(data_in[1].normal, 0.0f));
-    // EmitVertex();
-    // EndPrimitive();
-    
-    // gl_Position = data_in[2].projection * gl_in[2].gl_Position;
-    // EmitVertex();
-    // gl_Position = data_in[2].projection * (gl_in[2].gl_Position + vec4(data_in[2].normal, 0.0f));
-    // EmitVertex();
-    // EndPrimitive();
-
 }
