@@ -297,6 +297,9 @@ void Game::updateUniforms(){
     
     if(guiState[BOOM_SHADER])
         this->shaders[SHADER_BOOM_PROGRAM]->set1f(explosionScale, "explosionScale");
+    
+    if(guiState[TESS_SHADER])
+        this->shaders[SHADER_TESS_PROGRAM]->set1f(explosionScale, "explosionScale");
 
     // update light
     if(lightsOn)

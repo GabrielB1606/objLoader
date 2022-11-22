@@ -11,14 +11,4 @@ void main(){
 
     gl_Position = vec4(normalize(p0 + p1 + p2), 1.0);
 
-    // float r = 0.850651;
-
-    // gl_Position.x = mix(gl_in[0].gl_Position.x, gl_in[1].gl_Position.x, gl_TessCoord.x);
-    // gl_Position.y = mix(gl_in[0].gl_Position.y, gl_in[1].gl_Position.y, gl_TessCoord.y);
-    // gl_Position.z = mix(gl_in[0].gl_Position.z, gl_in[1].gl_Position.z, gl_TessCoord.z);
-
-    // gl_Position.x = mix(gl_Position.x, gl_in[2].gl_Position.x, gl_TessCoord.x);
-    // gl_Position.y = mix(gl_Position.y, gl_in[2].gl_Position.y, gl_TessCoord.y);
-    // gl_Position.z = mix(gl_Position.z, gl_in[2].gl_Position.z, gl_TessCoord.z);
-
 }

@@ -6,6 +6,7 @@ layout (triangle_strip, max_vertices = 3) out;
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
+uniform float explosionScale;
 
 void main(){
 
@@ -18,13 +19,9 @@ void main(){
 
     for(int i = 0; i<3; i++){
         
-        // gl_Position =
-        //     ProjectionMatrix * ViewMatrix * ModelMatrix *
-        //     (gl_in[i].gl_Position + 0.01*face_normal);
-        
         gl_Position =
             ProjectionMatrix * ViewMatrix * ModelMatrix *
-            (gl_in[i].gl_Position);
+            (gl_in[i].gl_Position+ explosionScale*vec4(face_normal, 0.0f));
         
         EmitVertex();
     }
