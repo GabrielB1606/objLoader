@@ -1,0 +1,5 @@
+enum DEMO_VARS{
+    EXPLOSION_SCALE = 0,
+    INNER_TESS,
+    OUTER_TESS
+};

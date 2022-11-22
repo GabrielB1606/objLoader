@@ -32,9 +32,13 @@ private:
     const int WIDTH, HEIGHT;
     int fbWidth, fbHeight;
 
+    // demo variables
+    float demoVars[3] = {0.f, 1.f, 1.f}; 
+    float explosionScale = 0.0f;
+    float innerTess = 1.f, outerTess = 1.f;
+
     // scene variables & stuff
     SHADER_PROGRAM coreProgramIndex = SHADER_CORE_PROGRAM;
-    float explosionScale = 0.0f;
     Moveable* objectSelected = nullptr;
     size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
@@ -296,10 +300,13 @@ void Game::updateUniforms(){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     if(guiState[BOOM_SHADER])
-        this->shaders[SHADER_BOOM_PROGRAM]->set1f(explosionScale, "explosionScale");
+        this->shaders[SHADER_BOOM_PROGRAM]->set1f(demoVars[EXPLOSION_SCALE], "explosionScale");
     
-    if(guiState[TESS_SHADER])
-        this->shaders[SHADER_TESS_PROGRAM]->set1f(explosionScale, "explosionScale");
+    if(guiState[TESS_SHADER]){
+        this->shaders[SHADER_TESS_PROGRAM]->set1f(demoVars[EXPLOSION_SCALE], "explosionScale");
+        this->shaders[SHADER_TESS_PROGRAM]->set1f(demoVars[INNER_TESS], "innerTess");
+        this->shaders[SHADER_TESS_PROGRAM]->set1f(demoVars[OUTER_TESS], "outerTess");
+    }
 
     // update light
     if(lightsOn)
@@ -509,7 +516,7 @@ void Game::render(){
         }
     }
     
-    gui->update( models, objectSelected, explosionScale );
+    gui->update( models, objectSelected, demoVars);
     gui->render();
 
     updateState();

@@ -54,6 +54,7 @@ size_t default_material_counter = 0;
 #include "PointLight.h"
 #include "Camera.h"
 
+#include "enumDemo.h"
 #include "enumGuiEvent.h"
 #include "UserInterface.h"
 #include "Game.h"
