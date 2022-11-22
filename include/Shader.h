@@ -182,11 +182,12 @@ bool Shader::linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geom
     if(tessControlShader)
         glAttachShader(this->id, tessControlShader);
 
+    if(tessEvalShader)
+        glAttachShader(this->id, tessEvalShader);
+        
     if(geometryShader)
         glAttachShader(this->id, geometryShader);
 
-    if(tessEvalShader)
-        glAttachShader(this->id, tessEvalShader);
 
     glAttachShader(this->id, fragmentShader);
 
