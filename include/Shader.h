@@ -8,6 +8,7 @@ class Shader{
         const int versionMin;
 
         const char* glsl_version;
+        bool tess = false;
 
         std::string loadShaderSource(char* filename);
         GLuint loadShader(GLenum type, char* filename);
@@ -24,6 +25,7 @@ class Shader{
         void setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose);
         void setMat3fv(glm::mat3 value, const GLchar* name, GLboolean transpose);
         void set1f(GLfloat value, const GLchar* name);
+        bool isTess(){ return tess; }
 };
 
 Shader::Shader(const char* glsl_version, const int versionMaj, const int versionMin,char* vertexFile, char* fragmentFile, char* geometryFile = nullptr, char* tessControlFile = nullptr, char* tessEvalFile = nullptr) : versionMaj(versionMaj), versionMin(versionMin){
@@ -44,8 +46,10 @@ Shader::Shader(const char* glsl_version, const int versionMaj, const int version
     if( geometryFile != nullptr)
         geometryShader = loadShader(GL_GEOMETRY_SHADER, geometryFile);
     
-    if( tessEvalFile != nullptr)
+    if( tessEvalFile != nullptr){
         tessEvalShader = loadShader(GL_TESS_EVALUATION_SHADER , tessEvalFile);
+        tess = true;
+    }
 
     fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentFile);
 

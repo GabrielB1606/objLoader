@@ -258,6 +258,13 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
 
     // render
 
+    GLenum renderType;
+
+    if( shader->isTess() )
+        renderType = GL_PATCHES;
+    else
+        renderType = this->renderType;
+
     if(showFill){
         
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -266,9 +273,9 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
 
         shader->use();
         if(this->nrOfIndices == 0)
-            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+            glDrawArrays(renderType, 0, this->nrOfVertices);
         else
-            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements(renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
 
     }
 
@@ -280,9 +287,9 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
 
         shader->use();
         if(this->nrOfIndices == 0)
-            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+            glDrawArrays(renderType, 0, this->nrOfVertices);
         else
-            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements(renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
         
     }
 
@@ -294,9 +301,9 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
 
         shader->use();
         if(this->nrOfIndices == 0)
-            glDrawArrays(this->renderType, 0, this->nrOfVertices);
+            glDrawArrays(renderType, 0, this->nrOfVertices);
         else
-            glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements(renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
 
         glPointSize(1.f);
         

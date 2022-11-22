@@ -8,8 +8,8 @@ private:
         SHADER_NORMALS_PROGRAM,
         SHADER_PICKING_PROGRAM,
         SHADER_PHONG_PROGRAM,
-        SHADER_BOOM_PROGRAM
-        
+        SHADER_BOOM_PROGRAM,
+        SHADER_TESS_PROGRAM
     };
 
     // Framerate
@@ -39,7 +39,7 @@ private:
     size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
-    bool guiState[15] = {
+    bool guiState[17] = {
         false,  // menu clicked   
         false,  // clear scene button clicked
         true,   // culling toggle
@@ -54,7 +54,9 @@ private:
         false,  // import MTL clicked
         false,  // import Scene clicked
         false,  // export Scene clicked
-        false
+        false,  // phong shading
+        false,  // boom shader
+        false   // tessellation shader
     };
 
     // User Interface
@@ -462,6 +464,7 @@ void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/picking/fragment_picking.glsl", "./shaders/core/geometry_core.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/phong/vertex_phong.glsl", "./shaders/phong/fragment_phong.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/boom/vertex.glsl", "./shaders/boom/fragment.glsl", "./shaders/boom/geometry.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/tessellation/vertex.glsl", "./shaders/tessellation/fragment.glsl", "./shaders/tessellation/geometry.glsl", "./shaders/tessellation/tessControl.glsl", "./shaders/tessellation/tessEval.glsl" ) );
 }
 
 void Game::initMatrices(){
