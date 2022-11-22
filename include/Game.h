@@ -263,7 +263,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/ico.obj", &this->materialMap);
     this->models.push_back( modelsLoaded[0] );
 
 }

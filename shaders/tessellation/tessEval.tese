@@ -1,19 +1,24 @@
 #version 460 core
 #extension GL_ARB_tessellation_shader : enable
 
-layout (quads, equal_spacing, ccw) in;
-
-vec4 interpolate( vec4 v0, vec4 v1, vec4 v2, vec4 v3 ){
-    vec4 a = mix(v0, v1, gl_TessCoord.x);
-    vec4 b = mix(v3, v2, gl_TessCoord.x);
-    return mix(a, b, gl_TessCoord.y);
-}
+layout (triangles, equal_spacing, ccw) in;
 
 void main(){
-    gl_Position = interpolate(
-        gl_in[0].gl_Position,
-        gl_in[1].gl_Position,
-        gl_in[2].gl_Position,
-        gl_in[3].gl_Position
-    );
+
+    vec3 p0 = gl_TessCoord.x * gl_in[0].gl_Position.xyz;
+    vec3 p1 = gl_TessCoord.y * gl_in[1].gl_Position.xyz;
+    vec3 p2 = gl_TessCoord.z * gl_in[2].gl_Position.xyz;
+
+    gl_Position = vec4(normalize(p0 + p1 + p2), 1.0);
+
+    // float r = 0.850651;
+
+    // gl_Position.x = mix(gl_in[0].gl_Position.x, gl_in[1].gl_Position.x, gl_TessCoord.x);
+    // gl_Position.y = mix(gl_in[0].gl_Position.y, gl_in[1].gl_Position.y, gl_TessCoord.y);
+    // gl_Position.z = mix(gl_in[0].gl_Position.z, gl_in[1].gl_Position.z, gl_TessCoord.z);
+
+    // gl_Position.x = mix(gl_Position.x, gl_in[2].gl_Position.x, gl_TessCoord.x);
+    // gl_Position.y = mix(gl_Position.y, gl_in[2].gl_Position.y, gl_TessCoord.y);
+    // gl_Position.z = mix(gl_Position.z, gl_in[2].gl_Position.z, gl_TessCoord.z);
+
 }
