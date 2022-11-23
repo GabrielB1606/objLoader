@@ -474,10 +474,10 @@ void Game::initShaders(){
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/normals/fragment_normals.glsl", "./shaders/normals/geometry_normals.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/core/vertex_core.glsl", "./shaders/picking/fragment_picking.glsl", "./shaders/core/geometry_core.glsl" ) );
     shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/phong/vertex_phong.glsl", "./shaders/phong/fragment_phong.glsl" ) );
-    // shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/boom/vertex.glsl", "./shaders/boom/fragment.glsl", "./shaders/boom/geometry.glsl" ) );
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/boom/vertex.glsl", "./shaders/boom/fragment.glsl", "./shaders/boom/geometry.glsl" ) );
 
-    // glPatchParameteri(GL_PATCH_VERTICES, 3);
-    // shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/tessellation/vertex.glsl", "./shaders/tessellation/fragment.glsl", "./shaders/tessellation/geometry.glsl", "./shaders/tessellation/tessControl.tesc", "./shaders/tessellation/tessEval.tese" ) );
+    glPatchParameteri(GL_PATCH_VERTICES, 3);
+    shaders.push_back( new Shader(glsl_version, GL_MAJOR, GL_MINOR, "./shaders/tessellation/vertex.glsl", "./shaders/tessellation/fragment.glsl", "./shaders/tessellation/geometry.glsl", "./shaders/tessellation/tessControl.tesc", "./shaders/tessellation/tessEval.tese" ) );
 }
 
 void Game::initMatrices(){
