@@ -36,6 +36,8 @@
 
 // tinyfiledialogs
 #include "tinyfiledialogs.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 size_t default_material_counter = 0;
 
@@ -57,3 +59,4 @@ size_t default_material_counter = 0;
 #include "enumGuiEvent.h"
 #include "UserInterface.h"
 #include "Game.h"
+

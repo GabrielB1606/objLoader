@@ -16,7 +16,7 @@ file( GLOB IMGUI_SRC src/imgui/*.cpp )
     # add all cpp files
 add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC} src/tinyfiledialogs/tinyfiledialogs.c)
     # target all .h and .hpp files
-target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui include/tinyfiledialogs)
+target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui include/tinyfiledialogs include/stb_image/)
     # target all .lib filesfor linking
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
     # specify libraries names for linking
@@ -29,7 +29,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # ImGui Demo
 add_executable(ImGUI_demo src/ImGuiDemo.cpp ${IMGUI_SRC})
-target_include_directories( ImGUI_demo PUBLIC include/ include/imgui/)
+target_include_directories( ImGUI_demo PUBLIC include/ include/imgui/ include/stb_image/)
 target_link_directories( ImGUI_demo PRIVATE lib/ )
 target_link_libraries(ImGUI_demo glew32s glfw3 opengl32)
 
