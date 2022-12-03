@@ -149,8 +149,17 @@ public:
 
 void Game::initTextures(){
     
+    glActiveTexture(GL_TEXTURE0);
     Texture tex("../../obj/container.jpg", GL_TEXTURE_2D);
     tex.bind();
+
+    shaders[SHADER_CORE_PROGRAM]->set1i( 0, "tex0" );
+
+    glActiveTexture(GL_TEXTURE1);
+    Texture tex2("../../obj/container2.jpg", GL_TEXTURE_2D);
+    tex2.bind();
+    
+    shaders[SHADER_CORE_PROGRAM]->set1i( 1, "tex1" );
 
     // unsigned int texture;
     // glGenTextures(1, &texture);

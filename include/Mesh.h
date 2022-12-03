@@ -25,6 +25,7 @@ private:
 
     glm::mat4 ModelMatrix;
     Material* material;
+    Texture* textures[4] = {nullptr};
 
 
 public:

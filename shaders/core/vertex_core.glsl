@@ -20,7 +20,7 @@ void main(){
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     data_out.normal = vertex_normal;
     data_out.color = vertex_color;
-    data_out.texcoord = vertex_texcoord;
+    data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);
 
     // // vs_normal = mat3(ModelMatrix) * vertex_normal;
