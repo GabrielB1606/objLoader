@@ -21,7 +21,7 @@ in DATA{
     vec3 position;
     vec3 normal;
     vec3 color;
-    vec2 textcoord;
+    vec2 texcoord;
 } data_in;
 
 // out

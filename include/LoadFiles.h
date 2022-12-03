@@ -101,7 +101,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
     // vertex data
     float maxVertex = 0.f;
     std::vector<glm::vec3> positionVertex;
-    std::vector<glm::vec2> textcoordVertex;
+    std::vector<glm::vec2> texcoordVertex;
     std::vector<glm::vec3> normalVertex;
 
     std::vector<glm::vec3> approxNormalVertex;
@@ -109,7 +109,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
     // vertex indices
     std::vector<GLuint> positionIndex;
-    std::vector<GLuint> textcoordIndex;
+    std::vector<GLuint> texcoordIndex;
     std::vector<GLuint> normalIndex;
 
     // vector of complete vertices
@@ -160,10 +160,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         new Mesh(
                             groupName,
                             positionVertex,
-                            textcoordVertex,
+                            texcoordVertex,
                             normalVertex.size()>0? normalVertex:approxNormalVertex,
                             positionIndex,
-                            textcoordIndex,
+                            texcoordIndex,
                             normalIndex,
                             (*materialMap)[materialName]
                         )
@@ -179,10 +179,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                         new Mesh(
                             groupName,
                             positionVertex,
-                            textcoordVertex,
+                            texcoordVertex,
                             normalVertex.size()>0? normalVertex:approxNormalVertex,
                             positionIndex,
-                            textcoordIndex,
+                            texcoordIndex,
                             normalIndex,
                             (*materialMap)[tmp_str]
                         )
@@ -191,11 +191,11 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                 }
                 
                 // positionVertex.clear();
-                // textcoordVertex.clear();
+                // texcoordVertex.clear();
                 // normalVertex.clear();
                 
                 positionIndex.clear();
-                textcoordIndex.clear();
+                texcoordIndex.clear();
                 normalIndex.clear();
                 groupName = "";
 
@@ -252,10 +252,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
             positionVertex.push_back( tmp_vec3 );
 
-        }else if(prefix == "vt"){   //  textcoord
+        }else if(prefix == "vt"){   //  texcoord
             
             ss >> tmp_vec2.x >> tmp_vec2.y;
-            textcoordVertex.push_back( tmp_vec2 );
+            texcoordVertex.push_back( tmp_vec2 );
 
         }else if(prefix == "vn"){  //  vertex normal
 
@@ -291,7 +291,7 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
 
                     ss.ignore(1, '/');
                     
-                    if( textcoordVertex.size()>0 )
+                    if( texcoordVertex.size()>0 )
                         ss >> face[i][1];
                     
                     if( ss.peek() == '/' ){
@@ -334,8 +334,8 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                     for(size_t i=0; i<face.size(); i++){
                         positionIndex.push_back( face[i][0] );
 
-                        if( textcoordVertex.size()>0 )
-                            textcoordIndex.push_back(face[i][1]);
+                        if( texcoordVertex.size()>0 )
+                            texcoordIndex.push_back(face[i][1]);
                             
                         if( normalVertex.size()>0 )
                             normalIndex.push_back(face[i][2]);
@@ -350,8 +350,8 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
                     for(int i : {0, 1, 2, 0, 2, 3}){
                         positionIndex.push_back( face[i][0] );
 
-                        if( textcoordVertex.size()>0 )
-                            textcoordIndex.push_back(face[i][1]);
+                        if( texcoordVertex.size()>0 )
+                            texcoordIndex.push_back(face[i][1]);
                         
                         if( normalVertex.size()>0 )
                             normalIndex.push_back(face[i][2]);
@@ -390,10 +390,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             new Mesh(
                 groupName,
                 positionVertex,
-                textcoordVertex,
+                texcoordVertex,
                 normalVertex.size()>0? normalVertex:approxNormalVertex,
                 positionIndex,
-                textcoordIndex,
+                texcoordIndex,
                 normalIndex,
                 (*materialMap)[materialName]
             )
@@ -408,10 +408,10 @@ std::vector<Model *> LoadOBJ(const char* objFile, std::unordered_map<std::string
             new Mesh(
                 groupName,
                 positionVertex,
-                textcoordVertex,
+                texcoordVertex,
                 normalVertex.size()>0? normalVertex:approxNormalVertex,
                 positionIndex,
-                textcoordIndex,
+                texcoordIndex,
                 normalIndex,
                 (*materialMap)[tmp_str]
             )

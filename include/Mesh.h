@@ -30,7 +30,7 @@ private:
 public:
 
     void initVAO();
-    Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
+    Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &texcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &texcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType);
     
     Mesh(const Mesh &obj);
     Mesh(Material* material, Vertex* vertexArray, const unsigned& nrOfVertices, GLenum renderType, GLuint* indexArray, const unsigned& nrOfIndices, glm::vec3 origin, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
@@ -87,7 +87,7 @@ void Mesh::normalize(const float factor){
 
 
 
-Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &textcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &textcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
+Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector<glm::vec2> &texcoordVertex, std::vector<glm::vec3> &normalVertex, std::vector<GLuint> &positionIndex, std::vector<GLuint> &texcoordIndex, std::vector<GLuint> normalIndex, Material* material, GLenum renderType = GL_TRIANGLES){
 
     this->name = name;
     this->renderType = renderType;
@@ -108,11 +108,11 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
 
             vertexMap[key] = vertexArray.size();
             vertexArray.push_back( 
-                textcoordVertex.size() >0?
+                texcoordVertex.size() >0?
                 Vertex( 
                     positionVertex[ positionIndex[i]-1 ],
                     glm::vec3(0.7f),
-                    textcoordVertex[ textcoordIndex[i]-1 ],
+                    texcoordVertex[ texcoordIndex[i]-1 ],
                     normalVertex[ normalIndex[i]-1 ]
                 ):
                 Vertex( 
@@ -142,7 +142,7 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
         this->vertexArray[i].color = vertexArray[i].color;
         this->vertexArray[i].normal = vertexArray[i].normal;
         this->vertexArray[i].position = vertexArray[i].position;
-        this->vertexArray[i].textcoord = vertexArray[i].textcoord;
+        this->vertexArray[i].texcoord = vertexArray[i].texcoord;
     }
 
     // initVAO();
@@ -401,8 +401,8 @@ void Mesh::initVAO(){
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
     glEnableVertexAttribArray(1);
 
-        // TEXTCOORD
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, textcoord));
+        // texcoord
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
     glEnableVertexAttribArray(2);
 
         // NORMAL

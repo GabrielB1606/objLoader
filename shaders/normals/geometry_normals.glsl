@@ -5,14 +5,14 @@ layout (line_strip, max_vertices = 6) out;
 
 out vec3 vs_position;
 out vec3 vs_color;
-out vec2 vs_textcoord;
+out vec2 vs_texcoord;
 out vec3 vs_normal;
 
 in DATA{
     vec3 position;
     vec3 normal;
     vec3 color;
-    vec2 textcoord;
+    vec2 texcoord;
 } data_in[];
 
 uniform mat4 ModelMatrix;
