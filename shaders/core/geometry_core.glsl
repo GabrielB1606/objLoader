@@ -8,24 +8,20 @@ out vec3 vs_color;
 out vec2 vs_texcoord;
 out vec3 vs_normal;
 
-in DATA{
+in Vertex{
     vec3 position;
     vec3 normal;
     vec3 color;
     vec2 texcoord;
 } data_in[];
 
-uniform mat4 ModelMatrix;
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-
 void main(){
 
     for(int i = 0; i<3; i++){
         
-        gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * gl_in[i].gl_Position;
+        gl_Position = gl_in[i].gl_Position;
         
-        vs_position = vec4(ModelMatrix * vec4(data_in[i].position, 1.f)).xyz;
+        vs_position = data_in[i].position;
         vs_normal = data_in[i].normal;
         vs_color = data_in[i].color;
         vs_texcoord = data_in[i].texcoord;
