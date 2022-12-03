@@ -18,9 +18,11 @@ out vec4 fs_color;
 
 // uniforms
 uniform Material material;
+uniform sampler2D ourTexture;
 
 void main(){
 
-    fs_color = vec4( material.diffuse , 1.f);
+    // fs_color = vec4( material.diffuse , 1.f);
+    fs_color = texture(ourTexture, vs_texcoord);
 
 }
