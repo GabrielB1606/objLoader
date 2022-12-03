@@ -41,6 +41,7 @@
 
 size_t default_material_counter = 0;
 
+#include "Texture.h"
 #include "Moveable.h"
 #include "HashPair.h"
 #include "Shader.h"

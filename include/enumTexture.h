@@ -1,0 +1,6 @@
+enum TEXTURE{
+    TEXTURE = 0,
+    AMBIENT,
+    DIFFUSE,
+    SPECULAR
+};
