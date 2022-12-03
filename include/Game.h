@@ -158,13 +158,13 @@ void Game::initTextures(){
     glActiveTexture(GL_TEXTURE0);
     Texture tex("../../obj/container.jpg", GL_TEXTURE_2D);
     tex.bind();
-
+    glActiveTexture(GL_TEXTURE0);
     shaders[SHADER_CORE_PROGRAM]->set1i( 0, "tex0" );
 
     glActiveTexture(GL_TEXTURE1);
     Texture tex2("../../obj/container2.jpg", GL_TEXTURE_2D);
     tex2.bind();
-    
+    glActiveTexture(GL_TEXTURE1);
     shaders[SHADER_CORE_PROGRAM]->set1i( 1, "tex1" );
 
     // unsigned int texture;
@@ -325,6 +325,14 @@ void Game::updateMatrices(){
 void Game::updateUniforms(){
     updateMatrices(); 
     
+    this->shaders[this->coreProgramIndex]->set1i( guiState[FLAT]? 1:0, "flatShading" );
+    this->shaders[this->coreProgramIndex]->set1i( guiState[GOURAUD]? 1:0, "gouraudShading" );
+    this->shaders[this->coreProgramIndex]->set1i( guiState[PHONG]? 1:0, "phongShading" );
+    
+    this->shaders[this->coreProgramIndex]->set1i( guiState[AMBIENT]? 1:0, "ambientLighting" );
+    this->shaders[this->coreProgramIndex]->set1i( guiState[DIFFUSE]? 1:0, "diffuseLighting" );
+    this->shaders[this->coreProgramIndex]->set1i( guiState[SPECULAR]? 1:0, "specularLighting" );
+
     this->shaders[this->coreProgramIndex]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[this->coreProgramIndex]->setVec3f(this->camera.getPosition(), "camPosition");
 
@@ -338,9 +346,11 @@ void Game::updateUniforms(){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
-    if(lightsOn)
-        for( PointLight* &pl : this->pointLights )
-            pl->sendToShader( *this->shaders[SHADER_PHONG_PROGRAM] );
+    // if(lightsOn)
+    for( PointLight* &pl : this->pointLights ){
+        pl->sendToShader( *this->shaders[SHADER_PHONG_PROGRAM] );
+        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    }
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
@@ -532,6 +542,10 @@ void Game::render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     updateUniforms();
+    // glActiveTexture(GL_TEXTURE0);
+    // shaders[SHADER_CORE_PROGRAM]->set1i( 0, "tex0" );
+    // glActiveTexture(GL_TEXTURE1);
+    // shaders[SHADER_CORE_PROGRAM]->set1i( 1, "tex1" );
 
     for( Model* &m : models ){
         m->render( this->shaders[this->coreProgramIndex], guiState[SHOW_EDGES], guiState[SHOW_VERTICES], guiState[SHOW_FILL], guiState[SHOW_BOUNDING_BOX], guiState[CULLING] );

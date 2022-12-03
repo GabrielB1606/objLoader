@@ -7,13 +7,31 @@ struct Material{
     vec3 specular;
 };
 
-// in
-in vec3 vs_position;
-in vec3 vs_color;
-in vec2 vs_texcoord;
-in vec3 vs_normal;
+struct PointLight{
+    vec3 position;
+    float intensity;
+    vec3 color;
+    float constant;
+    float linear;
+    float quadratic;
+};
 
-// out
+
+// input
+in Vertex{
+    vec3 position;
+    vec3 normal;
+    vec3 color;
+    vec2 texcoord;
+} data_in;
+
+    // menu
+uniform int phongShading;
+uniform int ambientLighting;
+uniform int diffuseLighting;
+uniform int specularLighting;
+
+// output
 out vec4 fs_color;
 
 // uniforms
@@ -23,7 +41,11 @@ uniform sampler2D tex1;
 
 void main(){
 
-    fs_color = vec4( material.diffuse , 1.f);
-    // fs_color = texture(tex1, vs_texcoord);
+    // fs_color = vec4( material.diffuse , 1.f);
+    if(phongShading != 0){
+        fs_color = texture(tex0, data_in.texcoord);
+    }else{
+        fs_color = texture(tex0, data_in.texcoord) * vec4(data_in.color, 1.f);
+    }
 
 }
