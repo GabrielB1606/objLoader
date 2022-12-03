@@ -45,7 +45,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
     ImGui::NewFrame();
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    // ImGui::ShowDemoWindow(&show_demo_window);
+    ImGui::ShowDemoWindow(&show_demo_window);
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
@@ -108,6 +108,56 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
         }
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+        // SHADERS
+        ImGui::Separator();
+        ImGui::Text("Lighting");               // Display some text (you can use a format strings too)
+
+        state[MENU_CLICK] |= 
+            ImGui::Checkbox("Ambient", &state[AMBIENT]) ||
+            SameLine() ||
+            ImGui::Checkbox("Diffuse", &state[DIFFUSE]) ||
+            SameLine() ||
+            ImGui::Checkbox("Specular", &state[SPECULAR]);
+        
+        ImGui::Text("Shader");
+        const char* itemsShaderCombo[] = { "None", "Flat", "Gouraud", "Phong" };
+        static int currentShader = 0;
+        ImGui::Combo("Shader Type", &currentShader, itemsShaderCombo, IM_ARRAYSIZE(itemsShaderCombo));
+
+        switch (currentShader){
+            case 0:
+                state[FLAT] = false;
+                state[PHONG] = false;
+                state[GOURAUD] = false;
+                break;
+            case 1:
+                state[FLAT] = true;
+                state[GOURAUD] = false;
+                state[PHONG] = false;
+                break;
+            case 2:
+                state[FLAT] = false;
+                state[GOURAUD] = true;
+                state[PHONG] = false;
+                break;
+            case 3:
+                state[FLAT] = false;
+                state[GOURAUD] = false;
+                state[PHONG] = true;
+                break;
+            
+            default:
+                break;
+        }
+
+        ImGui::Text("Attenuation Coefficients");               // Display some text (you can use a format strings too)
+        
+        // ImGui::SliderFloat("a", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
+        // SameLine();
+        // ImGui::SliderFloat("b", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
+        // SameLine();
+        // ImGui::SliderFloat("c", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
 
         // SHOW
         ImGui::Separator();

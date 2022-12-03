@@ -23,7 +23,7 @@ uniform sampler2D tex1;
 
 void main(){
 
-    // fs_color = vec4( material.diffuse , 1.f);
-    fs_color = texture(tex1, vs_texcoord);
+    fs_color = vec4( material.diffuse , 1.f);
+    // fs_color = texture(tex1, vs_texcoord);
 
 }

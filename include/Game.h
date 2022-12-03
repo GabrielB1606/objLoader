@@ -37,7 +37,7 @@ private:
     size_t modelSelected = -1, meshSelected = -1;
     glm::vec4 clearColor;
     glm::vec4 normalsColor;
-    bool guiState[15] = {
+    bool guiState[21] = {
         false,  // menu clicked   
         false,  // clear scene button clicked
         true,   // culling toggle
@@ -52,7 +52,13 @@ private:
         false,  // import MTL clicked
         false,  // import Scene clicked
         false,  // export Scene clicked
-        false
+        false,  // phong shading
+        false,  // ambient
+        false,  // diffuse
+        false,  // specular
+        false,  // flat
+        false,  // gouraud
+        false   // phong
     };
 
     // User Interface
