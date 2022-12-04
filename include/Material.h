@@ -40,7 +40,7 @@ glm::vec3* Material::getEdgeColorReference(){
     return &edge;
 }
 
-Material::Material(std::string name, glm::vec3 ambient = glm::vec3(0.2f), glm::vec3 diffuse = glm::vec3(0.7f), glm::vec3 specular = glm::vec3(1.f)){
+Material::Material(std::string name, glm::vec3 ambient = glm::vec3(0.7f), glm::vec3 diffuse = glm::vec3(0.9f), glm::vec3 specular = glm::vec3(1.f)){
     this->name = name;
     this->fill = diffuse;
     this->vertex = glm::vec3(0.f, 1.f, 0.f);

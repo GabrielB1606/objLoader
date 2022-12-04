@@ -53,9 +53,9 @@ private:
         false,  // import Scene clicked
         false,  // export Scene clicked
         false,  // phong shading
-        false,  // ambient
-        false,  // diffuse
-        false,  // specular
+        true,  // ambient
+        true,  // diffuse
+        true,  // specular
         false,  // flat
         false,  // gouraud
         false   // phong
@@ -156,7 +156,7 @@ public:
 void Game::initTextures(){
     
     glActiveTexture(GL_TEXTURE0);
-    Texture tex("../../obj/container.jpg", GL_TEXTURE_2D);
+    Texture tex("../../obj/crate_1.jpg", GL_TEXTURE_2D);
     tex.bind();
     glActiveTexture(GL_TEXTURE0);
     shaders[SHADER_CORE_PROGRAM]->set1i( 0, "tex0" );
@@ -306,8 +306,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Lowpoly_tree_sample.obj", &this->materialMap);
-    // this->models.push_back( modelsLoaded[0] );
+    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Crate1.obj", &this->materialMap);
+    this->models.push_back( modelsLoaded[0] );
 
 }
 
@@ -399,9 +399,9 @@ void Game::updateInputMouse(){
     }
     this->mouseButtonPressState = newState;
 
-    if(lightsOn)
-        if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS ){
-            this->pointLights[0]->setPosition( this->camera.getPosition() );
+
+    if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS ){
+        this->pointLights[0]->setPosition( this->camera.getPosition() );
     }
 
 }
@@ -484,9 +484,9 @@ void Game::initUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
-    if(lightsOn)
-        for( PointLight* &pl : this->pointLights )
-            pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    // if(lightsOn)
+    for( PointLight* &pl : this->pointLights )
+        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 }
 

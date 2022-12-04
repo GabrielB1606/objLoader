@@ -70,6 +70,15 @@ out Vertex{
     vec2 texcoord;
 } data_out;
 
+out Context{
+    Material material;
+    PointLight pointLight;
+    vec3 camPosition;
+    int ambientLighting;
+    int diffuseLighting;
+    int specularLighting;
+} context_out;
+
 void main(){
     
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
@@ -88,10 +97,15 @@ void main(){
             data_out.color += calculateSpecular(material, data_out.position, data_out.normal,pointLight.position, camPosition);
 
     }else{
+
+        context_out.material = material;
+        context_out.pointLight = pointLight;
+        context_out.camPosition = camPosition;
+        context_out.ambientLighting = ambientLighting;
+        context_out.diffuseLighting = diffuseLighting;
+        context_out.specularLighting = specularLighting;
+
         data_out.color = vertex_color;
     }
-
-
-    // // vs_normal = mat3(ModelMatrix) * vertex_normal;
-    // // vs_normal = mat3(transpose(inverse(ModelMatrix))) * vertex_normal;
+    
 }
