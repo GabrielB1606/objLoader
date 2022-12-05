@@ -53,16 +53,14 @@ in Vertex{
 
     // menu (do i have to shade in this step?)
 uniform int flatShading;
+uniform int ambientLighting;
+uniform int diffuseLighting;
+uniform int specularLighting;
 
-    // context (light + mtl + menu ) info (from prev step)
-in Context{
-    Material material;
-    PointLight pointLight;
-    vec3 camPosition;
-    int ambientLighting;
-    int diffuseLighting;
-    int specularLighting;
-} context_in[];
+    // context
+uniform Material material;
+uniform PointLight pointLight;
+uniform vec3 camPosition;
 
 // output
     // vertex info
@@ -73,23 +71,12 @@ out Vertex{
     vec2 texcoord;
 } data_out;
 
-    // context (light + mtl + menu ) info (to pass forward)
-out Context{
-    Material material;
-    PointLight pointLight;
-    vec3 camPosition;
-    int ambientLighting;
-    int diffuseLighting;
-    int specularLighting;
-} context_out;
-
 
 void main(){
 
         // if shading in this step
     if( flatShading != 0 ){
 
-            
         vec3 samplePosition = vec3(0.f);    // get the center of the primitive as the sample point for the lighting
         for(int i = 0; i<3; i++){
             samplePosition += data_in[i].position;
@@ -108,14 +95,14 @@ void main(){
             // accumulate light stuff in color_out to pass it to the next step
         vec3 color_out = vec3(0);
 
-        if( context_in[0].ambientLighting != 0 )
-            color_out += calculateAmbient(context_in[0].material, context_in[0].pointLight.color, context_in[0].pointLight.intensity);
+        if( ambientLighting != 0 )
+            color_out += calculateAmbient(material, pointLight.color, pointLight.intensity);
 
-        if( context_in[0].diffuseLighting != 0 )
-            color_out += calculateDiffuse(context_in[0].material, samplePosition, faceNormal, context_in[0].pointLight.position);
+        if( diffuseLighting != 0 )
+            color_out += calculateDiffuse(material, samplePosition, faceNormal, pointLight.position);
 
-        if( context_in[0].specularLighting != 0 )
-            color_out += calculateSpecular(context_in[0].material, samplePosition, faceNormal, context_in[0].pointLight.position, context_in[0].camPosition);
+        if( specularLighting != 0 )
+            color_out += calculateSpecular(material, samplePosition, faceNormal, pointLight.position, camPosition);
 
             // build vertices for the next step
         for(int i = 0; i<3; i++){
@@ -145,18 +132,6 @@ void main(){
             data_out.normal = data_in[i].normal;
             data_out.color = data_in[i].color;
             data_out.texcoord = data_in[i].texcoord;
-            
-                // pass context data forward
-            context_out.material = context_in[i].material;
-            context_out.pointLight = context_in[i].pointLight;
-            context_out.camPosition = context_in[i].camPosition;
-            context_out.ambientLighting = context_in[i].ambientLighting;
-            context_out.diffuseLighting = context_in[i].diffuseLighting;
-            context_out.specularLighting = context_in[i].specularLighting;
-
-            context_out.ambientLighting = 1;
-            context_out.diffuseLighting = 1;
-            context_out.specularLighting = 1;
 
             EmitVertex();
         }

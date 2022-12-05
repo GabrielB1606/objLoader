@@ -48,17 +48,15 @@ in Vertex{
 } data_in;
 
     // context
-in Context{
-    Material material;
-    PointLight pointLight;
-    vec3 camPosition;
-    int ambientLighting;
-    int diffuseLighting;
-    int specularLighting;
-} context_in;
+uniform Material material;
+uniform PointLight pointLight;
+uniform vec3 camPosition;
 
     // menu
 uniform int phongShading;
+uniform int ambientLighting;
+uniform int diffuseLighting;
+uniform int specularLighting;
 
     // textures
 uniform sampler2D tex0;
@@ -69,20 +67,25 @@ out vec4 fs_color;
 
 void main(){
 
+        // if shading in this step
     if( phongShading != 0 ){
+
         vec3 lightsFinal = vec3(0);
 
-        if( context_in.ambientLighting != 0 )
-            lightsFinal += calculateAmbient(context_in.material, context_in.pointLight.color, context_in.pointLight.intensity);
-        if( context_in.diffuseLighting != 0 )
-            lightsFinal += calculateDiffuse(context_in.material, data_in.position, data_in.normal, context_in.pointLight.position);
-        if( context_in.specularLighting != 0 )
-            lightsFinal += calculateSpecular(context_in.material, data_in.position, data_in.normal, context_in.pointLight.position, context_in.camPosition);
+        if( ambientLighting != 0 )
+            lightsFinal += calculateAmbient(material, pointLight.color, pointLight.intensity);
+        if( diffuseLighting != 0 )
+            lightsFinal += calculateDiffuse(material, data_in.position, data_in.normal, pointLight.position);
+        if( specularLighting != 0 )
+            lightsFinal += calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
 
         fs_color = texture(tex0, data_in.texcoord) * vec4(lightsFinal, 1.f);
         
     }else{
+
+            // if I'm not shading in this step, then someone before me shaded and saved the light stuff in the color component 
         fs_color = texture(tex0, data_in.texcoord) * vec4(data_in.color, 1.f);
+        
     }
 
 

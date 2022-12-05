@@ -71,15 +71,6 @@ out Vertex{
     vec2 texcoord;
 } data_out;
 
-    // context (light + mtl + menu ) info
-out Context{
-    Material material;
-    PointLight pointLight;
-    vec3 camPosition;
-    int ambientLighting;
-    int diffuseLighting;
-    int specularLighting;
-} context_out;
 
 void main(){
     
@@ -104,15 +95,6 @@ void main(){
             data_out.color += calculateSpecular(material, data_out.position, data_out.normal, pointLight.position, camPosition);
 
     }else{
-
-            // if not shading in this step, pass context forward
-        context_out.material = material;
-        context_out.pointLight = pointLight;
-        context_out.camPosition = camPosition;
-        context_out.ambientLighting = ambientLighting;
-        context_out.diffuseLighting = diffuseLighting;
-        context_out.specularLighting = specularLighting;
-
             // pass vertex color
         data_out.color = vertex_color;
     }
