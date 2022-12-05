@@ -56,9 +56,6 @@ in Context{
     int diffuseLighting;
     int specularLighting;
 } context_in;
-uniform int ambientLighting;
-uniform int diffuseLighting;
-uniform int specularLighting;
 
     // menu
 uniform int phongShading;
@@ -75,11 +72,11 @@ void main(){
     if( phongShading != 0 ){
         vec3 lightsFinal = vec3(0);
 
-        if( ambientLighting != 0 )
+        if( context_in.ambientLighting != 0 )
             lightsFinal += calculateAmbient(context_in.material, context_in.pointLight.color, context_in.pointLight.intensity);
-        if( diffuseLighting != 0 )
+        if( context_in.diffuseLighting != 0 )
             lightsFinal += calculateDiffuse(context_in.material, data_in.position, data_in.normal, context_in.pointLight.position);
-        if( specularLighting != 0 )
+        if( context_in.specularLighting != 0 )
             lightsFinal += calculateSpecular(context_in.material, data_in.position, data_in.normal, context_in.pointLight.position, context_in.camPosition);
 
         fs_color = texture(tex0, data_in.texcoord) * vec4(lightsFinal, 1.f);

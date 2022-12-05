@@ -63,6 +63,7 @@ uniform int specularLighting;
 
 
 // output
+    // vertex info
 out Vertex{
     vec3 position;
     vec3 normal;
@@ -70,6 +71,7 @@ out Vertex{
     vec2 texcoord;
 } data_out;
 
+    // context (light + mtl + menu ) info
 out Context{
     Material material;
     PointLight pointLight;
@@ -81,23 +83,29 @@ out Context{
 
 void main(){
     
+        // normal vertex shader stuff
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     data_out.normal = normalize( vec4(ModelMatrix * vec4(vertex_normal, 1.f)).xyz );
     data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);
     
+        // if shading in this step
     if( gouraudShading != 0 ){
-        data_out.color = vec3(0);
+
+        data_out.color = vec3(0);   // use the color component to pass the light stuff
 
         if( ambientLighting != 0 )
             data_out.color += calculateAmbient(material, pointLight.color, pointLight.intensity);
+
         if( diffuseLighting != 0 )
             data_out.color += calculateDiffuse(material, data_out.position, data_out.normal, pointLight.position);
+        
         if( specularLighting != 0 )
-            data_out.color += calculateSpecular(material, data_out.position, data_out.normal,pointLight.position, camPosition);
+            data_out.color += calculateSpecular(material, data_out.position, data_out.normal, pointLight.position, camPosition);
 
     }else{
 
+            // if not shading in this step, pass context forward
         context_out.material = material;
         context_out.pointLight = pointLight;
         context_out.camPosition = camPosition;
@@ -105,7 +113,8 @@ void main(){
         context_out.diffuseLighting = diffuseLighting;
         context_out.specularLighting = specularLighting;
 
+            // pass vertex color
         data_out.color = vertex_color;
     }
-    
+
 }

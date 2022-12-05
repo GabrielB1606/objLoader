@@ -1,7 +1,7 @@
 #version 330
 
-layout (triangles) in;
-layout (triangle_strip, max_vertices = 3) out;
+layout (triangles) in;  // get 3 vertices at the time
+layout (triangle_strip, max_vertices = 3) out;  // send a max of 3 vertices per invocation, and take them as a triangle
 
 // structs
 struct Material{
@@ -43,6 +43,7 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, vec3 lightPos, 
 }
 
 // input
+    // vertex info
 in Vertex{
     vec3 position;
     vec3 normal;
@@ -50,9 +51,10 @@ in Vertex{
     vec2 texcoord;
 } data_in[];
 
-    // menu
+    // menu (do i have to shade in this step?)
 uniform int flatShading;
 
+    // context (light + mtl + menu ) info (from prev step)
 in Context{
     Material material;
     PointLight pointLight;
@@ -63,6 +65,7 @@ in Context{
 } context_in[];
 
 // output
+    // vertex info
 out Vertex{
     vec3 position;
     vec3 normal;
@@ -70,6 +73,7 @@ out Vertex{
     vec2 texcoord;
 } data_out;
 
+    // context (light + mtl + menu ) info (to pass forward)
 out Context{
     Material material;
     PointLight pointLight;
@@ -82,37 +86,47 @@ out Context{
 
 void main(){
 
-
+        // if shading in this step
     if( flatShading != 0 ){
 
-        // vec3 samplePosition = (data_in[0].position + data_in[1].position + data_in[2].position)/3.f ;
-        // vec3 samplePosition = (gl_in[0].gl_Position.xyz + gl_in[1].gl_Position.xyz + gl_in[2].gl_Position.xyz  )/3 ;
-
-        vec3 samplePosition = vec3(0.f);
-        vec3 sampleNormal = vec3(0.f);
+            
+        vec3 samplePosition = vec3(0.f);    // get the center of the primitive as the sample point for the lighting
         for(int i = 0; i<3; i++){
             samplePosition += data_in[i].position;
-            sampleNormal += data_in[i].normal;
         }
-        sampleNormal = normalize( sampleNormal );
         samplePosition /= 3.f;
 
+
+        vec3 faceNormal =   // we also need the normal of the face
+            normalize(
+                cross( 
+                    vec3(data_in[1].position - data_in[0].position),
+                    vec3(data_in[2].position - data_in[0].position)
+                )
+            );
+
+            // accumulate light stuff in color_out to pass it to the next step
         vec3 color_out = vec3(0);
 
         if( context_in[0].ambientLighting != 0 )
             color_out += calculateAmbient(context_in[0].material, context_in[0].pointLight.color, context_in[0].pointLight.intensity);
-        if( context_in[0].diffuseLighting != 0 )
-            color_out += calculateDiffuse(context_in[0].material, samplePosition, sampleNormal, context_in[0].pointLight.position);
-        if( context_in[0].specularLighting != 0 )
-            color_out += calculateSpecular(context_in[0].material, samplePosition, sampleNormal, context_in[0].pointLight.position, context_in[0].camPosition);
 
+        if( context_in[0].diffuseLighting != 0 )
+            color_out += calculateDiffuse(context_in[0].material, samplePosition, faceNormal, context_in[0].pointLight.position);
+
+        if( context_in[0].specularLighting != 0 )
+            color_out += calculateSpecular(context_in[0].material, samplePosition, faceNormal, context_in[0].pointLight.position, context_in[0].camPosition);
+
+            // build vertices for the next step
         for(int i = 0; i<3; i++){
+
             gl_Position = gl_in[i].gl_Position;
             
             data_out.position = data_in[i].position;
             data_out.normal = data_in[i].normal;
-            data_out.color = color_out;
             data_out.texcoord = data_in[i].texcoord;
+
+            data_out.color = color_out;
 
             EmitVertex();
 
@@ -120,10 +134,11 @@ void main(){
 
         EndPrimitive();
 
-    }else{
+    }else{  // if not shading in this step
 
         for(int i = 0; i<3; i++){
-            
+
+                // pass vertex data forward
             gl_Position = gl_in[i].gl_Position;
             
             data_out.position = data_in[i].position;
@@ -131,12 +146,17 @@ void main(){
             data_out.color = data_in[i].color;
             data_out.texcoord = data_in[i].texcoord;
             
+                // pass context data forward
             context_out.material = context_in[i].material;
             context_out.pointLight = context_in[i].pointLight;
             context_out.camPosition = context_in[i].camPosition;
-            context_out.ambientLighting = context_in[0].ambientLighting;
-            context_out.diffuseLighting = context_in[0].diffuseLighting;
-            context_out.specularLighting = context_in[0].specularLighting;
+            context_out.ambientLighting = context_in[i].ambientLighting;
+            context_out.diffuseLighting = context_in[i].diffuseLighting;
+            context_out.specularLighting = context_in[i].specularLighting;
+
+            context_out.ambientLighting = 1;
+            context_out.diffuseLighting = 1;
+            context_out.specularLighting = 1;
 
             EmitVertex();
         }
