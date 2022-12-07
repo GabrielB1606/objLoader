@@ -25,7 +25,6 @@ private:
 
     glm::mat4 ModelMatrix;
     Material* material;
-    Texture* textures[4] = {nullptr};
 
 
 public:
@@ -259,8 +258,9 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
 
     // render
 
+
     if(showFill){
-        
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glPolygonOffset(4.0, 1.0);
         material->sendToShader(*shader, GL_FILL);
@@ -271,6 +271,7 @@ void Mesh::render(Shader* shader, bool showFill = true, bool showEdges = false, 
         else
             glDrawElements(this->renderType, this->nrOfIndices, GL_UNSIGNED_INT, 0);
 
+        material->deactivate();
     }
 
     if( showEdges ){

@@ -8,6 +8,9 @@ struct Material{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    sampler2D map_ka;
+    sampler2D map_kd;
+    sampler2D map_ks;
 };
 
 struct PointLight{

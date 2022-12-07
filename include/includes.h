@@ -41,11 +41,12 @@
 
 size_t default_material_counter = 0;
 
-#include "Texture.h"
+#include "enumTexture.h"
 #include "Moveable.h"
 #include "HashPair.h"
 #include "Shader.h"
 #include "Vertex.h"
+#include "Texture.h"
 #include "Material.h"
 #include "Primitive.h"
 #include "Mesh.h"

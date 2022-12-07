@@ -155,17 +155,11 @@ public:
 
 void Game::initTextures(){
     
-    glActiveTexture(GL_TEXTURE0);
-    Texture tex("../../obj/crate_1.jpg", GL_TEXTURE_2D);
-    tex.bind();
-    glActiveTexture(GL_TEXTURE0);
-    shaders[SHADER_CORE_PROGRAM]->set1i( 0, "tex0" );
-
-    glActiveTexture(GL_TEXTURE1);
-    Texture tex2("../../obj/container2.jpg", GL_TEXTURE_2D);
-    tex2.bind();
-    glActiveTexture(GL_TEXTURE1);
-    shaders[SHADER_CORE_PROGRAM]->set1i( 1, "tex1" );
+    // glActiveTexture(GL_TEXTURE0);
+    // Texture tex("../../obj/crate_1.jpg", GL_TEXTURE_2D);
+    // tex.bind();
+    // glActiveTexture(GL_TEXTURE0);
+    // shaders[SHADER_CORE_PROGRAM]->set1i( 0, "texture_map" );
 
     // unsigned int texture;
     // glGenTextures(1, &texture);

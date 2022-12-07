@@ -15,6 +15,10 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
     
     GLint illumination = 1; // denotes the illumination model used by the material. illum = 1 indicates a flat material with no specular highlights, so the value of Ks is not used. illum = 2 denotes the presence of specular highlights, and so a specification for Ks is required. 
 
+    Texture
+        *map_ka = nullptr,
+        *map_kd = nullptr,
+        *map_ks = nullptr;
 
     // file variables
     std::stringstream ss;
@@ -42,7 +46,7 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
                 if( materialMap->count(name) )
                     delete (*materialMap)[name];
                 
-                materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular) );
+                materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, map_ka, map_kd, map_ks) );
             }
 
             // reset to default
@@ -52,6 +56,9 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
             ambient = glm::vec3(0.2f);
             diffuse = glm::vec3(0.8f);
             specular = glm::vec3(1.f);
+            map_ka = nullptr;
+            map_ks = nullptr;
+            map_kd = nullptr;
             ss >> name;
 
         }else if( prefix == "Ns" ){
@@ -71,6 +78,18 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
             ss >> diffuse.x >> diffuse.y >> diffuse.z;
         }else if(prefix == "Ks"){   // specular
             ss >> specular.x >> specular.y >> specular.z;
+        }else if(prefix == "map_Ka"){   // ambient mapping
+            // std::getline(ss, prefix);
+            ss >> prefix;
+            map_ka = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE0);
+        }else if(prefix == "map_Kd"){   // diffuse mapping
+            // std::getline(ss, prefix);
+            ss >> prefix;
+            map_kd = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE1);
+        }else if(prefix == "map_Ks"){   // specular mapping
+            // std::getline(ss, prefix);
+            ss >> prefix;
+            map_ks = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE2);
         }
 
     }
@@ -81,7 +100,7 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
         if( materialMap->count(name) )
             delete (*materialMap)[name];
         
-        materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular) );
+        materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, map_kd, map_ka, map_ks) );
     }
 
 }
