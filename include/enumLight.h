@@ -3,4 +3,4 @@ enum LIGHT_TYPE{
     DIR_LIGHT = 1
 };
 
-std::string lightNames[2] = {"Point Light ", "Directional Light "};
+std::string lightNames[2] = {"Point", "Directional"};

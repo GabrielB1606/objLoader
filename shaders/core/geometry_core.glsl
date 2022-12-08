@@ -10,10 +10,13 @@ struct Material{
     vec3 specular;
 };
 
-struct PointLight{
+struct Light{
+    int type;
+    
     vec3 position;
     float intensity;
     vec3 color;
+    
     float constant;
     float linear;
     float quadratic;
@@ -62,7 +65,8 @@ uniform int specularLighting;
 
     // context
 uniform Material material;
-uniform PointLight pointLight;
+uniform Light lights[3];
+uniform int n_lights;
 uniform vec3 camPosition;
 
 // output
@@ -103,14 +107,19 @@ void main(){
         vec3 diffuse_out = vec3(0);
         vec3 ambient_out = vec3(0);
 
-        if( ambientLighting != 0 )
-            ambient_out = calculateAmbient(material, pointLight.color, pointLight.intensity);
+        for(int i = 0; i<n_lights; i++){
 
-        if( diffuseLighting != 0 )
-            diffuse_out = calculateDiffuse(material, samplePosition, faceNormal, pointLight.position);
+            if( ambientLighting != 0 )
+                ambient_out += calculateAmbient(material, lights[i].color, lights[i].intensity);
 
-        if( specularLighting != 0 )
-            specular_out = calculateSpecular(material, samplePosition, faceNormal, pointLight.position, camPosition);
+            if( diffuseLighting != 0 )
+                diffuse_out += calculateDiffuse(material, samplePosition, faceNormal, lights[i].position);
+
+            if( specularLighting != 0 )
+                specular_out += calculateSpecular(material, samplePosition, faceNormal, lights[i].position, camPosition);
+
+        }
+
 
             // build vertices for the next step
         for(int i = 0; i<3; i++){

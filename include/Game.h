@@ -373,22 +373,23 @@ void Game::updateUniforms(){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
-    for( Light* &pl : this->lights ){
-        switch (pl->getType())
-        {
-        case POINT_LIGHT:
-            ((PointLight*)pl)->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
-            break;
-        
-        case DIR_LIGHT:
-            /* code */
-            break;
-        
-        default:
-            break;
-        }
+    for(size_t i = 0; i<lights.size(); i++ ){
+        switch ( lights[i]->getType()){
+            case POINT_LIGHT:
+                ((PointLight*)lights[i])->sendToShader( *this->shaders[SHADER_CORE_PROGRAM], i );
+                break;
             
+            case DIR_LIGHT:
+                /* code */
+                break;
+            
+            default:
+                break;
+        }
     }
+
+    this->shaders[SHADER_CORE_PROGRAM]->set1i( lights.size(), "n_lights" );
+
 }
 
 void Game::updateInput(){

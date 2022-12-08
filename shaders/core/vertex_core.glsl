@@ -12,10 +12,13 @@ struct Material{
     vec3 specular;
 };
 
-struct PointLight{
+struct Light{
+    int type;
+    
     vec3 position;
     float intensity;
     vec3 color;
+    
     float constant;
     float linear;
     float quadratic;
@@ -52,7 +55,8 @@ uniform mat4 ProjectionMatrix;
 
     // context
 uniform Material material;
-uniform PointLight pointLight;
+uniform Light lights[3];
+uniform int n_lights;
 uniform vec3 camPosition;
 
     // menu
@@ -80,27 +84,30 @@ void main(){
         // normal vertex shader stuff
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     data_out.normal = normalize( vec4(ModelMatrix * vec4(vertex_normal, 1.f)).xyz );
+    
     data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
+    data_out.color = vertex_color;
+
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);
+    
+    data_out.ambient = vec3(0.f);
+    data_out.diffuse = vec3(0.f);
+    data_out.specular = vec3(0.f);
     
         // if shading in this step
     if( gouraudShading != 0 ){
-
-        if( ambientLighting != 0 )
-            data_out.ambient = calculateAmbient(material, pointLight.color, pointLight.intensity);
-
-        if( diffuseLighting != 0 )
-            data_out.diffuse = calculateDiffuse(material, data_out.position, data_out.normal, pointLight.position);
         
-        if( specularLighting != 0 )
-            data_out.specular = calculateSpecular(material, data_out.position, data_out.normal, pointLight.position, camPosition);
+        for(int i = 0; i<n_lights; i++){
+            if( ambientLighting != 0 )
+                data_out.ambient += calculateAmbient(material, lights[i].color, lights[i].intensity);
 
-    }else{
-            // pass vertex color
-        data_out.color = vertex_color;
-        data_out.specular = vec3(0);
-        data_out.ambient = vec3(0);
-        data_out.diffuse = vec3(0);
+            if( diffuseLighting != 0 )
+                data_out.diffuse += calculateDiffuse(material, data_out.position, data_out.normal, lights[i].position);
+            
+            if( specularLighting != 0 )
+                data_out.specular += calculateSpecular(material, data_out.position, data_out.normal, lights[i].position, camPosition);
+        }
+
     }
 
 }

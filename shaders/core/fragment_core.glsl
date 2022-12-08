@@ -7,13 +7,13 @@ struct Material{
     vec3 specular;
 };
 
-struct PointLight{
+struct Light{
+    int type;
+    
     vec3 position;
-
     float intensity;
     vec3 color;
-
-    // attenuation
+    
     float constant;
     float linear;
     float quadratic;
@@ -55,7 +55,8 @@ in Vertex{
 
     // context
 uniform Material material;
-uniform PointLight pointLight;
+uniform Light lights[3];
+uniform int n_lights;
 uniform vec3 camPosition;
 
     // menu
@@ -87,25 +88,19 @@ void main(){
         // if shading in this step
     if( phongShading != 0 ){
 
+        for(int i = 0; i<n_lights; i++){
 
-        if( ambientLighting != 0 )
-            ambient = calculateAmbient(material, pointLight.color, pointLight.intensity);
-        if( diffuseLighting != 0 )
-            diffuse = calculateDiffuse(material, data_in.position, data_in.normal, pointLight.position);
-        if( specularLighting != 0 )
-            specular = calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
+            if( ambientLighting != 0 )
+                ambient += calculateAmbient(material, lights[i].color, lights[i].intensity);
+            if( diffuseLighting != 0 )
+                diffuse += calculateDiffuse(material, data_in.position, data_in.normal, lights[i].position);
+            if( specularLighting != 0 )
+                specular += calculateSpecular(material, data_in.position, data_in.normal, lights[i].position, camPosition);
 
-        // if( map_kd != -1 )
-            // fs_color = texture( map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
-        // else
-        //     fs_color = material.diffuse * vec4(lightsFinal, 1.f);
+        }
         
     }else{
 
-            // if I'm not shading in this step, then someone before me shaded and saved the light stuff in the color component 
-        // if( map_kd != -1 )
-        // else
-        //     fs_color = material.diffuse * vec4(data_in.color, 1.f);
         specular = data_in.specular;
         ambient = data_in.ambient;
         diffuse = data_in.diffuse;

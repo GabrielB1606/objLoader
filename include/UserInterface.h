@@ -154,6 +154,14 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
         }
 
         ImGui::Text("Lights");
+
+            if( ImGui::Button("Add Point Light") ){
+                lights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
+            }
+            ImGui::SameLine();
+            if( ImGui::Button("Add Directional Light") ){
+            }
+
             for (size_t i = 0; i < lights.size(); i++){
 
                 ImGuiTreeNodeFlags node_flags = base_flags;
@@ -161,17 +169,23 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                 if ( i == indexLightSelected )
                     node_flags |= ImGuiTreeNodeFlags_Selected;
 
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, lightNames[ lights[i]->getType() ].c_str() );
+                std::string lightLabel =  "Light " + std::to_string(i) + " (" + lightNames[ lights[i]->getType() ] + ")";
+
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, lightLabel.c_str() );
 
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
                     indexLightSelected = i;
                 }
 
                 if (node_open){
+                    ImGui::DragFloat("Intensity", (lights[i])->getIntensityReference() , 0.15f);
+                    ImGui::ColorEdit3("Light Color", (float*)(lights[i])->getColorReference()); // Edit 3 floats 
+                    
                     switch ( lights[i]->getType() )
                     {
                         case POINT_LIGHT:
-                            ImGui::DragFloat("Intensity", (lights[i])->getIntensityReference() , 0.15f);
+                            ImGui::DragFloat3("Light Position", (float*)((PointLight*)lights[i])->getPositionReference(), 0.1f);
+
                             ImGui::Text("Attenuation Coefficients"); 
                             ImGui::DragFloat("Constant", ((PointLight*)lights[i])->getConstantReference() , 0.015f);
                             ImGui::DragFloat("Linear", ((PointLight*)lights[i])->getLinearReference() , 0.015f);
@@ -186,18 +200,9 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                         default:
                             break;
                     }
-                    // for(size_t j = 0; j<models[i]->getMeshesReferences().size(); j++){
-                    //     node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
-                    //     if( j == *indexMeshSelected )
-                    //         node_flags |= ImGuiTreeNodeFlags_Selected;
-                    //     ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, models[i]->getMeshesReferences()[j]->getName().c_str() );
-
-                    //     if (ImGui::IsItemClicked() ){
-                    //         *indexModelSelected = i;
-                    //         *indexMeshSelected = j;
-                    //         objectSelected = models[i]->getMeshesReferences()[j];
-                    //     }
-                    // }
+                    if( ImGui::Button("Remove Light") ){
+                        lights.erase( lights.begin()+i );
+                    }
                     ImGui::TreePop();
                 }
 
