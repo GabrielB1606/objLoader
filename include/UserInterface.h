@@ -19,6 +19,8 @@ private:
     size_t* indexModelSelected;
     size_t* indexMeshSelected;
 
+    size_t indexLightSelected = -1;
+
     ImGuiStyle style;
 
     bool SameLine(){ ImGui::SameLine(); return false; }
@@ -27,7 +29,7 @@ public:
     UserInterface(GLFWwindow* window, const char* glsl_version, bool* state, glm::vec4* clear_color, glm::vec4* normals_color, size_t* indexModelSelected, size_t* indexMeshSelected);
     ~UserInterface();
 
-    void update( std::vector<Model*> &models, Moveable* &objectSelected);
+    void update( std::vector<Model*> &models, Moveable* &objectSelected, std::vector<Light*> &lights);
     void render();
 
     bool clickOutside();
@@ -38,7 +40,7 @@ bool UserInterface::clickOutside(){
     return !io.WantCaptureMouse;
 }
 
-void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelected ){
+void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelected, std::vector<Light*> &lights ){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -151,7 +153,57 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                 break;
         }
 
-        ImGui::Text("Attenuation Coefficients");               // Display some text (you can use a format strings too)
+        ImGui::Text("Lights");
+            for (size_t i = 0; i < lights.size(); i++){
+
+                ImGuiTreeNodeFlags node_flags = base_flags;
+                
+                if ( i == indexLightSelected )
+                    node_flags |= ImGuiTreeNodeFlags_Selected;
+
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, lightNames[ lights[i]->getType() ].c_str() );
+
+                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
+                    indexLightSelected = i;
+                }
+
+                if (node_open){
+                    switch ( lights[i]->getType() )
+                    {
+                        case POINT_LIGHT:
+                            ImGui::DragFloat("Intensity", (lights[i])->getIntensityReference() , 0.15f);
+                            ImGui::Text("Attenuation Coefficients"); 
+                            ImGui::DragFloat("Constant", ((PointLight*)lights[i])->getConstantReference() , 0.015f);
+                            ImGui::DragFloat("Linear", ((PointLight*)lights[i])->getLinearReference() , 0.015f);
+                            ImGui::DragFloat("Quadratic", ((PointLight*)lights[i])->getLinearReference() , 0.015f);
+                            break;
+                        
+                        case DIR_LIGHT:
+                            ImGui::Text("dir");
+                            /* code */
+                            break;
+                        
+                        default:
+                            break;
+                    }
+                    // for(size_t j = 0; j<models[i]->getMeshesReferences().size(); j++){
+                    //     node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
+                    //     if( j == *indexMeshSelected )
+                    //         node_flags |= ImGuiTreeNodeFlags_Selected;
+                    //     ImGui::TreeNodeEx((void*)(intptr_t)(j), node_flags, models[i]->getMeshesReferences()[j]->getName().c_str() );
+
+                    //     if (ImGui::IsItemClicked() ){
+                    //         *indexModelSelected = i;
+                    //         *indexMeshSelected = j;
+                    //         objectSelected = models[i]->getMeshesReferences()[j];
+                    //     }
+                    // }
+                    ImGui::TreePop();
+                }
+
+            }
+
+
         
         // ImGui::SliderFloat("a", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
         // SameLine();

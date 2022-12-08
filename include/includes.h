@@ -41,6 +41,7 @@
 
 size_t default_material_counter = 0;
 
+#include "enumLight.h"
 #include "enumTexture.h"
 #include "Moveable.h"
 #include "HashPair.h"

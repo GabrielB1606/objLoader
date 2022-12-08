@@ -96,7 +96,7 @@ private:
     std::vector<Model*> models;
 
     // Lights
-    std::vector<PointLight*> pointLights;
+    std::vector<Light*> lights;
     bool lightsOn = false;
 
     // callback functions
@@ -373,12 +373,22 @@ void Game::updateUniforms(){
         this->shaders[SHADER_NORMALS_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
     
     // update light
-    // if(lightsOn)
-    for( PointLight* &pl : this->pointLights ){
-        pl->sendToShader( *this->shaders[SHADER_PHONG_PROGRAM] );
-        pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+    for( Light* &pl : this->lights ){
+        switch (pl->getType())
+        {
+        case POINT_LIGHT:
+            ((PointLight*)pl)->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
+            break;
+        
+        case DIR_LIGHT:
+            /* code */
+            break;
+        
+        default:
+            break;
+        }
+            
     }
-    // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 void Game::updateInput(){
@@ -428,7 +438,7 @@ void Game::updateInputMouse(){
 
 
     if( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS ){
-        this->pointLights[0]->setPosition( this->camera.getPosition() );
+        // this->lights[0]->setPosition( this->camera.getPosition() );
     }
 
 }
@@ -512,14 +522,14 @@ void Game::initUniforms(){
     this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
     // if(lightsOn)
-    for( PointLight* &pl : this->pointLights )
+    for( Light* &pl : this->lights )
         pl->sendToShader( *this->shaders[SHADER_CORE_PROGRAM] );
     // this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "camPosition");
 }
 
 void Game::initPointLights(){
 
-    this->pointLights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
+    this->lights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
 
 }
 
@@ -582,7 +592,7 @@ void Game::render(){
         }
     }
     
-    gui->update( models, objectSelected );
+    gui->update( models, objectSelected, lights );
     gui->render();
 
     updateState();
@@ -794,8 +804,8 @@ Game::Game(const char* title, const int windowWIDTH, const int windowHEIGHT, con
 }
 
 Game::~Game(){
-    for(size_t i = 0; i<this->pointLights.size(); i++)
-        delete this->pointLights[i];
+    for(size_t i = 0; i<this->lights.size(); i++)
+        delete this->lights[i];
 
     for(size_t i = 0; i<this->shaders.size(); i++)
         delete this->shaders[i];
