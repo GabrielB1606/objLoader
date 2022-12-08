@@ -380,7 +380,7 @@ void Game::updateUniforms(){
                 break;
             
             case DIR_LIGHT:
-                /* code */
+                ((DirectionalLight*)lights[i])->sendToShader( *this->shaders[SHADER_CORE_PROGRAM], i );
                 break;
             
             default:

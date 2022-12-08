@@ -34,7 +34,7 @@ vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, Light light){
     if( light.type == 0 )
         lightDir = normalize( light.position - position );
     else if(light.type == 1)
-        lightDir = normalize( light.position );
+        lightDir = normalize( -light.position );
 
     float diffuse = max( dot(lightDir, normalize(normal)), 0.0 );
 
@@ -48,7 +48,7 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, ve
     if( light.type == 0 )
         lightToPosNorm = normalize( position -  light.position );
     else if( light.type == 1 ){
-        lightToPosNorm = normalize( -light.position );
+        lightToPosNorm = normalize( light.position );
     }
 
     vec3 posToViewNorm = normalize( camPosition - position );
