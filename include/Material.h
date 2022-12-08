@@ -129,20 +129,26 @@ void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
     switch (type){
     case GL_FILL:
         
-        if(map_ka != nullptr)
-            map_ka->sendToShader(&program);
-        else
-            program.set1i( -1, "material.map_ka" );
+        glActiveTexture(GL_TEXTURE0 + AMBIENT_MAP);
+        if(map_ka != nullptr){
+            program.set1i( AMBIENT_MAP , "map_ka" );
+            glBindTexture(GL_TEXTURE_2D, map_ka->getID());
+        }else
+            program.set1i( -1, "map_ka" );
         
-        if(map_kd != nullptr)
-            map_kd->sendToShader(&program);
-        else
-            program.set1i( -1, "material.map_kd" );
-        
-        if(map_ks != nullptr)
-            map_ks->sendToShader(&program);
-        else
-            program.set1i( -1, "material.map_ks" );
+        glActiveTexture(GL_TEXTURE0 + DIFFUSE_MAP);
+        if(map_kd != nullptr){
+            program.set1i( DIFFUSE_MAP, "map_kd" );
+            glBindTexture(GL_TEXTURE_2D, map_kd->getID());
+        }else
+            program.set1i( -1, "map_kd" );
+
+        glActiveTexture(GL_TEXTURE0 + SPECULAR_MAP);        
+        if(map_ks != nullptr){
+            program.set1i(  SPECULAR_MAP, "map_ks" );
+            glBindTexture(GL_TEXTURE_2D, map_ks->getID());
+        }else
+            program.set1i( -1, "map_ks" );
         
         program.setVec3f(this->fill, "material.diffuse");
         break;

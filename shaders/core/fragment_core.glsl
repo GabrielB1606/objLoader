@@ -5,9 +5,9 @@ struct Material{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-    sampler2D map_ka;
-    sampler2D map_kd;
-    sampler2D map_ks;
+    // sampler2D map_ka;
+    // sampler2D map_kd;
+    // sampler2D map_ks;
 };
 
 struct PointLight{
@@ -63,9 +63,9 @@ uniform int specularLighting;
 
     // textures
 // uniform sampler2D texture_map;
-// uniform sampler2D map_ka;
-// uniform sampler2D map_kd;
-// uniform sampler2D map_ks;
+uniform sampler2D map_ka;
+uniform sampler2D map_kd;
+uniform sampler2D map_ks;
 
 // output
 out vec4 fs_color;
@@ -85,7 +85,7 @@ void main(){
             lightsFinal += calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
 
         if( map_kd != -1 )
-            fs_color = texture(material.map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
+            fs_color = texture( map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
         else
             fs_color = material.diffuse * vec4(lightsFinal, 1.f);
         
@@ -93,7 +93,7 @@ void main(){
 
             // if I'm not shading in this step, then someone before me shaded and saved the light stuff in the color component 
         if( map_kd != -1 )
-            fs_color = texture(material.map_kd, data_in.texcoord) * vec4(data_in.color, 1.f);
+            fs_color = texture( map_ks, data_in.texcoord) * vec4(data_in.color, 1.f);
         else
             fs_color = material.diffuse * vec4(data_in.color, 1.f);
         

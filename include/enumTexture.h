@@ -1,7 +1,7 @@
 enum TEXTURE{
-    AMBIENT_MAP = 0,
-    DIFFUSE_MAP,
-    SPECULAR_MAP
+    DIFFUSE_MAP = 0,
+    SPECULAR_MAP,
+    AMBIENT_MAP
 };
 
-const std::string texture_names[3] = {"map_ka", "map_kd", "map_ks"};
+const std::string texture_names[3] = {"map_kd", "map_ks", "map_ka"};

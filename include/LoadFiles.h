@@ -81,15 +81,15 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
         }else if(prefix == "map_Ka"){   // ambient mapping
             // std::getline(ss, prefix);
             ss >> prefix;
-            map_ka = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE2);
+            // map_ka = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE0 + AMBIENT_MAP);
         }else if(prefix == "map_Kd"){   // diffuse mapping
             // std::getline(ss, prefix);
             ss >> prefix;
-            map_kd = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE0);
+            // map_kd = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE0 + DIFFUSE_MAP);
         }else if(prefix == "map_Ks"){   // specular mapping
             // std::getline(ss, prefix);
             ss >> prefix;
-            map_ks = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE1);
+            // map_ks = new Texture(prefix, GL_TEXTURE_2D, GL_TEXTURE0 + SPECULAR_MAP);
         }
 
     }

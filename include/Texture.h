@@ -1,7 +1,7 @@
 class Texture{
 private:
     
-    unsigned int texture;
+    GLuint texture;
     GLenum target;
     int width, height, nrChannels;
     GLuint texUnit;
@@ -13,27 +13,16 @@ public:
     void bind();
     void unbind();
 
+    GLuint getID() { return texture; }
+
     void sendToShader(Shader* program);
 };
 
 void Texture::sendToShader(Shader* program){
     glActiveTexture(texUnit);
     glBindTexture( this->target, this->texture );
-    switch (texUnit)
-    {
-        case GL_TEXTURE0:
-            program->set1i( 0, "material.map_ka" );
-            break;
-        case GL_TEXTURE1:
-            program->set1i( 1, "material.map_kd" );
-            break;
-        case GL_TEXTURE2:
-            program->set1i( 2, "material.map_ks" );
-            break;
-        default:
-            break;
-    }
-    // program.set1i( i, texture_names[i].c_str() );
+    GLuint i = texUnit - GL_TEXTURE0;
+    program->set1i( i , texture_names[i].c_str() );
 }
 
 void Texture::bind(){
@@ -50,7 +39,7 @@ Texture::Texture(std::string filename, GLenum target, GLuint texUnit){
     this->target = target;
     this->texUnit = texUnit;
 
-    glActiveTexture(texUnit); // activate the texture unit first before binding texture
+    // glActiveTexture(texUnit); // activate the texture unit first before binding texture
     glGenTextures(1, &this->texture);
     glBindTexture(this->target, this->texture);
     
