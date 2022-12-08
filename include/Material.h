@@ -12,11 +12,12 @@ private:
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+    float shininess = 20.f;
 
     Texture *map_kd, *map_ka, *map_ks;
 
 public:
-    Material(std::string name, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, Texture *map_ka, Texture *map_kd , Texture *map_ks);
+    Material(std::string name, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess, Texture *map_ka, Texture *map_kd , Texture *map_ks);
     virtual ~Material();
     void sendToShader(Shader& programID, GLenum type);
 
@@ -92,7 +93,7 @@ glm::vec3* Material::getEdgeColorReference(){
     return &edge;
 }
 
-Material::Material(std::string name, glm::vec3 ambient = glm::vec3(0.7f), glm::vec3 diffuse = glm::vec3(0.9f), glm::vec3 specular = glm::vec3(1.f), Texture *map_ka = nullptr, Texture *map_kd = nullptr, Texture *map_ks = nullptr){
+Material::Material(std::string name, glm::vec3 ambient = glm::vec3(0.7f), glm::vec3 diffuse = glm::vec3(0.9f), glm::vec3 specular = glm::vec3(1.f), float shininess = 20.f, Texture *map_ka = nullptr, Texture *map_kd = nullptr, Texture *map_ks = nullptr){
     this->name = name;
     this->fill = diffuse;
     this->vertex = glm::vec3(0.f, 1.f, 0.f);
@@ -103,6 +104,7 @@ Material::Material(std::string name, glm::vec3 ambient = glm::vec3(0.7f), glm::v
     this->map_ka = map_ka;
     this->map_kd = map_kd;
     this->map_ks = map_ks;
+    this->shininess = shininess;
 }
 
 Material::~Material(){
@@ -151,6 +153,7 @@ void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
             program.set1i( 0, "mapKsPresent" );
 
         program.setVec3f(this->fill, "material.diffuse");
+        program.set1f(this->shininess, "material.shininess");
         break;
     case GL_LINE:
         program.setVec3f(this->edge, "material.diffuse");

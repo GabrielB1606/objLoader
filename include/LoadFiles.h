@@ -46,7 +46,7 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
                 if( materialMap->count(name) )
                     delete (*materialMap)[name];
                 
-                materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, map_ka, map_kd, map_ks) );
+                materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, shininess, map_ka, map_kd, map_ks) );
             }
 
             // reset to default
@@ -59,6 +59,7 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
             map_ka = nullptr;
             map_ks = nullptr;
             map_kd = nullptr;
+            shininess = 20.f;
             ss >> name;
 
         }else if( prefix == "Ns" ){
@@ -100,7 +101,7 @@ void LoadMTL(std::string mtlFile, std::unordered_map<std::string, Material*> *ma
         if( materialMap->count(name) )
             delete (*materialMap)[name];
         
-        materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, map_ka, map_kd, map_ks) );
+        materialMap->insert_or_assign(name, new Material(name, ambient, diffuse, specular, shininess, map_ka, map_kd, map_ks) );
     }
 
 }

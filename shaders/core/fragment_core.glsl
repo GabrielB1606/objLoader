@@ -5,6 +5,7 @@ struct Material{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float shininess;
 };
 
 struct Light{
@@ -50,7 +51,7 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, ve
 
     vec3 posToViewNorm = normalize( camPosition - position );
     vec3 reflectNorm = normalize( reflect( lightToPosNorm, normalize(normal) ) );
-    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), 35 ); //35 must be the shininess of the mtl
+    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), mtl.shininess ); //35 must be the shininess of the mtl
 
     return mtl.specular * specularConstant;
 }
