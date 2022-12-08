@@ -66,13 +66,13 @@ void Material::assignTexture(unsigned int type, Texture* tex){
 void Material::assignTexture(unsigned int type, std::string filename){
     switch (type){
         case AMBIENT_MAP:
-            map_ka = new Texture(filename, GL_TEXTURE_2D, GL_TEXTURE0);
+            map_ka = new Texture(filename, GL_TEXTURE_2D);
             break;
         case DIFFUSE_MAP:
-            map_kd = new Texture(filename, GL_TEXTURE_2D, GL_TEXTURE1);
+            map_kd = new Texture(filename, GL_TEXTURE_2D);
             break;
         case SPECULAR_MAP:
-            map_ks = new Texture(filename, GL_TEXTURE_2D, GL_TEXTURE2);
+            map_ks = new Texture(filename, GL_TEXTURE_2D);
             break;
         
         default:
@@ -129,27 +129,21 @@ void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
     switch (type){
     case GL_FILL:
         
-        glActiveTexture(GL_TEXTURE0 + AMBIENT_MAP);
         if(map_ka != nullptr){
-            program.set1i( AMBIENT_MAP , "map_ka" );
-            glBindTexture(GL_TEXTURE_2D, map_ka->getID());
-        }else
-            program.set1i( -1, "map_ka" );
+            program.set1i( 0, "map_ka" );
+            map_ka->bind( AMBIENT_MAP );
+        }
         
-        glActiveTexture(GL_TEXTURE0 + DIFFUSE_MAP);
         if(map_kd != nullptr){
-            program.set1i( DIFFUSE_MAP, "map_kd" );
-            glBindTexture(GL_TEXTURE_2D, map_kd->getID());
-        }else
-            program.set1i( -1, "map_kd" );
+            program.set1i( 1, "map_kd" );
+            map_kd->bind( DIFFUSE_MAP );
+        }
 
-        glActiveTexture(GL_TEXTURE0 + SPECULAR_MAP);        
         if(map_ks != nullptr){
-            program.set1i(  SPECULAR_MAP, "map_ks" );
-            glBindTexture(GL_TEXTURE_2D, map_ks->getID());
-        }else
-            program.set1i( -1, "map_ks" );
-        
+            program.set1i( 2, "map_ks" );
+            map_ks->bind( SPECULAR_MAP );
+        }
+
         program.setVec3f(this->fill, "material.diffuse");
         break;
     case GL_LINE:

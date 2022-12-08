@@ -4,42 +4,35 @@ private:
     GLuint texture;
     GLenum target;
     int width, height, nrChannels;
-    GLuint texUnit;
 
 public:
-    Texture(std::string filename, GLenum target, GLuint texUnit);
+    Texture(std::string filename, GLenum target);
     ~Texture();
 
-    void bind();
+    void bind( const GLuint texUnit  );
     void unbind();
 
     GLuint getID() { return texture; }
 
-    void sendToShader(Shader* program);
 };
 
-void Texture::sendToShader(Shader* program){
-    glActiveTexture(texUnit);
-    glBindTexture( this->target, this->texture );
-    GLuint i = texUnit - GL_TEXTURE0;
-    program->set1i( i , texture_names[i].c_str() );
-}
-
-void Texture::bind(){
+void Texture::bind( const GLuint texUnit ){
+    glActiveTexture(GL_TEXTURE0 + texUnit);
     glBindTexture( this->target, this->texture );
 }
 
 void Texture::unbind(){
-    // glBindTexture( this->target, 0 );
-    // glActiveTexture(0);
+    glActiveTexture(0);
+    glBindTexture(this->target, 0);
 }
 
-Texture::Texture(std::string filename, GLenum target, GLuint texUnit){
+Texture::Texture(std::string filename, GLenum target){
 
     this->target = target;
-    this->texUnit = texUnit;
 
-    // glActiveTexture(texUnit); // activate the texture unit first before binding texture
+    // load image
+    unsigned char *data = stbi_load(filename.c_str() , &this->width, &this->height, &this->nrChannels, 0);
+    
     glGenTextures(1, &this->texture);
     glBindTexture(this->target, this->texture);
     
@@ -49,9 +42,8 @@ Texture::Texture(std::string filename, GLenum target, GLuint texUnit){
     glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    // load and generate the texture
+    // generate the texture
     
-    unsigned char *data = stbi_load(filename.c_str() , &this->width, &this->height, &this->nrChannels, 0);
     if (data){
 
         glTexImage2D(this->target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -61,8 +53,9 @@ Texture::Texture(std::string filename, GLenum target, GLuint texUnit){
         std::cout << "Failed to load texture" << std::endl;
     }
 
-    stbi_image_free(data);
+    glActiveTexture(0);
     glBindTexture(this->target, 0);
+    stbi_image_free(data);
 
 }
 

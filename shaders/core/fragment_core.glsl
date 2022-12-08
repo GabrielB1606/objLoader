@@ -84,18 +84,18 @@ void main(){
         if( specularLighting != 0 )
             lightsFinal += calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
 
-        if( map_kd != -1 )
+        // if( map_kd != -1 )
             fs_color = texture( map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
-        else
-            fs_color = material.diffuse * vec4(lightsFinal, 1.f);
+        // else
+        //     fs_color = material.diffuse * vec4(lightsFinal, 1.f);
         
     }else{
 
             // if I'm not shading in this step, then someone before me shaded and saved the light stuff in the color component 
-        if( map_kd != -1 )
-            fs_color = texture( map_ks, data_in.texcoord) * vec4(data_in.color, 1.f);
-        else
-            fs_color = material.diffuse * vec4(data_in.color, 1.f);
+        // if( map_kd != -1 )
+            fs_color = texture( map_ka, data_in.texcoord) * vec4(data_in.color, 1.f);
+        // else
+        //     fs_color = material.diffuse * vec4(data_in.color, 1.f);
         
     }
 
