@@ -131,18 +131,24 @@ void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
         
         if(map_ka != nullptr){
             program.set1i( AMBIENT_MAP, "map_ka" );
+            program.set1i( 1, "mapKaPresent" );
             map_ka->bind( AMBIENT_MAP );
-        }
+        }else
+            program.set1i( 0, "mapKaPresent" );
         
         if(map_kd != nullptr){
             program.set1i( DIFFUSE_MAP, "map_kd" );
+            program.set1i( 1, "mapKdPresent" );
             map_kd->bind( DIFFUSE_MAP );
-        }
+        }else
+            program.set1i( 0, "mapKdPresent" );
 
         if(map_ks != nullptr){
             program.set1i( SPECULAR_MAP, "map_ks" );
+            program.set1i( 1, "mapKsPresent" );
             map_ks->bind( SPECULAR_MAP );
-        }
+        }else
+            program.set1i( 0, "mapKsPresent" );
 
         program.setVec3f(this->fill, "material.diffuse");
         break;

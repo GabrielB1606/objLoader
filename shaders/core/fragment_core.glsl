@@ -60,9 +60,14 @@ uniform vec3 camPosition;
 
     // menu
 uniform int phongShading;
+
 uniform int ambientLighting;
 uniform int diffuseLighting;
 uniform int specularLighting;
+
+uniform int mapKaPresent;
+uniform int mapKsPresent;
+uniform int mapKdPresent;
 
     // textures
 // uniform sampler2D texture_map;
@@ -106,10 +111,19 @@ void main(){
         diffuse = data_in.diffuse;
     }
 
-    vec3 lightsFinal = specular+ambient+diffuse;
+    if( specularLighting + mapKsPresent > 0 )
+        specular *= texture( map_ks, data_in.texcoord).xyz ;
+
+    if( diffuseLighting + mapKdPresent > 0 )
+        diffuse *= texture( map_kd, data_in.texcoord).xyz;
+
+    if( ambientLighting + mapKaPresent > 0 )
+        ambient *= texture( map_ka, data_in.texcoord).xyz;    
+
+    vec3 lightsFinal = specular + ambient + diffuse;
 
     if(lightsFinal != vec3(0))
-        fs_color = texture( map_kd, data_in.texcoord) * vec4( specular+ambient+diffuse , 1.f);
+        fs_color = texture( map_kd, data_in.texcoord) * vec4( lightsFinal , 1.f);
     else
         fs_color = texture( map_kd, data_in.texcoord);
 
