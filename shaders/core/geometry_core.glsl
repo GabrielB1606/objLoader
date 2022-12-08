@@ -27,20 +27,33 @@ vec3 calculateAmbient(Material mtl, vec3 lightColor, float intensity){
     return mtl.ambient * lightColor * intensity;
 }
 
-vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, vec3 lightPos){
+vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, Light light){
     
-    vec3 lightDir = normalize( lightPos - position );
+    vec3 lightDir = vec3(0.f);
+
+    if( light.type == 0 )
+        lightDir = normalize( light.position - position );
+    else if(light.type == 1)
+        lightDir = normalize( light.position );
+
     float diffuse = max( dot(lightDir, normalize(normal)), 0.0 );
 
     return diffuse * mtl.diffuse;
 }
 
-vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, vec3 lightPos, vec3 camPosition){
-    
-    vec3 lightToPosNorm = normalize( position -  lightPos );
-    vec3 reflectNorm = normalize( reflect( lightToPosNorm, normalize(normal) ) );
+vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, vec3 camPosition){
+
+    vec3 lightToPosNorm = vec3(0.f);
+
+    if( light.type == 0 )
+        lightToPosNorm = normalize( position -  light.position );
+    else if( light.type == 1 ){
+        lightToPosNorm = normalize( -light.position );
+    }
+
     vec3 posToViewNorm = normalize( camPosition - position );
-    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), 35 );
+    vec3 reflectNorm = normalize( reflect( lightToPosNorm, normalize(normal) ) );
+    float specularConstant = pow( max( dot( posToViewNorm, reflectNorm ), 0 ), 35 ); //35 must be the shininess of the mtl
 
     return mtl.specular * specularConstant;
 }
@@ -113,10 +126,10 @@ void main(){
                 ambient_out += calculateAmbient(material, lights[i].color, lights[i].intensity);
 
             if( diffuseLighting != 0 )
-                diffuse_out += calculateDiffuse(material, samplePosition, faceNormal, lights[i].position);
+                diffuse_out += calculateDiffuse(material, samplePosition, faceNormal, lights[i]);
 
             if( specularLighting != 0 )
-                specular_out += calculateSpecular(material, samplePosition, faceNormal, lights[i].position, camPosition);
+                specular_out += calculateSpecular(material, samplePosition, faceNormal, lights[i], camPosition);
 
         }
 

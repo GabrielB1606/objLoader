@@ -1,6 +1,6 @@
 #pragma once
 
-class PointLight : public Light, public Moveable{
+class PointLight : public Light{
 protected:
     glm::vec3 position;
     float constant;
@@ -14,20 +14,12 @@ public:
     void sendToShader( Shader& program, GLuint i );
     void setPosition( glm::vec3 position );
 
-    void move(const glm::vec3 movement);
-    void rotate(const glm::vec3 rotation){}
-    void scaleUp(const glm::vec3 scale){};
-
     float* getConstantReference(){ return &this->constant; }
     float* getLinearReference(){ return &this->linear; }
     float* getQuadraticReference(){ return &this->quadratic; }
 
     glm::vec3* getPositionReference(){ return &this->position; }
 };
-
-void PointLight::move(const glm::vec3 movement){
-    position += movement;
-}
 
 void PointLight::setPosition(glm::vec3 position){
     this->position = position;
