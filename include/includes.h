@@ -57,6 +57,7 @@ size_t default_material_counter = 0;
 #include "PrimitivePyramid.h"
 #include "Light.h"
 #include "PointLight.h"
+#include "DirectionalLight.h"
 #include "Camera.h"
 
 #include "enumGuiEvent.h"

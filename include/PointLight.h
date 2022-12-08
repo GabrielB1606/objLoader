@@ -36,6 +36,7 @@ PointLight::~PointLight(){
 }
 
 void PointLight::sendToShader(Shader& program, GLuint i = 0){
+    program.set1i(POINT_LIGHT, std::string( "lights["+ std::to_string(i) +"].type" ).c_str());
     program.setVec3f(this->position, std::string( "lights["+ std::to_string(i) +"].position" ).c_str()  );
     program.set1f(this->intensity, std::string( "lights["+ std::to_string(i) +"].intensity" ).c_str());
     program.setVec3f(this->color, std::string( "lights["+ std::to_string(i) +"].color" ).c_str());
