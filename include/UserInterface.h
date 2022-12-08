@@ -156,10 +156,13 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
         ImGui::Text("Lights");
 
             if( ImGui::Button("Add Point Light") ){
-                lights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
+                if( lights.size() < 3 )
+                    lights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
             }
             ImGui::SameLine();
             if( ImGui::Button("Add Directional Light") ){
+                if( lights.size() < 3 )
+                    lights.push_back( new DirectionalLight( glm::vec3(0.f) ) );
             }
 
             for (size_t i = 0; i < lights.size(); i++){
@@ -193,8 +196,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                             break;
                         
                         case DIR_LIGHT:
-                            ImGui::Text("dir");
-                            /* code */
+                            ImGui::DragFloat3("Light Direction", (float*)((DirectionalLight*)lights[i])->getDirectionReference(), 0.1f);
                             break;
                         
                         default:

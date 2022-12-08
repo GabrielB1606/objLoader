@@ -30,6 +30,7 @@ PointLight::PointLight(glm::vec3 position, float intensity = 1.f, glm::vec3 colo
     this->constant = constant;
     this->linear = linear;
     this->quadratic = quadratic;
+    this->type = POINT_LIGHT;
 }
 
 PointLight::~PointLight(){

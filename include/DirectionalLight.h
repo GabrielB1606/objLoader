@@ -14,6 +14,7 @@ public:
 };
 
 DirectionalLight::DirectionalLight(glm::vec3 direction, float intensity = 1.f, glm::vec3 color = glm::vec3(1.f)): Light(intensity, color){
+    this->type = DIR_LIGHT;
     this->direction = direction;
 }
 
