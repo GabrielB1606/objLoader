@@ -55,6 +55,13 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, ve
     return mtl.specular * specularConstant;
 }
 
+float calculateAttenuation(Light light, vec3 position){
+
+    float dist = length( light.position - position );
+    return 1.f/ ( light.constant + (light.linear*dist) +  ( light.quadratic*dist*dist ) );
+
+}
+
 // input
 in Vertex{
     vec3 position;
@@ -94,23 +101,30 @@ out vec4 fs_color;
 
 void main(){
 
-    vec3 specular = vec3(0);
-    vec3 ambient = vec3(0);
-    vec3 diffuse = vec3(0);
+    vec3 specular = vec3(0.f);
+    vec3 ambient = vec3(0.f);
+    vec3 diffuse = vec3(0.f);
+
+    float attenuation = 0.f;
 
         // if shading in this step
     if( phongShading != 0 ){
 
         for(int i = 0; i<n_lights; i++){
+            
+            if( lights[i].type == 0 )
+                attenuation = calculateAttenuation(lights[i], data_in.position);
+            else
+                attenuation = 1.f;
 
             if( ambientLighting != 0 )
-                ambient += calculateAmbient(material, lights[i].color, lights[i].intensity);
-
+                ambient += calculateAmbient(material, lights[i].color, lights[i].intensity)*attenuation;
+            
             if( diffuseLighting != 0 )
-                diffuse += calculateDiffuse(material, data_in.position, data_in.normal, lights[i]);
+                diffuse += calculateDiffuse(material, data_in.position, data_in.normal, lights[i])*attenuation;
             
             if( specularLighting != 0 )
-                specular += calculateSpecular(material, data_in.position, data_in.normal, lights[i], camPosition);
+                specular += calculateSpecular(material, data_in.position, data_in.normal, lights[i], camPosition)*attenuation;
 
         }
         

@@ -60,6 +60,13 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, ve
     return mtl.specular * specularConstant;
 }
 
+float calculateAttenuation(Light light, vec3 position){
+
+    float dist = length( light.position - position );
+    return 1.f/ ( light.constant + (light.linear*dist) +  ( light.quadratic*dist*dist ) );
+
+}
+
 // input
     // world
 uniform mat4 ModelMatrix;
@@ -107,18 +114,26 @@ void main(){
     data_out.diffuse = vec3(0.f);
     data_out.specular = vec3(0.f);
     
+    float attenuation = 0.f;
+
         // if shading in this step
     if( gouraudShading != 0 ){
         
         for(int i = 0; i<n_lights; i++){
+
+            if( lights[i].type == 0 )
+                attenuation = calculateAttenuation(lights[i], data_out.position);
+            else
+                attenuation = 1.f;
+
             if( ambientLighting != 0 )
-                data_out.ambient += calculateAmbient(material, lights[i].color, lights[i].intensity);
+                data_out.ambient += calculateAmbient(material, lights[i].color, lights[i].intensity)*attenuation;
 
             if( diffuseLighting != 0 )
-                data_out.diffuse += calculateDiffuse(material, data_out.position, data_out.normal, lights[i]);
+                data_out.diffuse += calculateDiffuse(material, data_out.position, data_out.normal, lights[i])*attenuation;
             
             if( specularLighting != 0 )
-                data_out.specular += calculateSpecular(material, data_out.position, data_out.normal, lights[i], camPosition);
+                data_out.specular += calculateSpecular(material, data_out.position, data_out.normal, lights[i], camPosition)*attenuation;
         }
 
     }

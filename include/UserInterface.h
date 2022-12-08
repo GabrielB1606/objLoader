@@ -189,7 +189,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                             ImGui::Text("Attenuation Coefficients"); 
                             ImGui::DragFloat("Constant", ((PointLight*)lights[i])->getConstantReference() , 0.015f);
                             ImGui::DragFloat("Linear", ((PointLight*)lights[i])->getLinearReference() , 0.015f);
-                            ImGui::DragFloat("Quadratic", ((PointLight*)lights[i])->getLinearReference() , 0.015f);
+                            ImGui::DragFloat("Quadratic", ((PointLight*)lights[i])->getQuadraticReference() , 0.015f);
                             break;
                         
                         case DIR_LIGHT:
