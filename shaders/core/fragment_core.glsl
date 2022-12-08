@@ -48,6 +48,9 @@ in Vertex{
     vec3 normal;
     vec3 color;
     vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 } data_in;
 
     // context
@@ -72,20 +75,23 @@ out vec4 fs_color;
 
 void main(){
 
+    vec3 specular = vec3(0);
+    vec3 ambient = vec3(0);
+    vec3 diffuse = vec3(0);
+
         // if shading in this step
     if( phongShading != 0 ){
 
-        vec3 lightsFinal = vec3(0);
 
         if( ambientLighting != 0 )
-            lightsFinal += calculateAmbient(material, pointLight.color, pointLight.intensity);
+            ambient = calculateAmbient(material, pointLight.color, pointLight.intensity);
         if( diffuseLighting != 0 )
-            lightsFinal += calculateDiffuse(material, data_in.position, data_in.normal, pointLight.position);
+            diffuse = calculateDiffuse(material, data_in.position, data_in.normal, pointLight.position);
         if( specularLighting != 0 )
-            lightsFinal += calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
+            specular = calculateSpecular(material, data_in.position, data_in.normal, pointLight.position, camPosition);
 
         // if( map_kd != -1 )
-            fs_color = texture( map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
+            // fs_color = texture( map_kd, data_in.texcoord) * vec4(lightsFinal, 1.f);
         // else
         //     fs_color = material.diffuse * vec4(lightsFinal, 1.f);
         
@@ -93,11 +99,18 @@ void main(){
 
             // if I'm not shading in this step, then someone before me shaded and saved the light stuff in the color component 
         // if( map_kd != -1 )
-            fs_color = texture( map_ka, data_in.texcoord) * vec4(data_in.color, 1.f);
         // else
         //     fs_color = material.diffuse * vec4(data_in.color, 1.f);
-        
+        specular = data_in.specular;
+        ambient = data_in.ambient;
+        diffuse = data_in.diffuse;
     }
 
+    vec3 lightsFinal = specular+ambient+diffuse;
+
+    if(lightsFinal != vec3(0))
+        fs_color = texture( map_kd, data_in.texcoord) * vec4( specular+ambient+diffuse , 1.f);
+    else
+        fs_color = texture( map_kd, data_in.texcoord);
 
 }

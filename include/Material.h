@@ -130,17 +130,17 @@ void Material::sendToShader(Shader& program, GLenum type = GL_FILL){
     case GL_FILL:
         
         if(map_ka != nullptr){
-            program.set1i( 0, "map_ka" );
+            program.set1i( AMBIENT_MAP, "map_ka" );
             map_ka->bind( AMBIENT_MAP );
         }
         
         if(map_kd != nullptr){
-            program.set1i( 1, "map_kd" );
+            program.set1i( DIFFUSE_MAP, "map_kd" );
             map_kd->bind( DIFFUSE_MAP );
         }
 
         if(map_ks != nullptr){
-            program.set1i( 2, "map_ks" );
+            program.set1i( SPECULAR_MAP, "map_ks" );
             map_ks->bind( SPECULAR_MAP );
         }
 

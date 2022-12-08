@@ -69,6 +69,9 @@ out Vertex{
     vec3 normal;
     vec3 color;
     vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 } data_out;
 
 
@@ -83,20 +86,21 @@ void main(){
         // if shading in this step
     if( gouraudShading != 0 ){
 
-        data_out.color = vec3(0);   // use the color component to pass the light stuff
-
         if( ambientLighting != 0 )
-            data_out.color += calculateAmbient(material, pointLight.color, pointLight.intensity);
+            data_out.ambient = calculateAmbient(material, pointLight.color, pointLight.intensity);
 
         if( diffuseLighting != 0 )
-            data_out.color += calculateDiffuse(material, data_out.position, data_out.normal, pointLight.position);
+            data_out.diffuse = calculateDiffuse(material, data_out.position, data_out.normal, pointLight.position);
         
         if( specularLighting != 0 )
-            data_out.color += calculateSpecular(material, data_out.position, data_out.normal, pointLight.position, camPosition);
+            data_out.specular = calculateSpecular(material, data_out.position, data_out.normal, pointLight.position, camPosition);
 
     }else{
             // pass vertex color
         data_out.color = vertex_color;
+        data_out.specular = vec3(0);
+        data_out.ambient = vec3(0);
+        data_out.diffuse = vec3(0);
     }
 
 }

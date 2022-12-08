@@ -49,6 +49,9 @@ in Vertex{
     vec3 normal;
     vec3 color;
     vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 } data_in[];
 
     // menu (do i have to shade in this step?)
@@ -69,6 +72,9 @@ out Vertex{
     vec3 normal;
     vec3 color;
     vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 } data_out;
 
 
@@ -93,16 +99,18 @@ void main(){
             );
 
             // accumulate light stuff in color_out to pass it to the next step
-        vec3 color_out = vec3(0);
+        vec3 specular_out = vec3(0);
+        vec3 diffuse_out = vec3(0);
+        vec3 ambient_out = vec3(0);
 
         if( ambientLighting != 0 )
-            color_out += calculateAmbient(material, pointLight.color, pointLight.intensity);
+            ambient_out = calculateAmbient(material, pointLight.color, pointLight.intensity);
 
         if( diffuseLighting != 0 )
-            color_out += calculateDiffuse(material, samplePosition, faceNormal, pointLight.position);
+            diffuse_out = calculateDiffuse(material, samplePosition, faceNormal, pointLight.position);
 
         if( specularLighting != 0 )
-            color_out += calculateSpecular(material, samplePosition, faceNormal, pointLight.position, camPosition);
+            specular_out = calculateSpecular(material, samplePosition, faceNormal, pointLight.position, camPosition);
 
             // build vertices for the next step
         for(int i = 0; i<3; i++){
@@ -112,8 +120,11 @@ void main(){
             data_out.position = data_in[i].position;
             data_out.normal = data_in[i].normal;
             data_out.texcoord = data_in[i].texcoord;
+            data_out.color = data_in[i].color;
 
-            data_out.color = color_out;
+            data_out.specular = specular_out;
+            data_out.ambient = ambient_out;
+            data_out.diffuse = diffuse_out;
 
             EmitVertex();
 
@@ -132,6 +143,10 @@ void main(){
             data_out.normal = data_in[i].normal;
             data_out.color = data_in[i].color;
             data_out.texcoord = data_in[i].texcoord;
+
+            data_out.specular = data_in[i].specular;
+            data_out.ambient =  data_in[i].ambient;
+            data_out.diffuse =  data_in[i].diffuse;
 
             EmitVertex();
         }
