@@ -17,7 +17,7 @@ private:
     GLfloat lastFrame;
 
     // Movement Speed
-    GLfloat movementSpeed = 0.3f;
+    GLfloat movementSpeed = 0.75f;
 
     // Mouse Movement
     double lastMouseX, lastMouseY;
@@ -467,7 +467,7 @@ void Game::initUniforms(){
 
 void Game::initPointLights(){
 
-    this->lights.push_back( new PointLight( glm::vec3(0.f, 0.f, 2.f) ) );
+    this->lights.push_back( new DirectionalLight( glm::vec3(0.f, 0.f, 2.f) ) );
 
 }
 
