@@ -267,8 +267,65 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
             else
                 selected = models[*indexModelSelected];
 
-            if( *indexMeshSelected != -1 && state[SPECULAR] )
-                ImGui::DragFloat( "Shininess", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getShininessReference() );
+            if( *indexMeshSelected != -1 ){
+                if(  state[SPECULAR] ){
+                    ImGui::DragFloat( "Shininess", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getShininessReference() );
+                }
+                ImGui::Text("Load Texture Maps");
+                if( ImGui::Button("Ambient Map") ){
+                    char const * lFilterPatterns[3] = { "*.jpg", "*.jpeg", "*.png" };
+                    char* filePath = tinyfd_openFileDialog(
+                        "Import Texture File",
+                        "",
+                        3,
+                        lFilterPatterns,
+                        NULL,
+                        0
+                    );
+                    
+                    if( filePath == NULL )
+                        return;
+                    
+                    models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(AMBIENT_MAP, std::string(filePath) );
+
+                }
+                SameLine();
+                if( ImGui::Button("Diffuse Map") ){
+                    char const * lFilterPatterns[3] = { "*.jpg", "*.jpeg", "*.png" };
+                    char* filePath = tinyfd_openFileDialog(
+                        "Import Texture File",
+                        "",
+                        3,
+                        lFilterPatterns,
+                        NULL,
+                        0
+                    );
+                    
+                    if( filePath == NULL )
+                        return;
+                    
+                    models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(DIFFUSE_MAP, std::string(filePath) );
+
+                }
+                SameLine();
+                if( ImGui::Button("Specular Map") ){
+                    char const * lFilterPatterns[3] = { "*.jpg", "*.jpeg", "*.png" };
+                    char* filePath = tinyfd_openFileDialog(
+                        "Import Texture File",
+                        "",
+                        3,
+                        lFilterPatterns,
+                        NULL,
+                        0
+                    );
+                    
+                    if( filePath == NULL )
+                        return;
+                    
+                    models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(SPECULAR, std::string(filePath) );
+
+                }
+            }
 
             ImGui::Text("Scale ");
             ImGui::SameLine();

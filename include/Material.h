@@ -68,12 +68,18 @@ void Material::assignTexture(unsigned int type, Texture* tex){
 void Material::assignTexture(unsigned int type, std::string filename){
     switch (type){
         case AMBIENT_MAP:
+            if(map_ka != nullptr)
+                delete map_ka;
             map_ka = new Texture(filename, GL_TEXTURE_2D);
             break;
         case DIFFUSE_MAP:
+            if(map_kd != nullptr)
+                delete map_kd;
             map_kd = new Texture(filename, GL_TEXTURE_2D);
             break;
         case SPECULAR_MAP:
+            if(map_ks != nullptr)
+                delete map_ks;
             map_ks = new Texture(filename, GL_TEXTURE_2D);
             break;
         

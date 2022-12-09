@@ -154,69 +154,6 @@ public:
 };
 
 void Game::initTextures(){
-    
-    // glActiveTexture(GL_TEXTURE0);
-    // Texture tex("../../obj/crate_1.jpg", GL_TEXTURE_2D, GL_TEXTURE0);
-    // tex.bind();
-    // glActiveTexture(GL_TEXTURE0);
-    // shaders[SHADER_CORE_PROGRAM]->set1i( 0, "material.map_kd" );
-
-    // glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
-    // unsigned int texture;
-    // glGenTextures(1, &texture);
-    // glBindTexture(GL_TEXTURE_2D, texture);
-    
-    // // set the texture wrapping/filtering options (on the currently bound texture object)
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    // // load and generate the texture
-    // int width, height, nrChannels;
-    // unsigned char *data = stbi_load("../../obj/crate_1.jpg", &width, &height, &nrChannels, 0);
-    // if (data){
-
-    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    //     glGenerateMipmap(GL_TEXTURE_2D);
-    
-    // }else{
-    //     std::cout << "Failed to load texture" << std::endl;
-    // }
-
-    // stbi_image_free(data);
-
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, texture);
-    // shaders[SHADER_CORE_PROGRAM]->set1i(0, "map_kd");
-
-    // glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture
-    // unsigned int texture2;
-    // glGenTextures(1, &texture2);
-    // glBindTexture(GL_TEXTURE_2D, texture2);
-    
-    // // set the texture wrapping/filtering options (on the currently bound texture object)
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    // // load and generate the texture
-    // data = stbi_load("../../obj/container2.jpg", &width, &height, &nrChannels, 0);
-    // if (data){
-
-    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    //     glGenerateMipmap(GL_TEXTURE_2D);
-    
-    // }else{
-    //     std::cout << "Failed to load texture" << std::endl;
-    // }
-
-    // stbi_image_free(data);
-
-    // glActiveTexture(GL_TEXTURE1);
-    // glBindTexture(GL_TEXTURE_2D, texture2);
-    // shaders[SHADER_CORE_PROGRAM]->set1i(1, "map_ks");
 
 }
 
