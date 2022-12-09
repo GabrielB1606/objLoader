@@ -5,6 +5,8 @@ layout (location = 1) in vec3 vertex_color;
 layout (location = 2) in vec2 vertex_texcoord;
 layout (location = 3) in vec3 vertex_normal;
 
+#define M_PI 3.1415926535897932384626433832795
+
 // structs
 struct Material{
     vec3 ambient;
@@ -79,7 +81,9 @@ uniform Material material;
 uniform Light lights[3];
 uniform int n_lights;
 uniform vec3 camPosition;
+
 uniform float normalFactor;
+uniform int texCoordGen;
 
     // menu
 uniform int gouraudShading;
@@ -107,8 +111,15 @@ void main(){
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     data_out.normal = normalize( vec4(ModelMatrix * vec4(vertex_normal, 1.f)).xyz );
     
-    // data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
-    data_out.texcoord = vec2( (normalFactor+vertex_position.x)/(2.f*normalFactor), (normalFactor+vertex_position.y)/(2.f*normalFactor)* -1.f );
+    if( texCoordGen == 0 )
+        data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
+    else if( texCoordGen == 1 )
+        data_out.texcoord = vec2( (normalFactor+vertex_position.x)/(2.f*normalFactor), (normalFactor+vertex_position.y)/(2.f*normalFactor) );
+    else if( texCoordGen == 2 ){
+        vec3 normal = normalize( vertex_normal );
+        data_out.texcoord.x = atan( normal.x, normal.z )/(2*M_PI) + 0.5;
+        data_out.texcoord.x = asin(normal.y)/(M_PI) + 0.5;
+    }
     
     data_out.color = vertex_color;
 

@@ -27,6 +27,7 @@ private:
     glm::mat4 ModelMatrix;
     Material* material;
 
+    int texCoordGen = 0;
 
 public:
 
@@ -57,6 +58,8 @@ public:
     void setRotation(const glm::vec3 rotation);
     void setScale(const glm::vec3 scale);
     void setOrigin(const glm::vec3 origin);
+
+    int* getTexCoordGenReference(){ return &this->texCoordGen; }
 
     std::string getName();
     Material* getMaterialReference();
@@ -231,6 +234,7 @@ void Mesh::updateModelMatrix(){
 void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
     shader->set1f(this->normalFactor, "normalFactor");
+    shader->set1i( this->texCoordGen, "texCoordGen" );
 }
 
 void Mesh::renderPicking(Shader* shader){

@@ -210,14 +210,6 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
 
             }
 
-
-        
-        // ImGui::SliderFloat("a", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
-        // SameLine();
-        // ImGui::SliderFloat("b", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
-        // SameLine();
-        // ImGui::SliderFloat("c", models[*indexModelSelected]->getVertexSizeReference(), 0.0f, 10.0f);
-
         // SHOW
         ImGui::Separator();
         ImGui::Text("Show");               // Display some text (you can use a format strings too)
@@ -325,7 +317,12 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(SPECULAR, std::string(filePath) );
 
                 }
+                
+                const char* itemsTexGenCombo[] = { "None", "Plane", "Spherical"};
+                ImGui::Combo("Texture Coordinates Generation", models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getTexCoordGenReference(), itemsTexGenCombo, IM_ARRAYSIZE(itemsTexGenCombo));
+
             }
+
 
             ImGui::Text("Scale ");
             ImGui::SameLine();
