@@ -263,6 +263,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                 if(  state[SPECULAR] ){
                     ImGui::DragFloat( "Shininess", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getShininessReference() );
                 }
+                ImGui::Checkbox( "Use Texture", models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getUseTextureReference() );
                 ImGui::Text("Load Texture Maps");
                 if( ImGui::Button("Ambient Map") ){
                     char const * lFilterPatterns[3] = { "*.jpg", "*.jpeg", "*.png" };

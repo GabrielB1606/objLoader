@@ -28,6 +28,7 @@ private:
     Material* material;
 
     int texCoordGen = 0;
+    bool useTexture = false;
 
 public:
 
@@ -60,6 +61,7 @@ public:
     void setOrigin(const glm::vec3 origin);
 
     int* getTexCoordGenReference(){ return &this->texCoordGen; }
+    bool* getUseTextureReference(){ return &this->useTexture; }
 
     std::string getName();
     Material* getMaterialReference();
@@ -235,6 +237,7 @@ void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
     shader->set1f(this->normalFactor, "normalFactor");
     shader->set1i( this->texCoordGen, "texCoordGen" );
+    shader->set1i( this->useTexture? 1:0, "useTexture" );
 }
 
 void Mesh::renderPicking(Shader* shader){

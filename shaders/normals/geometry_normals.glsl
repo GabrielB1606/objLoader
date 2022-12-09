@@ -3,17 +3,25 @@
 layout (triangles) in;
 layout (line_strip, max_vertices = 6) out;
 
-out vec3 vs_position;
-out vec3 vs_color;
-out vec2 vs_texcoord;
-out vec3 vs_normal;
-
-in DATA{
+in Vertex{
     vec3 position;
     vec3 normal;
     vec3 color;
     vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 } data_in[];
+
+out Vertex{
+    vec3 position;
+    vec3 normal;
+    vec3 color;
+    vec2 texcoord;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+} data_out;
 
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
