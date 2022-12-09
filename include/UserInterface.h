@@ -174,13 +174,13 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
 
                 std::string lightLabel =  "Light " + std::to_string(i) + " (" + lightNames[ lights[i]->getType() ] + ")";
 
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, lightLabel.c_str() );
+                bool node_open_light = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, lightLabel.c_str() );
 
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
                     indexLightSelected = i;
                 }
 
-                if (node_open){
+                if (node_open_light){
                     ImGui::DragFloat("Intensity", (lights[i])->getIntensityReference() , 0.15f);
                     ImGui::ColorEdit3("Light Color", (float*)(lights[i])->getColorReference()); // Edit 3 floats 
                     
@@ -267,6 +267,9 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
             else
                 selected = models[*indexModelSelected];
 
+            if( *indexMeshSelected != -1 && state[SPECULAR] )
+                ImGui::DragFloat( "Shininess", (float*)models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->getShininessReference() );
+
             ImGui::Text("Scale ");
             ImGui::SameLine();
             if( ImGui::Button("-") )
@@ -312,7 +315,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                 if ( i == *indexModelSelected )
                     node_flags |= ImGuiTreeNodeFlags_Selected;
 
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, models[i]->getName().c_str() );
+                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)(i+3), node_flags, models[i]->getName().c_str() );
 
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()){
                     *indexModelSelected = i;

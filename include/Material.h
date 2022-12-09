@@ -24,6 +24,7 @@ public:
     glm::vec3* getFillColorReference();
     glm::vec3* getVertexColorReference();
     glm::vec3* getEdgeColorReference();
+    float* getShininessReference(){ return &this->shininess; }
 
     std::string getName();
 
