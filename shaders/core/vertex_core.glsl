@@ -18,6 +18,7 @@ struct Material{
 struct Light{
     int type;
     
+    vec3 direction;
     vec3 position;
     float intensity;
     vec3 color;
@@ -39,7 +40,7 @@ vec3 calculateDiffuse(Material mtl, vec3 position, vec3 normal, Light light){
     if( light.type == 0 )
         lightDir = normalize( light.position - position );
     else if(light.type == 1)
-        lightDir = normalize( -light.position );
+        lightDir = normalize( light.direction );
 
     float diffuse = max( dot(lightDir, normalize(normal)), 0.0 );
 
@@ -52,9 +53,8 @@ vec3 calculateSpecular(Material mtl, vec3 position, vec3 normal, Light light, ve
 
     if( light.type == 0 )
         lightToPosNorm = normalize( position -  light.position );
-    else if( light.type == 1 ){
-        lightToPosNorm = normalize( light.position );
-    }
+    else if( light.type == 1 )
+        lightToPosNorm = normalize( -light.direction );
 
     vec3 posToViewNorm = normalize( camPosition - position );
     vec3 reflectNorm = normalize( reflect( lightToPosNorm, normalize(normal) ) );

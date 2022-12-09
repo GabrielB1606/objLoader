@@ -162,7 +162,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
             ImGui::SameLine();
             if( ImGui::Button("Add Directional Light") ){
                 if( lights.size() < 3 )
-                    lights.push_back( new DirectionalLight( glm::vec3(0.f, 3.14f, -14.0f) ) );
+                    lights.push_back( new DirectionalLight( glm::vec3(0.f, 0.f, 0.f) ) );
             }
 
             for (size_t i = 0; i < lights.size(); i++){

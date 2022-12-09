@@ -24,7 +24,7 @@ DirectionalLight::~DirectionalLight(){
 void DirectionalLight::sendToShader(Shader& program, GLuint i = 0){
     program.set1i(DIR_LIGHT, std::string( "lights["+ std::to_string(i) +"].type" ).c_str());
 
-    program.setVec3f(this->direction, std::string( "lights["+ std::to_string(i) +"].position" ).c_str()  );
+    program.setVec3f(this->direction, std::string( "lights["+ std::to_string(i) +"].direction" ).c_str()  );
     program.set1f(this->intensity, std::string( "lights["+ std::to_string(i) +"].intensity" ).c_str());
     program.setVec3f(this->color, std::string( "lights["+ std::to_string(i) +"].color" ).c_str());
 }
