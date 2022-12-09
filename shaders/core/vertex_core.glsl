@@ -118,7 +118,7 @@ void main(){
     else if( texCoordGen == 2 ){
         vec3 normal = normalize( vertex_normal );
         data_out.texcoord.x = atan( normal.x, normal.z )/(2*M_PI) + 0.5;
-        data_out.texcoord.x = asin(normal.y)/(M_PI) + 0.5;
+        data_out.texcoord.y = asin(normal.y)/(M_PI) + 0.5;
     }
     
     data_out.color = vertex_color;
