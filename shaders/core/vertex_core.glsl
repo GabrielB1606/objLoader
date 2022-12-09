@@ -108,7 +108,7 @@ void main(){
     data_out.normal = normalize( vec4(ModelMatrix * vec4(vertex_normal, 1.f)).xyz );
     
     // data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
-    data_out.texcoord = vec2( vertex_position.x/normalFactor, vertex_position.y/normalFactor* -1.f );
+    data_out.texcoord = vec2( (normalFactor+vertex_position.x)/(2.f*normalFactor), (normalFactor+vertex_position.y)/(2.f*normalFactor)* -1.f );
     
     data_out.color = vertex_color;
 
