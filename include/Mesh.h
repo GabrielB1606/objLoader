@@ -22,6 +22,7 @@ private:
     glm::mat4 rotationMatrix = glm::mat4(1.f);
     glm::vec3 scale;
     glm::vec3 origin;
+    float normalFactor = 0.f;
 
     glm::mat4 ModelMatrix;
     Material* material;
@@ -38,7 +39,7 @@ public:
     
 
     virtual ~Mesh();
-    
+    void rebindVBO();
     void update();
     void render(Shader* shader, bool showFill, bool showEdges, bool showVertices, float vertexSize);
     void renderPicking(Shader* shader);
@@ -99,6 +100,7 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
 
     std::pair<GLuint, GLuint> key;
 
+    this->normalFactor = 0.f;
 
     for( size_t i = 0; i<positionIndex.size(); i++ ){
 
@@ -120,6 +122,14 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
                     glm::vec3(0.7f),
                     glm::vec2(0.f),
                     normalVertex[ normalIndex[i]-1 ]
+                )
+            );
+
+            normalFactor = std::max(
+                normalFactor, std::max(
+                    std::abs(positionVertex[ positionIndex[i]-1 ].x), std::max(
+                        std::abs(positionVertex[ positionIndex[i]-1 ].y), std::abs(positionVertex[ positionIndex[i]-1 ].z) 
+                    )
                 )
             );
 
@@ -155,6 +165,7 @@ Mesh::Mesh(std::string name, std::vector<glm::vec3> &positionVertex, std::vector
 
 Mesh::Mesh(const Mesh &obj){
 
+    this->normalFactor = obj.normalFactor;
     this->name = obj.name;
     this->material = obj.material;
     this->renderType = obj.renderType;
@@ -219,6 +230,7 @@ void Mesh::updateModelMatrix(){
 
 void Mesh::updateUniforms(Shader* shader){
     shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
+    shader->set1f(this->normalFactor, "normalFactor");
 }
 
 void Mesh::renderPicking(Shader* shader){
@@ -374,6 +386,11 @@ Mesh::~Mesh(){
     delete this->vertexArray;
     delete this->indexArray;
 
+}
+
+void Mesh::rebindVBO(){
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices*sizeof(Vertex), this->vertexArray, GL_STATIC_DRAW); // could be dynamic draw
 }
 
 void Mesh::initVAO(){

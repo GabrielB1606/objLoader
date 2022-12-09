@@ -79,6 +79,7 @@ uniform Material material;
 uniform Light lights[3];
 uniform int n_lights;
 uniform vec3 camPosition;
+uniform float normalFactor;
 
     // menu
 uniform int gouraudShading;
@@ -106,7 +107,9 @@ void main(){
     data_out.position =  vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;
     data_out.normal = normalize( vec4(ModelMatrix * vec4(vertex_normal, 1.f)).xyz );
     
-    data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
+    // data_out.texcoord = vec2( vertex_texcoord.x, vertex_texcoord.y* -1.f );
+    data_out.texcoord = vec2( vertex_position.x/normalFactor, vertex_position.y/normalFactor* -1.f );
+    
     data_out.color = vertex_color;
 
     gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);
