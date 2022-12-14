@@ -315,7 +315,7 @@ void UserInterface::update( std::vector<Model*> &models, Moveable* &objectSelect
                     if( filePath == NULL )
                         return;
                     
-                    models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(SPECULAR, std::string(filePath) );
+                    models[*indexModelSelected]->getMeshesReferences()[*indexMeshSelected]->getMaterialReference()->assignTexture(SPECULAR_MAP, std::string(filePath) );
 
                 }
                 
