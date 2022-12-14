@@ -139,13 +139,13 @@ void main(){
     }
 
     if(useTexture > 0){
-        if( specularLighting + mapKsPresent >= 2 )
+        if( mapKsPresent >= 1 )
             specular *= texture( map_ks, data_in.texcoord).xyz ;
 
-        if( diffuseLighting + mapKdPresent >= 2 )
+        if( mapKdPresent >= 1 )
             diffuse *= texture( map_kd, data_in.texcoord).xyz;
 
-        if( ambientLighting + mapKaPresent >= 2 )
+        if( mapKaPresent >= 1 )
             ambient *= texture( map_ka, data_in.texcoord).xyz;
     }
 

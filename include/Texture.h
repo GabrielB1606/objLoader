@@ -46,7 +46,11 @@ Texture::Texture(std::string filename, GLenum target){
     
     if (data){
 
-        glTexImage2D(this->target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        if( filename.find(".png") != std::string::npos )
+            glTexImage2D(this->target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        else
+            glTexImage2D(this->target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        
         glGenerateMipmap(this->target);
     
     }else{

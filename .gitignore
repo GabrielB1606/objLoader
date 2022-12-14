@@ -45,3 +45,6 @@ _deps
 
 build/
 .vscode/
+
+*.jpg
+*.png
