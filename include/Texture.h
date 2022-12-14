@@ -17,8 +17,10 @@ public:
 };
 
 void Texture::bind( const GLuint texUnit ){
-    glActiveTexture(GL_TEXTURE0 + texUnit);
-    glBindTexture( this->target, this->texture );
+    if( this->texture != 0 ){
+        glActiveTexture(GL_TEXTURE0 + texUnit);
+        glBindTexture( this->target, this->texture );
+    }
 }
 
 void Texture::unbind(){

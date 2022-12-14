@@ -270,8 +270,8 @@ void Game::initUserInterface(){
 
 void Game::initModels(){
 
-    std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Crate1.obj", &this->materialMap);
-    this->models.push_back( modelsLoaded[0] );
+    // std::vector<Model*> modelsLoaded = LoadOBJ("../../obj/Crate1.obj", &this->materialMap);
+    // this->models.push_back( modelsLoaded[0] );
 
 }
 
